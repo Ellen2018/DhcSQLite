@@ -1,0 +1,2 @@
+include ':app', ':dhcsqlite2', ':dhcsqlitelibrary'
+rootProject.name='DhcSQLite'
