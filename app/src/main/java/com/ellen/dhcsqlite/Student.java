@@ -14,6 +14,8 @@ public class Student {
     @Ignore
     private String ingoreString;
     private boolean isMan;
+    @Ignore
+    private Father father;
 
     public Student(String name, int age, String phoneNumber, String address) {
         this.name = name;
@@ -52,5 +54,27 @@ public class Student {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Father getFather() {
+        return father;
+    }
+
+    public void setFather(Father father) {
+        this.father = father;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address + '\'' +
+                ", ingoreString='" + ingoreString + '\'' +
+                ", isMan=" + isMan +
+                ", father=" + father +
+                '}';
     }
 }
