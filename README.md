@@ -5,7 +5,9 @@
 
 ## 2.如何使用？
 
-&emsp;&emsp;步骤一：新建一个类去继承ZxyLibrary
+&emsp;&emsp;用法很简单详细步骤如下：
+
+&emsp;&emsp;步骤一：新建一个类去继承ZxyLibrary,首先需要一个Library对象，你必须继承ZxyLibrary，并且重写哪些该重写的方法，至于这些方法有什么用,请看注释
 
     public class SQliteLibrary extends ZxyLibrary {
 
@@ -48,5 +50,111 @@
         @Override
         public void onZxySQLiteUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+        }
+    }
+
+&emsp;&emsp;选择好需要和数据库进行绑定的类，例如我要绑定的是Student类，那么我就需要创建一个StudentTable的类并让它继承ZxyReflectionTable<Student>,代码如下所示：
+
+    public class StudentTable extends ZxyReflectionTable<Student> {
+
+        public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass) {
+            super(db, dataClass);
+        }
+
+        public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, String autoTableName) {
+            super(db, dataClass, autoTableName);
+        }
+    
+        /**
+         * 设置属性对应的数据库字段的类型
+         * @param classFieldName
+         * @param typeClass
+         * @return
+         */
+        @Override
+        protected SQLFieldType getSQLFieldType(String classFieldName, Class typeClass) {
+            if(classFieldName.equals("isMan")){
+                //将isMan的boolean映射为Integer类型，且长度为1位
+                return new SQLFieldType(SQLFieldTypeEnum.INTEGER,1);
+            }else {
+                return new SQLFieldType(getSQlStringType(typeClass), null);
+            }
+        }
+
+        /**
+         *  设置数据库中对应的属性名
+         */
+        @Override
+        protected String getSQLFieldName(String classFieldName, Class typeClass) {
+            return classFieldName;
+        }
+
+        /**
+         * boolean类型值转化为数据库中的存储
+         * @param classFieldName
+         * @param value
+         * @return
+         */
+        @Override
+        protected Object setBooleanValue(String classFieldName, boolean value) {
+            if(value){
+                return 0;
+            }else {
+                return 1;
+            }
+        }
+
+        /**
+         *  检测发现目标类中不可转换类型的属性类型映射为数据库中存储的字段类型
+         *  例如:Father --> TEXT
+         * @param classFieldName 类属性名字
+         * @param typeClass 类属性的类型
+         * @return 返回存储在数据库的类型
+         */
+        @Override
+        protected SQLFieldType conversionSQLiteType(String classFieldName, Class typeClass) {
+            //将Java类中的Father类型的father字段映射为数据库中的TEXT类型
+            if(classFieldName.equals("father")){
+                return new SQLFieldType(SQLFieldTypeEnum.TEXT,null);
+            }
+            return null;
+        }
+
+        /**
+         * 将目标类对象的非转换类型的属性值映射为数据库中存储的值,与conversionSQLiteType方法配合使用
+         * @param student
+         * @param classFieldName
+         * @param typeClass
+         * @param <E>
+         * @return
+         */
+        @Override
+        protected <E> E setConversionValue(Student student, String classFieldName, Class typeClass) {
+            if(classFieldName.equals("father")){
+                Gson gson = new Gson();
+                String jsonFather = gson.toJson(student.getFather());
+                return (E) jsonFather;
+            }
+            return null;
+        }
+
+        /**
+         *  将数据库中相应的非转换类型存储的值映射为相应的类型值
+         *  例如： TEXT -> Father
+         * @param value
+         * @param classFieldName
+         * @param typeClass
+         * @param <E>
+         * @return
+         */
+        @Override
+        protected <E> E resumeConversionObject(Object value, String classFieldName, Class typeClass) {
+            if(classFieldName.equals("father")){
+                String json = (String) value;
+                Gson gson = new Gson();
+                Father father = gson.fromJson(json,Father.class);
+                return (E) father;
+            }
+            return null;
         }
     }
