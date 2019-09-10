@@ -1,11 +1,9 @@
 package com.ellen.dhcsqlite;
 
 import com.ellen.dhcsqlitelibrary.table.reflection.Ignore;
-import com.ellen.dhcsqlitelibrary.table.reflection.Primarykey;
 
 public class Student {
 
-    @Primarykey
     private int id;
     private String name;
     private int age;
@@ -14,7 +12,6 @@ public class Student {
     @Ignore
     private String ingoreString;
     private boolean isMan;
-    @Ignore
     private Father father;
 
     public Student(String name, int age, String phoneNumber, String address) {

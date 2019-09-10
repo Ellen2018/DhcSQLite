@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
+import com.ellen.sqlitecreate.createsql.order.Order;
 import com.ellen.sqlitecreate.createsql.where.Where;
 import com.ellen.sqlitecreate.createsql.where.WhereIn;
 
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         SQliteLibrary sQliteLibrary = new SQliteLibrary(this,"sqlite_library",1);
         StudentTable studentTable = new StudentTable(sQliteLibrary.getWriteDataBase(),Student.class);
 
-        //创建表
+        //创建表带回调
         studentTable.onCreateTableIfNotExits(new ZxyReflectionTable.OnCreateSQLiteCallback() {
             @Override
             public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
@@ -46,8 +47,10 @@ public class MainActivity extends AppCompatActivity {
 
         Student student = new Student("ellen",23,"1823213","侏儒");
         student.setFather(new Father("Ellen_chen","2133123123123"));
+        //添加单条数据
         studentTable.saveData(student);
-
+        String ordersql = Order.getInstance(false).setFirstOrderFieldName("id").setSecondOrderFieldName("name").setIsDesc(true).createSQL();
+        BaseLog.log("order语句",ordersql);
         for(Student student1:studentTable.getAllDatas(null)){
             BaseLog.log("存储的数据",student1.toString());
         }
