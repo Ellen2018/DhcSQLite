@@ -1,3 +1,21 @@
+## 0.如何导入?
+
+[![](https://jitpack.io/v/Ellen2018/DhcSQLite.svg)](https://jitpack.io/#Ellen2018/DhcSQLite)
+
+&emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：  
+
+    allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }//加上这句即可
+		}
+	}
+
+&emsp;&emsp;然后你在要使用该库的module中添加以下依赖:  
+
+    implementation 'com.github.Ellen2018:DhcSQLite:x.y.z'
+
+&emsp;&emsp;x,y,z是笔者库的版本值，例如：1.0.0
 
 ## 1.介绍
 
