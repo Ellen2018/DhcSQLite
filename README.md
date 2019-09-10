@@ -19,7 +19,8 @@
 
 ## 1.介绍
 
-&emsp;&emsp;DhcSQLite是一款基于注解加反射的第三方SQLite库，基于SQLite进行的封装。用到了Java反射加注解技术，后期有时间改成注解加APT的方式。
+&emsp;&emsp;DhcSQLite是一款基于注解加反射的第三方SQLite库，基于SQLite进行的封装。用到了Java反射加注解技术，后期有时间改成注解加APT的方式。此库的操作增删改查等全部基于另外一个库生成的SQL语句，库的地址是：
+[ZxySQLiteCreate](https://github.com/Ellen2018/ZxySQLiteCreate)
 
 ## 2.如何使用？
 
@@ -176,3 +177,46 @@
             return null;
         }
     }
+
+&emsp;&emsp;步骤三:操作表。接下来，我们就可以任性的进行创建表和操作表了，笔者提供了两种方式来操作表，第一种是笔者封装的方法，第二种是通过[ZxySQLiteCreate](https://github.com/Ellen2018/ZxySQLiteCreate)
+库来构建add,delete,where,order等语句来完成操作，由于封装的实在太多，待笔者一点点进行整理吧。详细代码如下：  
+
+
+        //库的名字叫sqlite_library,版本号为1
+        SQliteLibrary sQliteLibrary = new SQliteLibrary(this,"sqlite_library",1);
+        //构建步骤二中StudentTable对象
+        StudentTable studentTable = new StudentTable(sQliteLibrary.getWriteDataBase(),Student.class);
+
+        //创建表带回调(也有不带回调的)
+        studentTable.onCreateTableIfNotExits(new ZxyReflectionTable.OnCreateSQLiteCallback() {
+
+            //创建表之前回调
+            @Override
+            public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            //创建表失败后回调
+            @Override
+            public void onCreateTableFailure(String errMessage, String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            //创建表成功后回调
+            @Override
+            public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+                BaseLog.log("创建表",createSQL);
+                tvAll.setText(createSQL);
+            }
+        });
+
+        Student student = new Student("ellen",23,"1823213","侏儒");
+        student.setFather(new Father("Ellen_chen","2133123123123"));
+        //添加单条数据
+        studentTable.saveData(student);
+        //通过SQL语句制作库制作SQL语句
+        String ordersql = Order.getInstance(false).setFirstOrderFieldName("id").setSecondOrderFieldName("name").setIsDesc(true).createSQL();
+        BaseLog.log("order语句",ordersql);
+        for(Student student1:studentTable.getAllDatas(null)){
+            BaseLog.log("存储的数据",student1.toString());
+        }
