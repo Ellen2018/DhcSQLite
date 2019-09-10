@@ -216,7 +216,7 @@
         studentTable.saveData(student);
         //通过SQL语句制作库制作SQL语句
         String ordersql = Order.getInstance(false).setFirstOrderFieldName("id").setSecondOrderFieldName("name").setIsDesc(true).createSQL();
-        BaseLog.log("order语句",ordersql);
-        for(Student student1:studentTable.getAllDatas(null)){
+      
+        for(Student student1:studentTable.getAllDatas(ordersql)){
             BaseLog.log("存储的数据",student1.toString());
         }
