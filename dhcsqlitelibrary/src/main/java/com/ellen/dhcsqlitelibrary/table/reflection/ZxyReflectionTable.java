@@ -41,6 +41,8 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         reflactionHelper = new ReflactionHelper<>();
         sqlNameMap = new HashMap<>();
         getFields();
+        //自动创建表
+        onCreateTableIfNotExits();
     }
 
     public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName) {
@@ -50,6 +52,8 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         reflactionHelper = new ReflactionHelper<>();
         sqlNameMap = new HashMap<>();
         getFields();
+        //自动创建表
+        onCreateTableIfNotExits();
     }
 
     /**
