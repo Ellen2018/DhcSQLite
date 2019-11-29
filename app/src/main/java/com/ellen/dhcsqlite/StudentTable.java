@@ -56,6 +56,12 @@ public class StudentTable extends ZxyReflectionTable<Student> {
         }
     }
 
+    @Override
+    protected boolean isAutoCreateTable() {
+        //true(自动创建表)
+        return true;
+    }
+
     /**
      *  检测发现目标类中不可转换类型的属性类型映射为数据库中存储的字段类型
      *  例如:Father --> TEXT
