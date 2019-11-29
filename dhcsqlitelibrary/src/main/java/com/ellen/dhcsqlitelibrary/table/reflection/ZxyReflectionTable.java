@@ -11,7 +11,6 @@ import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.ellen.sqlitecreate.createsql.helper.Value;
-import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 
@@ -275,31 +274,16 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         exeSQL(addDataSql);
     }
 
-    private void saveOrUpdate(T t){
-        if(primarykeyField != null){
-            String sqlFieldName = getSQLFieldName(primarykeyField.getName(),primarykeyField.getType());
-            String whereSQL = getWhere(false).addAndWhereValue(sqlFieldName, WhereSymbolEnum.EQUAL,reflactionHelper.getValue(t,primarykeyField)).createSQL();
-            String serachSQL = getSerachTableData().setTableName(tableName).setIsAddField(false).createSQLAutoWhere(whereSQL);
-           List<T> list = serachDatasBySQL(serachSQL);
-           if(list != null && list.size()>0){
-               //进行更新,这里自己写吧!
-           }else {
-               //进行保存
-               saveData(t);
-           }
-
+    /**
+     * 存储之前先清空表的所有数据
+     * @param dataList
+     */
+    public void saveDataAndDeleteAgo(List<T> dataList){
+        if(dataList == null || dataList.size() == 0){
+            return;
         }
-    }
-
-    private void saveOrUpdate(T t,String whereSQL){
-            String serachSQL = getSerachTableData().setTableName(tableName).setIsAddField(false).createSQLAutoWhere(whereSQL);
-            List<T> list = serachDatasBySQL(serachSQL);
-            if(list != null && list.size()>0){
-                //进行更新,这里也自己写吧
-            }else {
-                //进行保存
-                saveData(t);
-            }
+        clear();
+        saveData(dataList);
     }
 
     /**
@@ -470,6 +454,16 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
             cursor.close();
         }
         return dataList;
+    }
+
+    /**
+     * 提供给懒得写转换类型代码的人
+     * @param classFieldName
+     * @param typeClass
+     * @return
+     */
+    protected SQLFieldType defaultGetSQLFieldType(String classFieldName, Class typeClass){
+        return new SQLFieldType(getSQlStringType(typeClass),null);
     }
 
     private T getT() throws IllegalAccessException, InvocationTargetException, InstantiationException {
