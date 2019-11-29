@@ -42,7 +42,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         sqlNameMap = new HashMap<>();
         getFields();
         //自动创建表
-        onCreateTableIfNotExits();
+        if(isAutoCreateTable()) {
+            onCreateTableIfNotExits();
+        }
     }
 
     public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName) {
@@ -53,7 +55,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         sqlNameMap = new HashMap<>();
         getFields();
         //自动创建表
-        onCreateTableIfNotExits();
+        if(isAutoCreateTable()) {
+            onCreateTableIfNotExits();
+        }
     }
 
     /**
@@ -508,6 +512,8 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     protected abstract String getSQLFieldName(String classFieldName, Class typeClass);
 
     protected abstract Object setBooleanValue(String classFieldName, boolean value);
+
+    protected abstract boolean isAutoCreateTable();
 
     /**
      * 非基本类型转换为使用者自定义的类型
