@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         for(Student student1:studentTable.getAllDatas(null)){
             BaseLog.log("存储的数据",student1.toString());
         }
-        
 
     }
 }
