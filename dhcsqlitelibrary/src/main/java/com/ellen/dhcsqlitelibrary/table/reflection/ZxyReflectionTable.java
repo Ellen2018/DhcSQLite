@@ -320,6 +320,39 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     }
 
     /**
+     * 根据主键选择更新或者保存
+     * 如果存在就选择更新
+     * 如果不存在选择保存
+     * @param t
+     */
+    public void saveOrUpdateByPrimaryKey(T t){
+        if(isContainsByPrimaryKey(t)){
+            //进行更新
+            updateByPrimaryKey(t);
+        }else {
+            saveData(t);
+        }
+    }
+
+    /**
+     * 根据主键选择更新或者保存
+     * 如果存在就选择更新
+     * 如果不存在选择保存
+     * @param tList
+     */
+    public void saveOrUpdateByPrimaryKey(List<T> tList){
+        List<T> saveList = new ArrayList<>();
+        for(T t:tList){
+            if(isContainsByPrimaryKey(t)){
+                updateByPrimaryKey(t);
+            }else {
+                saveList.add(t);
+            }
+        }
+        saveData(saveList);
+    }
+
+    /**
      * 按照主键进行修改数据
      * @param t
      */
