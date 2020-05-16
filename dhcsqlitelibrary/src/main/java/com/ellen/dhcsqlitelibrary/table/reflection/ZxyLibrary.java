@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 public abstract class ZxyLibrary {
 
-    private ZxySQLiteHelper zxySQLiteHelper;
+    protected ZxySQLiteHelper zxySQLiteHelper;
     private String name = null;
     private String filePath = null;
 
