@@ -37,6 +37,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     private HashMap<SQLField, Field> sqlNameMap;
     private Field primarykeyField = null;
     private SQLField primarykeySqlField = null;
+    private ZxyChangeListener zxyChangeListener;
 
     public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass) {
         super(db);
@@ -62,6 +63,10 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         if (isAutoCreateTable()) {
             onCreateTableIfNotExits();
         }
+    }
+
+    public void setZxyChangeListener(ZxyChangeListener zxyChangeListener) {
+        this.zxyChangeListener = zxyChangeListener;
     }
 
     /**
@@ -264,6 +269,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         }
         String addDataSql = addSingleRowToTable.createSQL();
         exeSQL(addDataSql);
+        if(zxyChangeListener != null){
+            zxyChangeListener.onDataChange();
+        }
     }
 
     public String getTableName() {
@@ -306,6 +314,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         }
         String addDataSql = addManyRowToTable.createSQL();
         exeSQL(addDataSql);
+        if(zxyChangeListener != null){
+            zxyChangeListener.onDataChange();
+        }
     }
 
     /**
@@ -343,6 +354,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     public void delete(String whereSQL) {
         String deleteSQL = getDeleteTableDataRow().setTableName(tableName).createSQLAutoWhere(whereSQL);
         exeSQL(deleteSQL);
+        if(zxyChangeListener != null){
+            zxyChangeListener.onDataChange();
+        }
     }
 
     /**
@@ -351,6 +365,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     public void clear() {
         String clearTableSQL = getDeleteTableDataRow().setTableName(tableName).createDeleteAllDataSQL();
         exeSQL(clearTableSQL);
+        if(zxyChangeListener != null){
+            zxyChangeListener.onDataChange();
+        }
     }
 
     /**
@@ -456,6 +473,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         }
         String updateSql = updateTableDataRow.createSQLAutoWhere(whereSQL);
         exeSQL(updateSql);
+        if(zxyChangeListener != null){
+            zxyChangeListener.onDataChange();
+        }
     }
 
     /**

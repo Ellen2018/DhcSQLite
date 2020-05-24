@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.ellen.dhcsqlitelibrary.table.reflection.ZxyChangeListener;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.delete.DeleteTableDataRow;
@@ -44,6 +45,13 @@ public class MainActivity extends AppCompatActivity {
         searchData();
         //其他用法
         other();
+
+        studentTable.setZxyChangeListener(new ZxyChangeListener() {
+            @Override
+            public void onDataChange() {
+                //当数据库增加，删除数据时，也就是数据发生了变化都会回调这里
+            }
+        });
     }
 
     private void other() {
