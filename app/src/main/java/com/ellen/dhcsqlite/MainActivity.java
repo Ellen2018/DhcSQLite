@@ -44,16 +44,5 @@ public class MainActivity extends AppCompatActivity {
                 tvAll.setText(createSQL);
             }
         });
-
-        Student student = new Student("ellen",23,"1823213","侏儒");
-        student.setFather(new Father("Ellen_chen","2133123123123"));
-        //添加单条数据
-        studentTable.saveData(student);
-        String ordersql = Order.getInstance(false).setFirstOrderFieldName("id").setSecondOrderFieldName("name").setIsDesc(true).createSQL();
-        BaseLog.log("order语句",ordersql);
-        for(Student student1:studentTable.getAllDatas(null)){
-            BaseLog.log("存储的数据",student1.toString());
-        }
-
     }
 }

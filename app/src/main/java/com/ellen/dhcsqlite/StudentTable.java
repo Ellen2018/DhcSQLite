@@ -34,14 +34,6 @@ public class StudentTable extends ZxyReflectionTable<Student> {
     }
 
     /**
-     *  设置数据库中对应的属性名
-     */
-    @Override
-    protected String getSQLFieldName(String classFieldName, Class typeClass) {
-        return classFieldName;
-    }
-
-    /**
      * boolean类型值转化为数据库中的存储
      * @param classFieldName
      * @param value

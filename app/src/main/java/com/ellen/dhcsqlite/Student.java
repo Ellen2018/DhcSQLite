@@ -1,11 +1,14 @@
 package com.ellen.dhcsqlite;
 
+import com.ellen.dhcsqlitelibrary.table.reflection.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.reflection.Ignore;
 
 public class Student {
 
     private int id;
+    @DhcSqlFieldName("my_name")
     private String name;
+    @DhcSqlFieldName("your_age")
     private int age;
     private String phoneNumber;
     private String address;

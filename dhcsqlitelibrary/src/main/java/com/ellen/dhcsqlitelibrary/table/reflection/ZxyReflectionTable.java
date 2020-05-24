@@ -78,7 +78,12 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
             } else {
                 fieldType = conversionSQLiteType(field.getName(), field.getType()).getSQLFieldTypeString();
             }
-            fieldName = getSQLFieldName(field.getName(), field.getType());
+            DhcSqlFieldName dhcSqlFieldName = field.getAnnotation(DhcSqlFieldName.class);
+            if(dhcSqlFieldName == null) {
+                fieldName = getSQLFieldName(field.getName(), field.getType());
+            }else {
+                fieldName = dhcSqlFieldName.value();
+            }
             Primarykey primarykey = field.getAnnotation(Primarykey.class);
             SQLField sqlField = null;
             if (primarykey != null) {
@@ -583,13 +588,15 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
 
     /**
      * 根据字段的名字和类型返回相应的数据库中的保存类型
-     * example：int -> Integer
+     * example：int age -> age
      *
      * @param classFieldName
      * @param typeClass
      * @return
      */
-    protected abstract String getSQLFieldName(String classFieldName, Class typeClass);
+    protected String getSQLFieldName(String classFieldName, Class typeClass){
+        return classFieldName;
+    }
 
     protected abstract Object setBooleanValue(String classFieldName, boolean value);
 
