@@ -1,5 +1,6 @@
 package com.ellen.dhcsqlitelibrary.table.reflection;
 
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Ignore;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.lang.reflect.Field;
@@ -95,7 +96,7 @@ public class ReflactionHelper<T> {
         }
     }
 
-    public SQLFieldTypeEnum getSQlStringType(Class<?> ziDuanJavaType) {
+    public SQLFieldTypeEnum getSqlStringType(Class<?> ziDuanJavaType) {
         SQLFieldTypeEnum sqlType = null;
         if (ziDuanJavaType == Byte.class || ziDuanJavaType.getName().equals("byte")) {
             sqlType = SQLFieldTypeEnum.INTEGER;

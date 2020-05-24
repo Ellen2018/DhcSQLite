@@ -6,6 +6,10 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.dhcsqlitelibrary.table.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.EncryptionInterFace;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NotNull;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Primarykey;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
@@ -79,7 +83,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
             String fieldType = null;
             String fieldName = null;
             if (reflactionHelper.isBasicType(field)) {
-                fieldType = getSQLFieldType(field.getName(), field.getType()).getSQLFieldTypeString();
+                fieldType = getSqlFieldType(field.getName(), field.getType()).getSQLFieldTypeString();
             } else {
                 fieldType = conversionSQLiteType(field.getName(), field.getType()).getSQLFieldTypeString();
             }
@@ -519,7 +523,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
                 int index = cursor.getColumnIndex(sqlFieldList.get(i).getName());
                 String sqlDataType = null;
                 if (reflactionHelper.isBasicType(field)) {
-                    sqlDataType = getSQLFieldType(field.getName(), field.getType()).getTypeString();
+                    sqlDataType = getSqlFieldType(field.getName(), field.getType()).getTypeString();
                 } else {
                     sqlDataType = conversionSQLiteType(field.getName(), field.getType()).getTypeString();
                 }
@@ -605,7 +609,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * @return
      */
     protected SQLFieldType defaultGetSQLFieldType(String classFieldName, Class typeClass) {
-        return new SQLFieldType(getSQlStringType(typeClass), null);
+        return new SQLFieldType(getSqlStringType(typeClass), null);
     }
 
     private T getT() throws IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -633,7 +637,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * @param typeClass
      * @return
      */
-    protected abstract SQLFieldType getSQLFieldType(String classFieldName, Class typeClass);
+    protected SQLFieldType getSqlFieldType(String classFieldName, Class typeClass){
+        return defaultGetSQLFieldType(classFieldName,typeClass);
+    }
 
     /**
      * 根据字段的名字和类型返回相应的数据库中的保存类型
@@ -682,8 +688,8 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      */
     protected abstract <E> E resumeConversionObject(Object value, String classFieldName, Class typeClass);
 
-    public SQLFieldTypeEnum getSQlStringType(Class<?> ziDuanJavaType) {
-        return reflactionHelper.getSQlStringType(ziDuanJavaType);
+    public SQLFieldTypeEnum getSqlStringType(Class<?> fieldJavaType) {
+        return reflactionHelper.getSqlStringType(fieldJavaType);
     }
 
     public interface OnCreateSQLiteCallback {

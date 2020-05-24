@@ -1,4 +1,4 @@
-package com.ellen.dhcsqlitelibrary.table.reflection;
+package com.ellen.dhcsqlitelibrary.table.reflection.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DhcSqlFieldName {
-    String value();
+public @interface Primarykey {
 }

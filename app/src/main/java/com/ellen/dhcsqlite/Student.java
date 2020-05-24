@@ -1,8 +1,8 @@
 package com.ellen.dhcsqlite;
 
-import com.ellen.dhcsqlitelibrary.table.reflection.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.reflection.Ignore;
-import com.ellen.dhcsqlitelibrary.table.reflection.Primarykey;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Ignore;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Primarykey;
 
 public class Student {
 

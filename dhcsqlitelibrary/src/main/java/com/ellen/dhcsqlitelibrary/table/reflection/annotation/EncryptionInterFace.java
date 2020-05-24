@@ -1,4 +1,4 @@
-package com.ellen.dhcsqlitelibrary.table.reflection;
+package com.ellen.dhcsqlitelibrary.table.reflection.annotation;
 
 public interface EncryptionInterFace {
 
