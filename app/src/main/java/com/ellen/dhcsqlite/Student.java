@@ -67,6 +67,14 @@ public class Student {
         this.father = father;
     }
 
+    public boolean isMan() {
+        return isMan;
+    }
+
+    public void setMan(boolean man) {
+        isMan = man;
+    }
+
     @Override
     public String toString() {
         return "Student{" +

@@ -32,8 +32,17 @@ public class MainActivity extends AppCompatActivity {
         SQliteLibrary sQliteLibrary = new SQliteLibrary(this, "sqlite_library", 1);
         studentTable = new StudentTable(sQliteLibrary.getWriteDataBase(), Student.class);
 
+        studentTable.setZxyChangeListener(new ZxyChangeListener() {
+            @Override
+            public void onDataChange() {
+                //当数据库增加，删除数据时，也就是数据发生了变化都会回调这里
+            }
+        });
+
         //创建表
         onCreateTable();
+
+        studentTable.clear();
 
         //增加数据
         addData();
@@ -44,14 +53,9 @@ public class MainActivity extends AppCompatActivity {
         //查询数据
         searchData();
         //其他用法
-        other();
+        //other();
 
-        studentTable.setZxyChangeListener(new ZxyChangeListener() {
-            @Override
-            public void onDataChange() {
-                //当数据库增加，删除数据时，也就是数据发生了变化都会回调这里
-            }
-        });
+
     }
 
     private void other() {
@@ -123,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                         .addAndWhereValue("my_name", WhereSymbolEnum.LIKE, "%Ellen%")
                         .createSQL();
         String orderSql = Order.getInstance(false)
-                .setFirstOrderFieldName("age")
+                .setFirstOrderFieldName("your_age")
                 .setIsDesc(true)
                 .createSQL();
 
@@ -146,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         String whereSql =
                 Where.getInstance(false)
                         .addAndWhereValue("my_name", WhereSymbolEnum.EQUAL, "Ellen2018")
-                        .addAndWhereValue("age", WhereSymbolEnum.MORE_THAN, 20)
+                        .addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 20)
                         .createSQL();
         //注意这种修改方式为全映射修改，如果只修改部分数据，请使用下面的方式
         //什么是全映射修改？就是将对象的整个属性数据覆盖在whereSql满足的条件里
@@ -157,12 +161,12 @@ public class MainActivity extends AppCompatActivity {
         //将大于age > 20岁年龄的数据的 age 的值全部修改为 age = 18,my_name = "永远18岁"
         String whereSqlByAge =
                 Where.getInstance(false)
-                        .addAndWhereValue("age", WhereSymbolEnum.MORE_THAN, 20)
+                        .addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 20)
                         .createSQL();
 
         String updateSql = UpdateTableDataRow.getInstance()
                 .setTableName(studentTable.getTableName())
-                .addSetValue("age", 18)
+                .addSetValue("your_age", 18)
                 .addSetValue("my_name", "永远18岁")
                 .createSQLAutoWhere(whereSqlByAge);
 
@@ -186,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
         String whereSql =
                 Where.getInstance(false)
                         .addAndWhereValue("my_name", WhereSymbolEnum.EQUAL, "Ellen2018")
-                        .addAndWhereValue("age", WhereSymbolEnum.MORE_THAN, 20)
+                        .addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 20)
                         .createSQL();
 
         studentTable.delete(whereSql);
@@ -236,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addData() {
         Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
+        student.setMan(true);
         Father father = new Father("Ellen2019", "1");
         student.setFather(father);
 
@@ -246,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             student = new Student(i, "Ellen2018", 19, "18272167574", "火星");
+            student.setMan(true);
             studentList.add(student);
         }
         studentTable.saveData(studentList);
