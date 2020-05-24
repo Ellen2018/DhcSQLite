@@ -277,7 +277,7 @@
             this.father = father;
         }
 
-    @Override
+        @Override
         public String toString() {
             return "Student{" +
                     "id=" + id +
