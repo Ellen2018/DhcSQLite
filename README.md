@@ -212,3 +212,83 @@
         for(Student student1:studentTable.getAllDatas(ordersql)){
             BaseLog.log("存储的数据",student1.toString());
         }
+    
+&emsp;&emsp;关于注解的使用规则，阅读下面Student Bean类很明显就能知道用法:
+
+    public class Student {
+
+        @Primarykey //主键
+        private int id;
+        @DhcSqlFieldName("my_name") //映射数据库中字段名字为my_name
+        private String name;
+        @DhcSqlFieldName("your_age")
+        private int age;
+        private String phoneNumber;
+        private String address;
+        @Ignore //不映射这个属性到数据库中
+        private String ingoreString;
+        private boolean isMan;
+        private Father father;
+
+        public Student(String name, int age, String phoneNumber, String address) {
+            this.name = name;
+            this.age = age;
+            this.phoneNumber = phoneNumber;
+            this.address = address;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+
+        public void setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public Father getFather() {
+            return father;
+        }
+
+        public void setFather(Father father) {
+            this.father = father;
+        }
+
+    @Override
+        public String toString() {
+            return "Student{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", age=" + age +
+                    ", phoneNumber='" + phoneNumber + '\'' +
+                    ", address='" + address + '\'' +
+                    ", ingoreString='" + ingoreString + '\'' +
+                    ", isMan=" + isMan +
+                    ", father=" + father +
+                    '}';
+        }    
+    }           
+        

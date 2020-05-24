@@ -2,17 +2,19 @@ package com.ellen.dhcsqlite;
 
 import com.ellen.dhcsqlitelibrary.table.reflection.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.reflection.Ignore;
+import com.ellen.dhcsqlitelibrary.table.reflection.Primarykey;
 
 public class Student {
 
+    @Primarykey //主键
     private int id;
-    @DhcSqlFieldName("my_name")
+    @DhcSqlFieldName("my_name") //映射数据库中字段名字为my_name
     private String name;
     @DhcSqlFieldName("your_age")
     private int age;
     private String phoneNumber;
     private String address;
-    @Ignore
+    @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     private boolean isMan;
     private Father father;
