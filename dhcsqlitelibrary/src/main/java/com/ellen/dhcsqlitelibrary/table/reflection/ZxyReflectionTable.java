@@ -5,7 +5,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.dhcsqlitelibrary.table.ZxyTable;
-import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyExcepition;
+import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
@@ -198,11 +198,27 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         }
     }
 
+    public void deleteTable(){
+        deleteTable(tableName);
+    }
+
+    public void deleteTable(OnDeleteTableCallback onDeleteTableCallback){
+        deleteTable(tableName,onDeleteTableCallback);
+    }
+
+    /**
+     * 删除表 by 表名字
+     * @param tableName
+     */
     public void deleteTable(String tableName) {
         String deleteTableSQL = getDeleteTable().setTableName(tableName).createSQL();
         exeSQL(deleteTableSQL);
     }
 
+    /**
+     * 删除表 by 表名字 & 带回调
+     * @param tableName
+     */
     public void deleteTable(String tableName, OnDeleteTableCallback onDeleteTableCallback) {
         boolean isException = false;
         String deleteTableSQL = getDeleteTable().setTableName(tableName).createSQL();
@@ -306,6 +322,19 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     }
 
     /**
+     * 存储之前先清空表的所有数据
+     *
+     * @param
+     */
+    public void saveDataAndDeleteAgo(T data) {
+        if (data == null) {
+            return;
+        }
+        clear();
+        saveData(data);
+    }
+
+    /**
      * 删除
      * 建议使用Where系列类生产Where SQL语句
      *
@@ -364,7 +393,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     public void updateByPrimaryKey(T t){
         if(primarykeySqlField == null){
             //说明没有主键,抛出无主键异常
-            throw new NoPrimaryKeyExcepition("没有主键,无法根据主键更新数据!");
+            throw new NoPrimaryKeyException("没有主键,无法根据主键更新数据!");
         }else {
             String whereSql = Where.getInstance(false)
                     .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL,reflactionHelper.getValue(t,primarykeyField))
@@ -382,12 +411,12 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         boolean isContains = false;
         if(primarykeySqlField == null){
             //说明没有主键,抛出无主键异常
-            throw new NoPrimaryKeyExcepition("没有主键,无法根据主键查询数据的存在!");
+            throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据的存在!");
         }else {
             String whereSql = Where.getInstance(false)
                     .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL,reflactionHelper.getValue(t,primarykeyField))
                     .createSQL();
-            List<T> tList = serach(whereSql,null);
+            List<T> tList = search(whereSql,null);
             if(tList != null && tList.size() > 0){
                 isContains = true;
             }else {
@@ -435,14 +464,14 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * @param orderSQL
      * @return
      */
-    public List<T> getAllDatas(String orderSQL) {
+    public List<T> getAllData(String orderSQL) {
         SerachTableData serachTableData = getSerachTableData().setTableName(tableName);
         serachTableData.setIsAddField(false);
         String getAllTableDataSQL = serachTableData.getTableAllDataSQL(orderSQL);
-        return serachDatasBySQL(getAllTableDataSQL);
+        return searchDataBySql(getAllTableDataSQL);
     }
 
-    public List<T> serach(String whereSQL, String orderSQL) {
+    public List<T> search(String whereSQL, String orderSQL) {
         List<T> dataList = new ArrayList<>();
         SerachTableData serachTableData = getSerachTableData().setTableName(tableName);
         serachTableData.setIsAddField(false);
@@ -452,12 +481,12 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         } else {
             serachSQL = serachTableData.createSQLAutoWhere(whereSQL);
         }
-        return serachDatasBySQL(serachSQL);
+        return searchDataBySql(serachSQL);
     }
 
-    private List<T> serachDatasBySQL(String sql) {
+    private List<T> searchDataBySql(String sql) {
         List<T> dataList = new ArrayList<>();
-        Cursor cursor = serachBySQL(sql);
+        Cursor cursor = searchBySQL(sql);
         while (cursor.moveToNext()) {
             T t = null;
             try {

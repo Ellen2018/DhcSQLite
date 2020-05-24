@@ -20,7 +20,7 @@ public class ZxyTable extends ZxySQLite {
         getSQLiteDatabase().execSQL(sql);
     }
 
-    public Cursor serachBySQL(String sql){
+    public Cursor searchBySQL(String sql){
         return getSQLiteDatabase().rawQuery(sql,null);
     }
 

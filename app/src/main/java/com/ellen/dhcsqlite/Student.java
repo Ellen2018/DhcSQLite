@@ -19,7 +19,8 @@ public class Student {
     private boolean isMan;
     private Father father;
 
-    public Student(String name, int age, String phoneNumber, String address) {
+    public Student(int id,String name, int age, String phoneNumber, String address) {
+        this.id = id;
         this.name = name;
         this.age = age;
         this.phoneNumber = phoneNumber;

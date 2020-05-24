@@ -1,10 +1,10 @@
 package com.ellen.dhcsqlitelibrary.table.exception;
 
-public class NoPrimaryKeyExcepition extends RuntimeException {
+public class NoPrimaryKeyException extends RuntimeException {
 
     private String errorMessage;
 
-    public NoPrimaryKeyExcepition(String errorMessage){
+    public NoPrimaryKeyException(String errorMessage){
         this.errorMessage = errorMessage;
     }
 
