@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         studentTable.getAutoDesignOperate().update("逗比","Ellen2018");
 
-        List<Student> studentList = studentTable.getAutoDesignOperate().getSearchList1(17,"逗比");
+        List<Student> studentList = studentTable.getAutoDesignOperate().searchByMajorKey(10);
 
         for(Student student:studentList){
             Log.e("Ellen2018",student.toString());

@@ -3,17 +3,18 @@ package com.ellen.dhcsqlite;
 import com.ellen.dhcsqlitelibrary.table.annotation.DataStructure;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
+import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.NoBasicType;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
-import com.ellen.dhcsqlitelibrary.table.annotation.Primarykey;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.util.Arrays;
 
 public class Student {
 
-    @Primarykey //主键
+    //主键
+    @MajorKey
     private int id;
     @DhcSqlFieldName("my_name") //映射数据库中字段名字为my_name
     private String name;

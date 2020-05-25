@@ -13,7 +13,7 @@ public class FastJsonFormat implements JsonFormat {
     private Class fastJsonClass;
 
 
-    public FastJsonFormat(Class fastJsonClass) {
+    FastJsonFormat(Class fastJsonClass) {
         this.fastJsonClass = fastJsonClass;
     }
 

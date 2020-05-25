@@ -1,6 +1,6 @@
 package com.ellen.dhcsqlitelibrary.table.annotation;
 
-import com.ellen.dhcsqlitelibrary.table.AutoDesignOperate;
+import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

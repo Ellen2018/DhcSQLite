@@ -1,8 +1,9 @@
 package com.ellen.dhcsqlite;
 
-import com.ellen.dhcsqlitelibrary.table.AutoDesignOperate;
+import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.Delete;
 import com.ellen.dhcsqlitelibrary.table.operate.Search;
+import com.ellen.dhcsqlitelibrary.table.operate.SearchByMajorKey;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalSearchSql;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalUpdateSql;
 import com.ellen.dhcsqlitelibrary.table.operate.Value;
@@ -36,6 +37,14 @@ public interface MyAutoDesignOperate extends AutoDesignOperate {
 
     @TotalUpdateSql("UPDATE Student SET my_name = '@newName' WHERE my_name = '@oldName';")
     void update(@Value("newName") String newName,@Value("oldName") String oldName);
+
+    /**
+     * 根据主键查询数据
+     * @param id_value
+     * @return
+     */
+    @SearchByMajorKey(whereSql = "> @id_value")
+    List<Student> searchByMajorKey(@Value("id_value") int id_value);
 
 }
 

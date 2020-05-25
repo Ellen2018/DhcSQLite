@@ -7,7 +7,7 @@ import com.ellen.sqlitecreate.createsql.delete.DeleteTable;
 
 public abstract class ZxyLibrary {
 
-    protected ZxySQLiteHelper zxySQLiteHelper;
+    private ZxySQLiteHelper zxySQLiteHelper;
     private String name = null;
     private String filePath = null;
 

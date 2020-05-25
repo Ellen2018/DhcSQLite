@@ -1,13 +1,9 @@
 package com.ellen.dhcsqlitelibrary.table.reflection;
 
-import android.util.Log;
-
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +17,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
-public class ReflactionHelper<T> {
+public class ReflectHelper<T> {
 
-    public List<Field> getClassFieldList(Class<? extends T> dataClass, boolean isAddStatic) {
+    List<Field> getClassFieldList(Class<? extends T> dataClass, boolean isAddStatic) {
         List<Field> fieldList = new ArrayList<>();
         Field[] fields = dataClass.getDeclaredFields();
         if (fields != null && fields.length != 0) {
@@ -52,6 +48,7 @@ public class ReflactionHelper<T> {
 
     /**
      * 判断该field是否为数据结构类型
+     * 如果您需要支持更多的数据结构，那么您需要更改此处以便让它告诉整个框架他就是数据结构类型
      * @param field
      * @return
      */
@@ -85,7 +82,7 @@ public class ReflactionHelper<T> {
     }
 
 
-    public Object[] getValueArray(Object object, Field targetFiled) {
+    Object[] getValueArray(Object object, Field targetFiled) {
         Object value = getValue(object,targetFiled);
         if(value == null)return null;
         String name = value.getClass().getSimpleName();
@@ -144,7 +141,7 @@ public class ReflactionHelper<T> {
         return objectArray;
     }
 
-    public Object getValue(Object obj, Field targetField) {
+    Object getValue(Object obj, Field targetField) {
         targetField.setAccessible(true);
         Object value = null;
         try {
@@ -155,7 +152,7 @@ public class ReflactionHelper<T> {
         return value;
     }
 
-    public boolean isBasicType(Field field) {
+    boolean isBasicType(Field field) {
         boolean b = false;
         if (field.getType() == Byte.class || field.getType().getName().equals("byte")) {
             b = true;
@@ -179,7 +176,7 @@ public class ReflactionHelper<T> {
         return b;
     }
 
-    public Object getDefaultValue(Class classType) {
+    Object getDefaultValue(Class classType) {
         if (classType == Byte.class || classType.getName().equals("byte")) {
             return 0;
         } else if (classType == Short.class || classType.getName().equals("short")) {
@@ -203,7 +200,7 @@ public class ReflactionHelper<T> {
         }
     }
 
-    public SQLFieldTypeEnum getSqlStringType(Class<?> ziDuanJavaType) {
+    SQLFieldTypeEnum getSqlStringType(Class<?> ziDuanJavaType) {
         SQLFieldTypeEnum sqlType = null;
         if (ziDuanJavaType == Byte.class || ziDuanJavaType.getName().equals("byte")) {
             sqlType = SQLFieldTypeEnum.INTEGER;

@@ -1,4 +1,7 @@
-package com.ellen.dhcsqlitelibrary;
+package com.ellen.dhcsqlitelibrary.table.reflection;
+
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
@@ -15,7 +18,24 @@ import com.ellen.sqlitecreate.createsql.where.Between;
 import com.ellen.sqlitecreate.createsql.where.Where;
 import com.ellen.sqlitecreate.createsql.where.WhereIn;
 
-public class ZxySQLite {
+class ZxyTable {
+    private SQLiteDatabase db;
+
+    ZxyTable(SQLiteDatabase db){
+        this.db = db;
+    }
+
+    SQLiteDatabase getSQLiteDatabase(){
+        return db;
+    }
+
+    public void exeSQL(String sql){
+        getSQLiteDatabase().execSQL(sql);
+    }
+
+    Cursor searchBySQL(String sql){
+        return getSQLiteDatabase().rawQuery(sql,null);
+    }
 
     /**
      * 创建表的SQL语句生产类
@@ -80,7 +100,7 @@ public class ZxySQLite {
     /**
      * 查询数据的SQL语句生产类
      */
-    public SerachTableData getSerachTableData() {
+    public SerachTableData getSearchTableData() {
         return SerachTableData.getInstance();
     }
     /**

@@ -4,9 +4,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.ellen.dhcsqlitelibrary.table.AutoDesignOperate;
+import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.Proxy.AutoOperateProxy;
-import com.ellen.dhcsqlitelibrary.table.ZxyTable;
+import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
 import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
@@ -15,7 +15,6 @@ import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.annotation.NoBasicType;
 import com.ellen.dhcsqlitelibrary.table.annotation.NotNull;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
-import com.ellen.dhcsqlitelibrary.table.annotation.Primarykey;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
@@ -27,10 +26,8 @@ import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
-import java.io.ObjectOutput;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +45,10 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
     private List<SQLField> sqlFieldList;
     private String tableName;
     private O autoDesignOperate;
-    private ReflactionHelper<T> reflactionHelper;
+    private ReflectHelper<T> reflectHelper;
     private HashMap<SQLField, Field> sqlNameMap;
-    private Field primarykeyField = null;
-    private SQLField primarykeySqlField = null;
+    private Field majorKeyField = null;
+    private SQLField majorKeySqlField = null;
     private JsonHelper jsonHelper;
 
     private ZxyChangeListener zxyChangeListener;
@@ -66,6 +63,18 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
         return autoDesignOperate;
     }
 
+    /**
+     * 获取主键的字段名字
+     * @return
+     */
+    public String getMajorKeyName(){
+        String majorKeyName = null;
+        if(majorKeySqlField != null){
+            majorKeyName = majorKeySqlField.getName();
+        }
+        return majorKeyName;
+    }
+
     public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName,Class<? extends AutoDesignOperate> autoClass) {
         super(db);
         init(autoTableName, dataClass,autoClass);
@@ -74,7 +83,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
     private void init(String tableName, Class<? extends T> dataClass,Class<? extends AutoDesignOperate> autoClass) {
         this.dataClass = dataClass;
         this.tableName = tableName;
-        reflactionHelper = new ReflactionHelper<>();
+        reflectHelper = new ReflectHelper<>();
         sqlNameMap = new HashMap<>();
         getFields();
         jsonHelper = new JsonHelper(getJsonLibraryType());
@@ -90,11 +99,11 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      */
     private void getFields() {
         sqlFieldList = new ArrayList<>();
-        List<Field> fieldList = reflactionHelper.getClassFieldList(dataClass, false);
+        List<Field> fieldList = reflectHelper.getClassFieldList(dataClass, false);
         for (Field field : fieldList) {
             String fieldType = null;
             String fieldName = null;
-            if (reflactionHelper.isBasicType(field)) {
+            if (reflectHelper.isBasicType(field)) {
                 fieldType = getSqlFieldType(field.getName(), field.getType()).getSQLFieldTypeString();
             } else {
                 //不是基本类型
@@ -106,13 +115,13 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
             } else {
                 fieldName = dhcSqlFieldName.value();
             }
-            Primarykey primarykey = field.getAnnotation(Primarykey.class);
+            MajorKey majorKeykey = field.getAnnotation(MajorKey.class);
             SQLField sqlField = null;
-            if (primarykey != null) {
+            if (majorKeykey != null) {
                 //这里是主键
                 sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, false);
-                primarykeyField = field;
-                primarykeySqlField = sqlField;
+                majorKeyField = field;
+                majorKeySqlField = sqlField;
             } else {
                 NotNull notNull = field.getAnnotation(NotNull.class);
                 if (notNull != null) {
@@ -275,8 +284,8 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
         for (int i = 0; i < sqlFieldList.size(); i++) {
             Field field = sqlNameMap.get(sqlFieldList.get(i));
             Object value = null;
-            if (reflactionHelper.isBasicType(field)) {
-                value = reflactionHelper.getValue(data, field);
+            if (reflectHelper.isBasicType(field)) {
+                value = reflectHelper.getValue(data, field);
                 if (value instanceof Boolean) {
                     value = setBooleanValue(field.getName(), (Boolean) value);
                 }
@@ -316,8 +325,8 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
             for (int j = 0; j < sqlFieldList.size(); j++) {
                 Field field = sqlNameMap.get(sqlFieldList.get(j));
                 Object value = null;
-                if (reflactionHelper.isBasicType(field)) {
-                    value = reflactionHelper.getValue(dataList.get(i), field);
+                if (reflectHelper.isBasicType(field)) {
+                    value = reflectHelper.getValue(dataList.get(i), field);
                     if (value instanceof Boolean) {
                         value = setBooleanValue(field.getName(), (Boolean) value);
                     }
@@ -436,12 +445,12 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      * @param t
      */
     public void updateByPrimaryKey(T t) {
-        if (primarykeySqlField == null) {
+        if (majorKeySqlField == null) {
             //说明没有主键,抛出无主键异常
             throw new NoPrimaryKeyException("没有主键,无法根据主键更新数据!");
         } else {
             String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL, reflactionHelper.getValue(t, primarykeyField))
+                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, reflectHelper.getValue(t, majorKeyField))
                     .createSQL();
             update(t, whereSql);
         }
@@ -454,12 +463,12 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      */
     public T getDataByPrimaryKey(Object value){
         T t = null;
-        if (primarykeySqlField == null) {
+        if (majorKeySqlField == null) {
             //说明没有主键,抛出无主键异常
             throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据!");
         } else {
             String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL, value)
+                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, value)
                     .createSQL();
             List<T> tList = search(whereSql,null);
             if(tList != null & tList.size() > 0){
@@ -477,12 +486,12 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      */
     public boolean isContainsByPrimaryKey(T t) {
         boolean isContains = false;
-        if (primarykeySqlField == null) {
+        if (majorKeySqlField == null) {
             //说明没有主键,抛出无主键异常
             throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据的存在!");
         } else {
             String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL, reflactionHelper.getValue(t, primarykeyField))
+                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, reflectHelper.getValue(t, majorKeyField))
                     .createSQL();
             List<T> tList = search(whereSql, null);
             if (tList != null && tList.size() > 0) {
@@ -508,8 +517,8 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
             String fieldName = sqlFieldList.get(i).getName();
             Field field = sqlNameMap.get(sqlFieldList.get(i));
             Object value = null;
-            if (reflactionHelper.isBasicType(field)) {
-                value = reflactionHelper.getValue(t, field);
+            if (reflectHelper.isBasicType(field)) {
+                value = reflectHelper.getValue(t, field);
                 if (value instanceof Boolean) {
                     value = setBooleanValue(field.getName(), (Boolean) value);
                 }
@@ -577,7 +586,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
                 Field field = sqlNameMap.get(sqlFieldList.get(i));
                 int index = cursor.getColumnIndex(sqlFieldList.get(i).getName());
                 String sqlDataType = null;
-                if (reflactionHelper.isBasicType(field)) {
+                if (reflectHelper.isBasicType(field)) {
                     sqlDataType = getSqlFieldType(field.getName(), field.getType()).getTypeString();
                 } else {
                     sqlDataType = conversionSQLiteType(field).getTypeString();
@@ -618,7 +627,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
                 //此处可以进行解密类型操作
 
                 try {
-                    if (reflactionHelper.isBasicType(field)) {
+                    if (reflectHelper.isBasicType(field)) {
                         if (field.getType() == Boolean.class || field.getType().getName().equals("boolean")) {
                             Object booleanTrueValue = setBooleanValue(field.getName(), true);
                             if (booleanTrueValue.equals(value)) {
@@ -671,7 +680,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
         if (classArray != null && classArray.length > 0) {
             Object[] objects = new Object[classArray.length];
             for (int i = 0; i < classArray.length; i++) {
-                Object value = reflactionHelper.getDefaultValue(classArray[i]);
+                Object value = reflectHelper.getDefaultValue(classArray[i]);
                 objects[i] = value;
             }
             return (T) constructor.newInstance(objects);
@@ -719,7 +728,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      * @return
      */
     private SQLFieldType conversionSQLiteType(Field field) {
-        if(reflactionHelper.isDataStructure(field)){
+        if(reflectHelper.isDataStructure(field)){
             //如果是数据结构类型的属性，SQL中存储的类型为TEXT且无线长度类型
             SQLFieldType sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT,-1);
             return  sqlFieldType;
@@ -744,7 +753,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      */
     private Object setConversionValue(Field field, T t) {
         //先判断是不是数据结构类型
-        if (reflactionHelper.isDataStructure(field)) {
+        if (reflectHelper.isDataStructure(field)) {
             return getDataStructureJson(t,field);
         }
         //先看转换类型的操作
@@ -762,15 +771,15 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
             }
-            Object zValue = reflactionHelper.getValue(t, field);
+            Object zValue = reflectHelper.getValue(t, field);
             if (zValue != null) {
-                value = reflactionHelper.getValue(zValue, valueField);
+                value = reflectHelper.getValue(zValue, valueField);
             } else {
                 value = null;
             }
         } else {
             //Json存储
-            Object zValue = reflactionHelper.getValue(t, field);
+            Object zValue = reflectHelper.getValue(t, field);
             value = toJson(zValue, typeClass);
         }
         return value;
@@ -793,14 +802,14 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
         String json = null;
         if(field.getType().isArray()) {
             //数组
-            Object[] objectArray = reflactionHelper.getValueArray(t, field);
+            Object[] objectArray = reflectHelper.getValueArray(t, field);
             if (objectArray != null) {
                 List list = Arrays.asList(objectArray);
                 json = jsonHelper.toJsonByList(list);
             }
         }else {
             //其他数据结构
-            Object obj = reflactionHelper.getValue(t,field);
+            Object obj = reflectHelper.getValue(t,field);
             if(obj != null) {
                 json = jsonHelper.toJson(obj);
             }
@@ -824,7 +833,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      */
     private Object resumeConversionObject(Field field, Object value) {
         //先判断是不是数据结构类型
-        if (reflactionHelper.isDataStructure(field)) {
+        if (reflectHelper.isDataStructure(field)) {
             return getDataStructureObj(field, (String) value);
         }
         Operate operate = field.getAnnotation(Operate.class);
@@ -860,7 +869,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
     }
 
     private SQLFieldTypeEnum getSqlStringType(Class<?> fieldJavaType) {
-        return reflactionHelper.getSqlStringType(fieldJavaType);
+        return reflectHelper.getSqlStringType(fieldJavaType);
     }
 
     public interface OnCreateSQLiteCallback {

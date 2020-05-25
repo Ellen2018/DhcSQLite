@@ -1,6 +1,4 @@
-package com.ellen.dhcsqlitelibrary.table;
-
-import com.ellen.dhcsqlitelibrary.table.operate.SearchSingle;
+package com.ellen.dhcsqlitelibrary.table.operate;
 
 /**
  * 自动化设计你的操作

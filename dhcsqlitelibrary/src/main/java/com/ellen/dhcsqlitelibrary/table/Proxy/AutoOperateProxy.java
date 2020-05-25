@@ -1,12 +1,14 @@
 package com.ellen.dhcsqlitelibrary.table.Proxy;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
 import com.ellen.dhcsqlitelibrary.table.operate.Delete;
+import com.ellen.dhcsqlitelibrary.table.operate.SearchByMajorKey;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalSearchSql;
 import com.ellen.dhcsqlitelibrary.table.operate.Search;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalSql;
@@ -30,7 +32,6 @@ public class AutoOperateProxy implements InvocationHandler {
     public AutoOperateProxy(ZxyReflectionTable zxyReflectionTable) {
         this.zxyReflectionTable = zxyReflectionTable;
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private Map<String, Object> getArgValue(Method method, Object[] args) {
@@ -64,7 +65,10 @@ public class AutoOperateProxy implements InvocationHandler {
         Search search = method.getAnnotation(Search.class);
         if (search != null) {
             String whereSql = search.whereSql();
-            String orderSql = search.orderSql().equals("") ? null : search.orderSql();
+            String orderSql = search.orderSql();
+            if(orderSql != null && orderSql.equals("")){
+                orderSql = null;
+            }
             return zxyReflectionTable.search(newSql(whereSql, method, args), orderSql);
         }
         Delete delete = method.getAnnotation(Delete.class);
@@ -106,6 +110,25 @@ public class AutoOperateProxy implements InvocationHandler {
             Log.e("Ellen2018","update语句:"+updateSql);
             zxyReflectionTable.exeSQL(updateSql);
             return null;
+        }
+        SearchByMajorKey searchByMajorKey = method.getAnnotation(SearchByMajorKey.class);
+        if(searchByMajorKey != null){
+            String whereSql = searchByMajorKey.whereSql();
+            String orderSql = searchByMajorKey.orderSql();
+            if(orderSql != null && orderSql.equals("")){
+                orderSql = null;
+            }
+            String majorKeyName = zxyReflectionTable.getMajorKeyName();
+            if(!TextUtils.isEmpty(majorKeyName)) {
+                if(whereSql.contains("{}")) {
+                    whereSql = whereSql.replace("{}", zxyReflectionTable.getMajorKeyName());
+                }else {
+                    whereSql = zxyReflectionTable.getMajorKeyName() + " "+whereSql;
+                }
+            }else {
+                throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据!");
+            }
+            return zxyReflectionTable.search(newSql(whereSql,method,args),orderSql);
         }
         return null;
     }

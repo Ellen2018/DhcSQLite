@@ -7,15 +7,15 @@ import androidx.annotation.Nullable;
 
 import java.io.File;
 
-public class ZxySQLiteHelper extends SQLiteOpenHelper {
+class ZxySQLiteHelper extends SQLiteOpenHelper {
 
     private ZxySQLiteHelperCallback zxySQLiteHelperCallback;
 
-    public ZxySQLiteHelper(@Nullable Context context, @Nullable String fatherFile, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version){
+    ZxySQLiteHelper(@Nullable Context context, @Nullable String fatherFile, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version){
         super(context,new File(fatherFile,name+".db").getAbsolutePath(),factory,version);
     }
 
-    public ZxySQLiteHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+    ZxySQLiteHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
 
@@ -37,11 +37,11 @@ public class ZxySQLiteHelper extends SQLiteOpenHelper {
         return zxySQLiteHelperCallback;
     }
 
-    public void setZxySQLiteHelperCallback(ZxySQLiteHelperCallback zxySQLiteHelperCallback) {
+    void setZxySQLiteHelperCallback(ZxySQLiteHelperCallback zxySQLiteHelperCallback) {
         this.zxySQLiteHelperCallback = zxySQLiteHelperCallback;
     }
 
-    public interface ZxySQLiteHelperCallback{
+    interface ZxySQLiteHelperCallback{
         void onCreate(SQLiteDatabase db);
         void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion);
     }

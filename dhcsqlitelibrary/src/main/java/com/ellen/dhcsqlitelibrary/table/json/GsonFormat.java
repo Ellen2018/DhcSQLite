@@ -14,7 +14,7 @@ public class GsonFormat implements JsonFormat {
     private Object gsonObject;
     private Gson gson;
 
-    public GsonFormat(Object gsonObject) {
+    GsonFormat(Object gsonObject) {
         this.gsonObject = gsonObject;
         gson = new Gson();
     }

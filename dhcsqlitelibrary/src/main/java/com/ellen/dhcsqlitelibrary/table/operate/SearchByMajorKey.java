@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SearchSingle {
-    String value();
+public @interface SearchByMajorKey {
+    String whereSql();
+    String orderSql() default "";
 }

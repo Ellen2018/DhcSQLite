@@ -1,9 +1,8 @@
 package com.ellen.dhcsqlite;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
-import com.ellen.dhcsqlitelibrary.table.AutoDesignOperate;
+import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
@@ -11,11 +10,8 @@ import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public class StudentTable extends ZxyReflectionTable<Student, MyAutoDesignOperate> {
 
