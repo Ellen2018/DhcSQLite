@@ -30,7 +30,7 @@ public interface MyAutoDesignOperate extends AutoDesignOperate {
      */
     @Delete("id = @id and my_name = '@name'")
     void deleteData(@Value("id") int id,@Value("name") String name);
-    
+
     @TotalSearchSql("SELECT * FROM Student WHERE your_age > 50;")
     List<Student> search();
 
