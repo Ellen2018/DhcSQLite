@@ -6,14 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
- * 用于查找的
- * 使用者可以自定义查找方法封装
+ * 用于更新数据
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Search {
-
+public @interface Update {
+    String valueSql();
     String whereSql();
-    String orderSql() default "";
 }

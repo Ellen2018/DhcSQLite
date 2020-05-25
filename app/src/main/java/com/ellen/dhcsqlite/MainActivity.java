@@ -12,6 +12,7 @@ import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.delete.DeleteTableDataRow;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.order.Order;
+import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
 import com.ellen.sqlitecreate.createsql.where.WhereIn;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tvAll = findViewById(R.id.tv_all);
         sQliteLibrary = new SQliteLibrary(this, "sqlite_library", 1);
-        studentTable = new StudentTable(sQliteLibrary.getWriteDataBase(), Student.class);
+        studentTable = new StudentTable(sQliteLibrary.getWriteDataBase(), Student.class,MyAutoDesignOperate.class);
 
         studentTable.setZxyChangeListener(new ZxyChangeListener() {
             @Override
@@ -56,7 +57,12 @@ public class MainActivity extends AppCompatActivity {
         //其他用法
         //other();
 
-        for(Student student:studentTable.getAllData(null)){
+
+        studentTable.getAutoDesignOperate().update("傻逼","Ellen2018");
+
+        List<Student> studentList = studentTable.getAutoDesignOperate().getSearchList1(17,"傻逼");
+
+        for(Student student:studentList){
             Log.e("Ellen2018",student.toString());
         }
 
@@ -257,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
         //多条数据添加
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            student = new Student(i, "Ellen2018", 19, "18272167574", "火星");
+            student = new Student(i, "Ellen2018", i, "18272167574", "火星");
             father = new Father("Ellen2019", ""+i);
             student.setFather(father);
             student.setMan(true);

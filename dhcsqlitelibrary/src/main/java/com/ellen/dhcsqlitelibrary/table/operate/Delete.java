@@ -7,13 +7,12 @@ import java.lang.annotation.Target;
 
 /**
  *
- * 用于查找的
+ * 用于删除
  * 使用者可以自定义查找方法封装
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Search {
+public @interface Delete {
 
-    String whereSql();
-    String orderSql() default "";
+    String value();
 }

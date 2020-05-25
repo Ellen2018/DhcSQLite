@@ -3,6 +3,7 @@ package com.ellen.dhcsqlite;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.ellen.dhcsqlitelibrary.table.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
@@ -16,14 +17,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-public class StudentTable extends ZxyReflectionTable<Student> {
+public class StudentTable extends ZxyReflectionTable<Student, MyAutoDesignOperate> {
 
-    public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass) {
-        super(db, dataClass);
+
+    public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, Class<? extends AutoDesignOperate> autoClass) {
+        super(db, dataClass, autoClass);
     }
 
-    public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, String autoTableName) {
-        super(db, dataClass, autoTableName);
+    public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, String autoTableName, Class<? extends AutoDesignOperate> autoClass) {
+        super(db, dataClass, autoTableName, autoClass);
     }
 
     /**

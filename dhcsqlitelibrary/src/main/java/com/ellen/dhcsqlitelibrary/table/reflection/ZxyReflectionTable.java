@@ -3,11 +3,9 @@ package com.ellen.dhcsqlitelibrary.table.reflection;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
-import android.util.Log;
 
-import androidx.annotation.RequiresApi;
-
+import com.ellen.dhcsqlitelibrary.table.AutoDesignOperate;
+import com.ellen.dhcsqlitelibrary.table.Proxy.AutoOperateProxy;
 import com.ellen.dhcsqlitelibrary.table.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
@@ -31,6 +29,7 @@ import com.ellen.sqlitecreate.createsql.where.Where;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,12 +40,13 @@ import java.util.List;
  * 此类是基于反射对类进行自动建表
  * 完全类似于LitePal的用法
  */
-public abstract class ZxyReflectionTable<T> extends ZxyTable {
+public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends ZxyTable {
 
     private Class dataClass;
 
     private List<SQLField> sqlFieldList;
     private String tableName;
+    private O autoDesignOperate;
     private ReflactionHelper<T> reflactionHelper;
     private HashMap<SQLField, Field> sqlNameMap;
     private Field primarykeyField = null;
@@ -54,24 +54,30 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     private JsonHelper jsonHelper;
 
     private ZxyChangeListener zxyChangeListener;
+    private Class<? extends AutoDesignOperate> autoClass;
 
-    public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass) {
+    public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass,Class<? extends AutoDesignOperate> autoClass) {
         super(db);
-        init(dataClass.getSimpleName(), dataClass);
+        init(dataClass.getSimpleName(), dataClass,autoClass);
     }
 
-    public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName) {
-        super(db);
-        init(autoTableName, dataClass);
+    public O getAutoDesignOperate() {
+        return autoDesignOperate;
     }
 
-    private void init(String tableName, Class<? extends T> dataClass) {
+    public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName,Class<? extends AutoDesignOperate> autoClass) {
+        super(db);
+        init(autoTableName, dataClass,autoClass);
+    }
+
+    private void init(String tableName, Class<? extends T> dataClass,Class<? extends AutoDesignOperate> autoClass) {
         this.dataClass = dataClass;
         this.tableName = tableName;
         reflactionHelper = new ReflactionHelper<>();
         sqlNameMap = new HashMap<>();
         getFields();
         jsonHelper = new JsonHelper(getJsonLibraryType());
+        autoDesignOperate = (O) AutoOperateProxy.newMapperProxy(autoClass,this);
     }
 
     public void setZxyChangeListener(ZxyChangeListener zxyChangeListener) {
@@ -248,6 +254,10 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         if (!isException) {
             onDeleteTableCallback.onDeleteTableSuccess(deleteTableSQL);
         }
+    }
+
+    public void deleteData(String deleteSql){
+        exeSQL(deleteSql);
     }
 
     /**
@@ -508,6 +518,15 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         return searchDataBySql(getAllTableDataSQL);
     }
 
+    /**
+     * 查询数据通过一整段sql语句
+     * @param searchSql
+     * @return
+     */
+    public List<T> searchByTotalSql(String searchSql){
+        return searchDataBySql(searchSql);
+    }
+
     public List<T> search(String whereSQL, String orderSQL) {
         List<T> dataList = new ArrayList<>();
         SerachTableData serachTableData = getSerachTableData().setTableName(tableName);
@@ -521,7 +540,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         return searchDataBySql(serachSQL);
     }
 
-    private List<T> searchDataBySql(String sql) {
+    public List<T> searchDataBySql(String sql) {
         List<T> dataList = new ArrayList<>();
         Cursor cursor = searchBySQL(sql);
         while (cursor.moveToNext()) {
@@ -609,6 +628,8 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         }
         return dataList;
     }
+
+
 
     /**
      * 提供给懒得写转换类型代码的人
