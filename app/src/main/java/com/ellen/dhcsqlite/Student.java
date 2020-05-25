@@ -37,7 +37,7 @@ public class Student {
         this.age = age;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        
+
         fathers = new Father[5];
         for (int i = 0; i < fathers.length; i++) {
             fathers[i] = new Father("名字：" + i, "ID:" + i);
