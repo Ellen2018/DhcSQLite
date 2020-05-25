@@ -7,15 +7,13 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyChangeListener;
-import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
+import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.delete.DeleteTableDataRow;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.order.Order;
-import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
-import com.ellen.sqlitecreate.createsql.where.WhereIn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         String tableName = studentTable.getTableName();
 
         //修改表名
-        studentTable.reNameTable("my_student", new ZxyReflectionTable.OnRenameTableCallback() {
+        studentTable.reNameTable("my_student", new ZxyTable.OnRenameTableCallback() {
             @Override
             public void onRenameFailure(String errMessage, String currentName, String newName, String reNameTableSQL) {
                 //修改失败回调这里
@@ -107,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         sQliteLibrary.deleteTable(studentTable.getTableName());
 
         //删除表 & 带回调
-        studentTable.deleteTable(new ZxyReflectionTable.OnDeleteTableCallback() {
+        studentTable.deleteTable(new ZxyTable.OnDeleteTableCallback() {
             @Override
             public void onDeleteTableFailure(String errMessage, String deleteTableSQL) {
                 //删除失败回调这里
@@ -121,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         //删除其他表
         studentTable.deleteTable("father");
-        studentTable.deleteTable("father", new ZxyReflectionTable.OnDeleteTableCallback() {
+        studentTable.deleteTable("father", new ZxyTable.OnDeleteTableCallback() {
             @Override
             public void onDeleteTableFailure(String errMessage, String deleteTableSQL) {
 
@@ -228,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     private void onCreateTable() {
 
         //创建表带回调
-        studentTable.onCreateTableIfNotExits(new ZxyReflectionTable.OnCreateSQLiteCallback() {
+        studentTable.onCreateTableIfNotExits(new ZxyTable.OnCreateSQLiteCallback() {
             @Override
             public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
 

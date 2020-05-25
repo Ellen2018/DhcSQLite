@@ -4,7 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
-import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
+import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.google.gson.Gson;
@@ -13,7 +13,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class StudentTable extends ZxyReflectionTable<Student, MyAutoDesignOperate> {
+public class StudentTable extends ZxyTable<Student, MyAutoDesignOperate> {
 
 
     public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, Class<? extends AutoDesignOperate> autoClass) {

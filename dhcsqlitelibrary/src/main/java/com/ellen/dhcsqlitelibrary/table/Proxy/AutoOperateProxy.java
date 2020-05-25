@@ -15,7 +15,7 @@ import com.ellen.dhcsqlitelibrary.table.operate.TotalSql;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalUpdateSql;
 import com.ellen.dhcsqlitelibrary.table.operate.Update;
 import com.ellen.dhcsqlitelibrary.table.operate.Value;
-import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
+import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -27,10 +27,10 @@ import java.util.Set;
 
 public class AutoOperateProxy implements InvocationHandler {
 
-    private ZxyReflectionTable zxyReflectionTable;
+    private ZxyTable zxyReflectionTable;
 
-    public AutoOperateProxy(ZxyReflectionTable zxyReflectionTable) {
-        this.zxyReflectionTable = zxyReflectionTable;
+    public AutoOperateProxy(ZxyTable zxyTable) {
+        this.zxyReflectionTable = zxyTable;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -133,10 +133,10 @@ public class AutoOperateProxy implements InvocationHandler {
         return null;
     }
 
-    public static <T> T newMapperProxy(Class<T> mapperInterface, ZxyReflectionTable zxyReflectionTable) {
+    public static <T> T newMapperProxy(Class<T> mapperInterface, ZxyTable zxyTable) {
         ClassLoader classLoader = mapperInterface.getClassLoader();
         Class<?>[] interfaces = new Class[]{mapperInterface};
-        AutoOperateProxy proxy = new AutoOperateProxy(zxyReflectionTable);
+        AutoOperateProxy proxy = new AutoOperateProxy(zxyTable);
         return (T) Proxy.newProxyInstance(classLoader, interfaces, proxy);
     }
 
