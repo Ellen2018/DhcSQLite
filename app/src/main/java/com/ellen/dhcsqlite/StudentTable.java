@@ -111,6 +111,7 @@ public class StudentTable extends ZxyReflectionTable<Student> {
                 fathers1[i] = fathers.get(i);
             }
             return fathers1;
+            
         }
         return null;
     }
