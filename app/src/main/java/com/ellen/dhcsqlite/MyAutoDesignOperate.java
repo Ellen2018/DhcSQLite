@@ -5,7 +5,6 @@ import com.ellen.dhcsqlitelibrary.table.operate.Delete;
 import com.ellen.dhcsqlitelibrary.table.operate.Search;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalSearchSql;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalUpdateSql;
-import com.ellen.dhcsqlitelibrary.table.operate.Update;
 import com.ellen.dhcsqlitelibrary.table.operate.Value;
 
 import java.util.List;
@@ -38,6 +37,6 @@ public interface MyAutoDesignOperate extends AutoDesignOperate {
 
     @TotalUpdateSql("UPDATE Student SET my_name = '@newName' WHERE my_name = '@oldName';")
     void update(@Value("newName") String newName,@Value("oldName") String oldName);
-    
+
 }
 
