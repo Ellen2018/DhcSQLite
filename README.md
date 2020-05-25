@@ -72,10 +72,7 @@
         }
     }
 
-&emsp;&emsp;选择好需要和数据库进行绑定的类，例如我要绑定的是Student类，那么我就需要创建一个StudentTable的类并让它继承ZxyReflectionTable<Student>,代码如下所示：
-
-
-    [代码查阅](https://github.com/Ellen2018/DhcSQLite/blob/master/app/src/main/java/com/ellen/dhcsqlite/StudentTable.java)
+&emsp;&emsp;选择好需要和数据库进行绑定的类，例如我要绑定的是Student类，那么我就需要创建一个StudentTable的类并让它继承ZxyReflectionTable<Student>,代码如下所示：[代码查阅](https://github.com/Ellen2018/DhcSQLite/blob/master/app/src/main/java/com/ellen/dhcsqlite/StudentTable.java)
 
 &emsp;&emsp;步骤三:操作表。接下来，我们就可以任性的进行创建表和操作表了，笔者提供了两种方式来操作表，第一种是笔者封装的方法，第二种是通过[ZxySQLiteCreate](https://github.com/Ellen2018/ZxySQLiteCreate)
 库来构建add,delete,where,order等语句来完成操作，由于封装的实在太多，待笔者一点点进行整理吧。详细代码如下：  
