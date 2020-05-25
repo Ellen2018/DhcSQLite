@@ -102,13 +102,7 @@ public class StudentTable extends ZxyReflectionTable<Student> {
      */
     @Override
     protected Object resumeDataStructure(String  classFieldName, String json) {
-        if(classFieldName.equals("fatherSet")) {
-            Type founderSetType = new TypeToken<Map<Integer, Father>>() {}.getType();
-            return new Gson().fromJson(json, founderSetType);
-        }else if(classFieldName.equals("fatherList")){
-            Type founderSetType = new TypeToken<List<Father>>() {}.getType();
-            return new Gson().fromJson(json, founderSetType);
-        }else if(classFieldName.equals("fathers")){
+      if(classFieldName.equals("fathers")){
             Type founderSetType = new TypeToken<List<Father>>() {}.getType();
             List<Father> fathers = new Gson().fromJson(json, founderSetType);
             Father[] fathers1 = new Father[fathers.size()];
