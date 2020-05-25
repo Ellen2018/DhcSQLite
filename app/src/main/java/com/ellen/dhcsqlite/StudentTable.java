@@ -40,6 +40,7 @@ public class StudentTable extends ZxyReflectionTable<Student> {
 
     /**
      * boolean类型值转化为数据库中的存储
+     * 此方法默认情况下无须重写
      *
      * 如果你的bean类中没有boolean类型的存储，此方法返回null即可
      *
@@ -61,63 +62,41 @@ public class StudentTable extends ZxyReflectionTable<Student> {
         }
     }
 
-    @Override
-    protected boolean isAutoCreateTable() {
-        //true(自动创建表)
-        return true;
-    }
-
     /**
-     *  检测发现目标类中不可转换类型的属性类型映射为数据库中存储的字段类型
-     *  例如:Father --> TEXT
-     * @param classFieldName 类属性名字
-     * @param typeClass 类属性的类型
-     * @return 返回存储在数据库的类型
+     * 这里是将bean中的无法进行转换的对象进行json映射
+     * 比如:Student中的father
+     *
+     * 为什么这里需要重写呢？
+     * 因为笔者并不知道你json映射的库使用的哪个，因此我将此处json映射逻辑交给你自行处理
+     * @param obj
+     * @param targetClass
+     * @return
      */
     @Override
-    protected SQLFieldType conversionSQLiteType(String classFieldName, Class typeClass) {
-        //将Java类中的Father类型的father字段映射为数据库中的TEXT类型
-        if(classFieldName.equals("father")){
-            return new SQLFieldType(SQLFieldTypeEnum.TEXT,null);
+    protected String toJson(Object obj, Class targetClass) {
+        String json = null;
+        if(targetClass == Father.class){
+            Father father = (Father) obj;
+            json = new Gson().toJson(father);
         }
-        return null;
+        return json;
     }
 
     /**
-     * 将目标类对象的非转换类型的属性值映射为数据库中存储的值,与conversionSQLiteType方法配合使用
-     * @param student
-     * @param classFieldName
-     * @param typeClass
+     * 将json映射为目标对象
+     * 比如:Student中的father
+     *
+     * 为什么这里需要重写呢？
+     * 因为笔者并不知道你json映射的库使用的哪个，因此我将此处json映射逻辑交给你自行处理
+     * @param json
+     * @param targetClass
      * @param <E>
      * @return
      */
     @Override
-    protected <E> E setConversionValue(Student student, String classFieldName, Class typeClass) {
-        if(classFieldName.equals("father")){
-            Gson gson = new Gson();
-            String jsonFather = gson.toJson(student.getFather());
-            return (E) jsonFather;
-        }
-        return null;
+    protected <E> E resumeValue(String json, Class targetClass) {
+        E e = (E) new Gson().fromJson(json,targetClass);
+        return e;
     }
 
-    /**
-     *  将数据库中相应的非转换类型存储的值映射为相应的类型值
-     *  例如： TEXT -> Father
-     * @param value
-     * @param classFieldName
-     * @param typeClass
-     * @param <E>
-     * @return
-     */
-    @Override
-    protected <E> E resumeConversionObject(Object value, String classFieldName, Class typeClass) {
-        if(classFieldName.equals("father")){
-            String json = (String) value;
-            Gson gson = new Gson();
-            Father father = gson.fromJson(json,Father.class);
-            return (E) father;
-        }
-        return null;
-    }
 }

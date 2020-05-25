@@ -3,6 +3,8 @@ package com.ellen.dhcsqlitelibrary.table.reflection;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.ellen.sqlitecreate.createsql.delete.DeleteTable;
+
 public abstract class ZxyLibrary {
 
     protected ZxySQLiteHelper zxySQLiteHelper;
@@ -57,5 +59,10 @@ public abstract class ZxyLibrary {
 
     public  abstract void onZxySQLiteCreate(SQLiteDatabase db);
     public  abstract void onZxySQLiteUpgrade(SQLiteDatabase db, int oldVersion, int newVersion);
+
+    public void deleteTable(String tableName){
+        String deleteTableSql = DeleteTable.getInstance().setTableName(tableName).createSQL();
+        getWriteDataBase().execSQL(deleteTableSql);
+    }
 
 }

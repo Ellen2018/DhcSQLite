@@ -23,13 +23,14 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tvAll;
     private StudentTable studentTable;
+    private SQliteLibrary sQliteLibrary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvAll = findViewById(R.id.tv_all);
-        SQliteLibrary sQliteLibrary = new SQliteLibrary(this, "sqlite_library", 1);
+        sQliteLibrary = new SQliteLibrary(this, "sqlite_library", 1);
         studentTable = new StudentTable(sQliteLibrary.getWriteDataBase(), Student.class);
 
         studentTable.setZxyChangeListener(new ZxyChangeListener() {
@@ -55,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
         //其他用法
         //other();
 
+//        for(Student student:studentTable.getAllData(null)){
+//            Log.e("Ellen2018",student.toString());
+//        }
 
     }
 
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         String tableName = studentTable.getTableName();
 
         //修改表名
-        studentTable.reNameTable("my_student", new ZxyReflectionTable.OnRenameTableCallbcak() {
+        studentTable.reNameTable("my_student", new ZxyReflectionTable.OnRenameTableCallback() {
             @Override
             public void onRenameFailure(String errMessage, String currentName, String newName, String reNameTableSQL) {
                 //修改失败回调这里
@@ -90,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
         //删除表
         studentTable.deleteTable();
+
+        //也可以通过Library对象进行删除
+        sQliteLibrary.deleteTable(studentTable.getTableName());
 
         //删除表 & 带回调
         studentTable.deleteTable(new ZxyReflectionTable.OnDeleteTableCallback() {
@@ -251,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
             student = new Student(i, "Ellen2018", 19, "18272167574", "火星");
+            father = new Father("Ellen2019", ""+i);
+            student.setFather(father);
             student.setMan(true);
             studentList.add(student);
         }

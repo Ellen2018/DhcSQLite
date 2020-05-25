@@ -3,12 +3,14 @@ package com.ellen.dhcsqlitelibrary.table.reflection;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.EncryptionInterFace;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NoBasicTypeSetting;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NotNull;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Primarykey;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
@@ -21,6 +23,8 @@ import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -35,38 +39,32 @@ import java.util.List;
 public abstract class ZxyReflectionTable<T> extends ZxyTable {
 
     private Class dataClass;
+
     private List<SQLField> sqlFieldList;
     private String tableName;
     private ReflactionHelper<T> reflactionHelper;
     private HashMap<SQLField, Field> sqlNameMap;
     private Field primarykeyField = null;
     private SQLField primarykeySqlField = null;
+
     private ZxyChangeListener zxyChangeListener;
 
     public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass) {
         super(db);
-        this.dataClass = dataClass;
-        this.tableName = dataClass.getSimpleName();
-        reflactionHelper = new ReflactionHelper<>();
-        sqlNameMap = new HashMap<>();
-        getFields();
-        //自动创建表
-        if (isAutoCreateTable()) {
-            onCreateTableIfNotExits();
-        }
+        init(dataClass.getSimpleName(), dataClass);
     }
 
     public ZxyReflectionTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName) {
         super(db);
+        init(autoTableName, dataClass);
+    }
+
+    private void init(String tableName, Class<? extends T> dataClass) {
         this.dataClass = dataClass;
-        this.tableName = autoTableName;
+        this.tableName = tableName;
         reflactionHelper = new ReflactionHelper<>();
         sqlNameMap = new HashMap<>();
         getFields();
-        //自动创建表
-        if (isAutoCreateTable()) {
-            onCreateTableIfNotExits();
-        }
     }
 
     public void setZxyChangeListener(ZxyChangeListener zxyChangeListener) {
@@ -85,12 +83,13 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
             if (reflactionHelper.isBasicType(field)) {
                 fieldType = getSqlFieldType(field.getName(), field.getType()).getSQLFieldTypeString();
             } else {
-                fieldType = conversionSQLiteType(field.getName(), field.getType()).getSQLFieldTypeString();
+                //不是基本类型
+                fieldType = conversionSQLiteType(field).getSQLFieldTypeString();
             }
             DhcSqlFieldName dhcSqlFieldName = field.getAnnotation(DhcSqlFieldName.class);
-            if(dhcSqlFieldName == null) {
+            if (dhcSqlFieldName == null) {
                 fieldName = getSQLFieldName(field.getName(), field.getType());
-            }else {
+            } else {
                 fieldName = dhcSqlFieldName.value();
             }
             Primarykey primarykey = field.getAnnotation(Primarykey.class);
@@ -187,9 +186,9 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * 重命名表
      *
      * @param newName
-     * @param onRenameTableCallbcak
+     * @param onRenameTableCallback
      */
-    public void reNameTable(String newName, OnRenameTableCallbcak onRenameTableCallbcak) {
+    public void reNameTable(String newName, OnRenameTableCallback onRenameTableCallback) {
         boolean isException = false;
         String reNameTableSql = getUpdateTableName()
                 .setOldTableName(tableName)
@@ -199,24 +198,25 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
             exeSQL(reNameTableSql);
         } catch (SQLException e) {
             isException = true;
-            onRenameTableCallbcak.onRenameFailure(e.getMessage(), tableName, newName, reNameTableSql);
+            onRenameTableCallback.onRenameFailure(e.getMessage(), tableName, newName, reNameTableSql);
         }
         if (!isException) {
             this.tableName = newName;
-            onRenameTableCallbcak.onRenameSuccess(tableName, newName, reNameTableSql);
+            onRenameTableCallback.onRenameSuccess(tableName, newName, reNameTableSql);
         }
     }
 
-    public void deleteTable(){
+    public void deleteTable() {
         deleteTable(tableName);
     }
 
-    public void deleteTable(OnDeleteTableCallback onDeleteTableCallback){
-        deleteTable(tableName,onDeleteTableCallback);
+    public void deleteTable(OnDeleteTableCallback onDeleteTableCallback) {
+        deleteTable(tableName, onDeleteTableCallback);
     }
 
     /**
      * 删除表 by 表名字
+     *
      * @param tableName
      */
     public void deleteTable(String tableName) {
@@ -226,6 +226,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
 
     /**
      * 删除表 by 表名字 & 带回调
+     *
      * @param tableName
      */
     public void deleteTable(String tableName, OnDeleteTableCallback onDeleteTableCallback) {
@@ -262,18 +263,16 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
                     value = setBooleanValue(field.getName(), (Boolean) value);
                 }
             } else {
-                value = setConversionValue(data, field.getName(), field.getType());
+                value = setConversionValue(field, data);
             }
-            if (ZxyReflectionTable.this instanceof EncryptionInterFace) {
-                //进行加密
-                EncryptionInterFace encryptionInterFace = (EncryptionInterFace) this;
-                value = encryptionInterFace.encryption(field.getName(), sqlFieldList.get(i).getName(), field.getType(), value);
-            }
+
+            //此处可以添加记录数据库数据之前的操作:加密数据等
+
             addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
         }
         String addDataSql = addSingleRowToTable.createSQL();
         exeSQL(addDataSql);
-        if(zxyChangeListener != null){
+        if (zxyChangeListener != null) {
             zxyChangeListener.onDataChange();
         }
     }
@@ -305,20 +304,18 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
                         value = setBooleanValue(field.getName(), (Boolean) value);
                     }
                 } else {
-                    value = setConversionValue(dataList.get(i), field.getName(), field.getType());
+                    value = setConversionValue(field, dataList.get(i));
                 }
-                if (ZxyReflectionTable.this instanceof EncryptionInterFace) {
-                    //进行加密
-                    EncryptionInterFace encryptionInterFace = (EncryptionInterFace) this;
-                    value = encryptionInterFace.encryption(field.getName(), sqlFieldList.get(j).getName(), field.getType(), value);
-                }
+
+                //此处可以添加记录数据库数据之前的操作:加密数据等
+
                 list.add(value);
             }
             addManyRowToTable.addValueList(list);
         }
         String addDataSql = addManyRowToTable.createSQL();
         exeSQL(addDataSql);
-        if(zxyChangeListener != null){
+        if (zxyChangeListener != null) {
             zxyChangeListener.onDataChange();
         }
     }
@@ -332,7 +329,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         if (dataList == null || dataList.size() == 0) {
             return;
         }
-        clear();
+        clear(false);
         saveData(dataList);
     }
 
@@ -345,7 +342,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         if (data == null) {
             return;
         }
-        clear();
+        clear(false);
         saveData(data);
     }
 
@@ -358,19 +355,25 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     public void delete(String whereSQL) {
         String deleteSQL = getDeleteTableDataRow().setTableName(tableName).createSQLAutoWhere(whereSQL);
         exeSQL(deleteSQL);
-        if(zxyChangeListener != null){
+        if (zxyChangeListener != null) {
             zxyChangeListener.onDataChange();
         }
+    }
+
+    public void clear() {
+        clear(true);
     }
 
     /**
      * 清空数据
      */
-    public void clear() {
+    private void clear(boolean isResponseChange) {
         String clearTableSQL = getDeleteTableDataRow().setTableName(tableName).createDeleteAllDataSQL();
         exeSQL(clearTableSQL);
-        if(zxyChangeListener != null){
-            zxyChangeListener.onDataChange();
+        if (isResponseChange) {
+            if (zxyChangeListener != null) {
+                zxyChangeListener.onDataChange();
+            }
         }
     }
 
@@ -378,13 +381,14 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * 根据主键选择更新或者保存
      * 如果存在就选择更新
      * 如果不存在选择保存
+     *
      * @param t
      */
-    public void saveOrUpdateByPrimaryKey(T t){
-        if(isContainsByPrimaryKey(t)){
+    public void saveOrUpdateByPrimaryKey(T t) {
+        if (isContainsByPrimaryKey(t)) {
             //进行更新
             updateByPrimaryKey(t);
-        }else {
+        } else {
             saveData(t);
         }
     }
@@ -393,14 +397,15 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * 根据主键选择更新或者保存
      * 如果存在就选择更新
      * 如果不存在选择保存
+     *
      * @param tList
      */
-    public void saveOrUpdateByPrimaryKey(List<T> tList){
+    public void saveOrUpdateByPrimaryKey(List<T> tList) {
         List<T> saveList = new ArrayList<>();
-        for(T t:tList){
-            if(isContainsByPrimaryKey(t)){
+        for (T t : tList) {
+            if (isContainsByPrimaryKey(t)) {
                 updateByPrimaryKey(t);
-            }else {
+            } else {
                 saveList.add(t);
             }
         }
@@ -409,38 +414,40 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
 
     /**
      * 按照主键进行修改数据
+     *
      * @param t
      */
-    public void updateByPrimaryKey(T t){
-        if(primarykeySqlField == null){
+    public void updateByPrimaryKey(T t) {
+        if (primarykeySqlField == null) {
             //说明没有主键,抛出无主键异常
             throw new NoPrimaryKeyException("没有主键,无法根据主键更新数据!");
-        }else {
+        } else {
             String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL,reflactionHelper.getValue(t,primarykeyField))
+                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL, reflactionHelper.getValue(t, primarykeyField))
                     .createSQL();
-            update(t,whereSql);
+            update(t, whereSql);
         }
     }
 
     /**
      * 判断是否存在该条数据(根据主键判断)
+     *
      * @param t
      * @return
      */
-    public boolean isContainsByPrimaryKey(T t){
+    public boolean isContainsByPrimaryKey(T t) {
         boolean isContains = false;
-        if(primarykeySqlField == null){
+        if (primarykeySqlField == null) {
             //说明没有主键,抛出无主键异常
             throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据的存在!");
-        }else {
+        } else {
             String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL,reflactionHelper.getValue(t,primarykeyField))
+                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL, reflactionHelper.getValue(t, primarykeyField))
                     .createSQL();
-            List<T> tList = search(whereSql,null);
-            if(tList != null && tList.size() > 0){
+            List<T> tList = search(whereSql, null);
+            if (tList != null && tList.size() > 0) {
                 isContains = true;
-            }else {
+            } else {
                 isContains = false;
             }
         }
@@ -467,17 +474,16 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
                     value = setBooleanValue(field.getName(), (Boolean) value);
                 }
             } else {
-                value = setConversionValue(t, field.getName(), field.getType());
+                value = setConversionValue(field, t);
             }
-            if (this instanceof EncryptionInterFace) {
-                EncryptionInterFace encryptionInterFace = (EncryptionInterFace) this;
-                value = encryptionInterFace.encryption(field.getName(), fieldName, field.getType(), value);
-            }
+
+            //此处可以添加记录数据库数据之前的操作:加密数据等
+
             updateTableDataRow.addSetValue(fieldName, value);
         }
         String updateSql = updateTableDataRow.createSQLAutoWhere(whereSQL);
         exeSQL(updateSql);
-        if(zxyChangeListener != null){
+        if (zxyChangeListener != null) {
             zxyChangeListener.onDataChange();
         }
     }
@@ -514,7 +520,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         while (cursor.moveToNext()) {
             T t = null;
             try {
-                t = getT();
+                t = getT(dataClass);
             } catch (Exception e) {
 
             }
@@ -525,7 +531,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
                 if (reflactionHelper.isBasicType(field)) {
                     sqlDataType = getSqlFieldType(field.getName(), field.getType()).getTypeString();
                 } else {
-                    sqlDataType = conversionSQLiteType(field.getName(), field.getType()).getTypeString();
+                    sqlDataType = conversionSQLiteType(field).getTypeString();
                 }
                 Class type = field.getType();
                 Object value = null;
@@ -560,11 +566,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
                     value = cursor.getString(index);
                 }
 
-                //进行解密
-                if (this instanceof EncryptionInterFace) {
-                    EncryptionInterFace encryptionInterFace = (EncryptionInterFace) this;
-                    value = encryptionInterFace.decrypt(field.getName(), sqlFieldList.get(i).getName(), field.getType(), value);
-                }
+                //此处可以进行解密类型操作
 
                 try {
                     if (reflactionHelper.isBasicType(field)) {
@@ -587,7 +589,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
                             }
                         }
                     } else {
-                        field.set(t, resumeConversionObject(value, field.getName(), field.getType()));
+                        field.set(t, resumeConversionObject(field, value));
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -612,7 +614,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         return new SQLFieldType(getSqlStringType(typeClass), null);
     }
 
-    private T getT() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    private T getT(Class dataClass) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor[] constructors = dataClass.getDeclaredConstructors();
         Constructor constructor = constructors[0];
         constructor.setAccessible(true);
@@ -637,8 +639,8 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * @param typeClass
      * @return
      */
-    protected SQLFieldType getSqlFieldType(String classFieldName, Class typeClass){
-        return defaultGetSQLFieldType(classFieldName,typeClass);
+    protected SQLFieldType getSqlFieldType(String classFieldName, Class typeClass) {
+        return defaultGetSQLFieldType(classFieldName, typeClass);
     }
 
     /**
@@ -649,46 +651,114 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * @param typeClass
      * @return
      */
-    protected String getSQLFieldName(String classFieldName, Class typeClass){
+    protected String getSQLFieldName(String classFieldName, Class typeClass) {
         return classFieldName;
     }
 
-    protected abstract Object setBooleanValue(String classFieldName, boolean value);
-
-    protected abstract boolean isAutoCreateTable();
+    protected Object setBooleanValue(String classFieldName, boolean value){
+        if(value){
+            return 1;
+        }else {
+            return 0;
+        }
+    }
 
     /**
      * 非基本类型转换为使用者自定义的类型
      *
-     * @param classFieldName
-     * @param typeClass
+     * @param field
+
      * @return
      */
-    protected abstract SQLFieldType conversionSQLiteType(String classFieldName, Class typeClass);
+    private SQLFieldType conversionSQLiteType(Field field) {
+        NoBasicTypeSetting noBasicTypeSetting = field.getAnnotation(NoBasicTypeSetting.class);
+        SQLFieldTypeEnum sqlFieldTypeEnum = noBasicTypeSetting.sqlFiledType();
+        int length = noBasicTypeSetting.length();
+        SQLFieldType sqlFieldType;
+        if(length <= 0) {
+            sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, null);
+        }else {
+            sqlFieldType = new SQLFieldType(sqlFieldTypeEnum,length);
+        }
+        return sqlFieldType;
+    }
 
     /**
      * 将非基本类型的值转换为数据库中存储的值
      *
      * @param t
-     * @param classFieldName
-     * @param typeClass
-     * @param <E>
      * @return
      */
-    protected abstract <E> E setConversionValue(T t, String classFieldName, Class typeClass);
+    private Object setConversionValue(Field field, T t) {
+        //先看转换类型的操作
+        Class typeClass = field.getType();
+        NoBasicTypeSetting noBasicTypeSetting = field.getAnnotation(NoBasicTypeSetting.class);
+        Operate operate = noBasicTypeSetting.operate();
+        Object value = null;
+        if (operate == Operate.VALUE) {
+            //仅仅存值
+            String valueName = noBasicTypeSetting.valueName();
+            Field valueField = null;
+            try {
+                valueField = typeClass.getDeclaredField(valueName);
+                valueField.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+            Object zValue = reflactionHelper.getValue(t, field);
+            if (zValue != null) {
+                value = reflactionHelper.getValue(zValue, valueField);
+            } else {
+                value = null;
+            }
+        } else {
+            //Json存储
+            Object zValue = reflactionHelper.getValue(t, field);
+            value = toJson(zValue, typeClass);
+        }
+        return value;
+    }
+
+    protected abstract String toJson(Object obj, Class targetClass);
+
+    protected abstract <E> E resumeValue(String json, Class targetClass);
 
     /**
      * 数据库中数据恢复为转换类时回调
      *
      * @param value
-     * @param classFieldName
-     * @param typeClass
-     * @param <E>
      * @return
      */
-    protected abstract <E> E resumeConversionObject(Object value, String classFieldName, Class typeClass);
+    private Object resumeConversionObject(Field field, Object value) {
+        NoBasicTypeSetting noBasicTypeSetting = field.getAnnotation(NoBasicTypeSetting.class);
+        String filedName = noBasicTypeSetting.valueName();
+        Operate operate = noBasicTypeSetting.operate();
+        Class typeClass = field.getType();
+        Object object = null;
+        if (operate == Operate.VALUE) {
+            try {
+                object = getT(typeClass);
+                Field targetField = typeClass.getDeclaredField(filedName);
+                targetField.setAccessible(true);
+                if (value != null && object != null) {
+                    targetField.set(object, value);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        } else {
+            object = resumeValue((String) value, typeClass);
+        }
+        return object;
+    }
 
-    public SQLFieldTypeEnum getSqlStringType(Class<?> fieldJavaType) {
+    private SQLFieldTypeEnum getSqlStringType(Class<?> fieldJavaType) {
         return reflactionHelper.getSqlStringType(fieldJavaType);
     }
 
@@ -700,7 +770,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL);
     }
 
-    public interface OnRenameTableCallbcak {
+    public interface OnRenameTableCallback {
         void onRenameFailure(String errMessage, String currentName, String newName, String reNameTableSQL);
 
         void onRenameSuccess(String oldName, String newName, String reNameTableSQL);

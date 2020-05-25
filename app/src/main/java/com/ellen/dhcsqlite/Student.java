@@ -2,7 +2,10 @@ package com.ellen.dhcsqlite;
 
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Ignore;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NoBasicTypeSetting;
+import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Primarykey;
+import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 public class Student {
 
@@ -17,6 +20,9 @@ public class Student {
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     private boolean isMan;
+    @Ignore
+    @NoBasicTypeSetting(sqlFiledType = SQLFieldTypeEnum.TEXT,length = 100,operate = Operate.JSON)
+    @DhcSqlFieldName("your_father")
     private Father father;
 
     public Student(int id,String name, int age, String phoneNumber, String address) {

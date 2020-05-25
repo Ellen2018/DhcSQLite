@@ -37,11 +37,11 @@ public class ReflactionHelper<T> {
         return fieldList;
     }
 
-    public Object getValue(T t, Field targetField) {
+    public Object getValue(Object obj, Field targetField) {
         targetField.setAccessible(true);
         Object value = null;
         try {
-            value = targetField.get(t);
+            value = targetField.get(obj);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
