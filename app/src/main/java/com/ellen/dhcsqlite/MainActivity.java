@@ -48,17 +48,17 @@ public class MainActivity extends AppCompatActivity {
         //增加数据
         addData();
         //删除数据
-        deleteData();
+        //deleteData();
         //修改数据
-        updateData();
+        //updateData();
         //查询数据
-        searchData();
+        //searchData();
         //其他用法
         //other();
 
-//        for(Student student:studentTable.getAllData(null)){
-//            Log.e("Ellen2018",student.toString());
-//        }
+        for(Student student:studentTable.getAllData(null)){
+            Log.e("Ellen2018",student.toString());
+        }
 
     }
 

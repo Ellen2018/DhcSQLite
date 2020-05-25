@@ -20,7 +20,6 @@ public class Student {
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     private boolean isMan;
-    @Ignore
     @NoBasicTypeSetting(sqlFiledType = SQLFieldTypeEnum.TEXT,length = 100,operate = Operate.JSON)
     @DhcSqlFieldName("your_father")
     private Father father;
@@ -94,4 +93,21 @@ public class Student {
                 ", father=" + father +
                 '}';
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getIngoreString() {
+        return ingoreString;
+    }
+
+    public void setIngoreString(String ingoreString) {
+        this.ingoreString = ingoreString;
+    }
 }
+

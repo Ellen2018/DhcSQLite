@@ -2,6 +2,7 @@ package com.ellen.dhcsqlite;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
@@ -63,40 +64,26 @@ public class StudentTable extends ZxyReflectionTable<Student> {
     }
 
     /**
-     * 这里是将bean中的无法进行转换的对象进行json映射
-     * 比如:Student中的father
+     * 注意，你映射的bean类必须要有空的构造器，否则就会映射失败
+     * 其原因是FastJson无法映射到没有空构造器的bean类
      *
-     * 为什么这里需要重写呢？
-     * 因为笔者并不知道你json映射的库使用的哪个，因此我将此处json映射逻辑交给你自行处理
-     * @param obj
-     * @param targetClass
+     *
+     * JsonLibraryType.Gson --> 使用Gson进行json映射
+     *
+     * JsonLibraryType.FastJson --> 使用FastJson进行json映射
+     *
+     * 当你没有重写此方法时候，默认会使用Gson
+     *
+     * 后期还可以加入其它的json映射类型
+     *
+     *  非常注意:如果你的项目中没有导入Json解析库:Gson或者是FastJson,那么在映射的时候就会抛出JsonNoCanFormatException
+     *  一旦出现这个异常，你需要导入Gson或者FastJson库即可解决这个异常
+     *
      * @return
      */
     @Override
-    protected String toJson(Object obj, Class targetClass) {
-        String json = null;
-        if(targetClass == Father.class){
-            Father father = (Father) obj;
-            json = new Gson().toJson(father);
-        }
-        return json;
-    }
-
-    /**
-     * 将json映射为目标对象
-     * 比如:Student中的father
-     *
-     * 为什么这里需要重写呢？
-     * 因为笔者并不知道你json映射的库使用的哪个，因此我将此处json映射逻辑交给你自行处理
-     * @param json
-     * @param targetClass
-     * @param <E>
-     * @return
-     */
-    @Override
-    protected <E> E resumeValue(String json, Class targetClass) {
-        E e = (E) new Gson().fromJson(json,targetClass);
-        return e;
+    protected JsonLibraryType getJsonLibraryType() {
+        return JsonLibraryType.FastJson;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.ellen.dhcsqlitelibrary.table.reflection;
 
+import android.util.Log;
+
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Ignore;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 

@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
+import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
+import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NoBasicTypeSetting;
 import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NotNull;
@@ -46,6 +48,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
     private HashMap<SQLField, Field> sqlNameMap;
     private Field primarykeyField = null;
     private SQLField primarykeySqlField = null;
+    private JsonHelper jsonHelper;
 
     private ZxyChangeListener zxyChangeListener;
 
@@ -65,6 +68,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         reflactionHelper = new ReflactionHelper<>();
         sqlNameMap = new HashMap<>();
         getFields();
+        jsonHelper = new JsonHelper(getJsonLibraryType());
     }
 
     public void setZxyChangeListener(ZxyChangeListener zxyChangeListener) {
@@ -719,9 +723,13 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         return value;
     }
 
-    protected abstract String toJson(Object obj, Class targetClass);
+    private String toJson(Object obj, Class targetClass){
+        return jsonHelper.toJson(obj);
+    }
 
-    protected abstract <E> E resumeValue(String json, Class targetClass);
+    private <E> E resumeValue(String json, Class targetClass){
+        return jsonHelper.toObject(json,targetClass);
+    }
 
     /**
      * 数据库中数据恢复为转换类时回调
@@ -756,6 +764,10 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
             object = resumeValue((String) value, typeClass);
         }
         return object;
+    }
+
+    protected JsonLibraryType getJsonLibraryType(){
+        return JsonLibraryType.Gson;
     }
 
     private SQLFieldTypeEnum getSqlStringType(Class<?> fieldJavaType) {
