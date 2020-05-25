@@ -544,7 +544,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      * @return
      */
     public List<T> getAllData(String orderSQL) {
-        SerachTableData serachTableData = getSerachTableData().setTableName(tableName);
+        SerachTableData serachTableData = getSearchTableData().setTableName(tableName);
         serachTableData.setIsAddField(false);
         String getAllTableDataSQL = serachTableData.getTableAllDataSQL(orderSQL);
         return searchDataBySql(getAllTableDataSQL);
@@ -561,7 +561,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
 
     public List<T> search(String whereSQL, String orderSQL) {
         List<T> dataList = new ArrayList<>();
-        SerachTableData serachTableData = getSerachTableData().setTableName(tableName);
+        SerachTableData serachTableData = getSearchTableData().setTableName(tableName);
         serachTableData.setIsAddField(false);
         String serachSQL = null;
         if (orderSQL != null) {
