@@ -3,17 +3,21 @@ package com.ellen.dhcsqlitelibrary.table.reflection;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
 import com.ellen.dhcsqlitelibrary.table.ZxyTable;
+import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
 import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NoBasicTypeSetting;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NotNull;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Operate;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Primarykey;
+import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.annotation.NoBasicType;
+import com.ellen.dhcsqlitelibrary.table.annotation.NotNull;
+import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.Primarykey;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
@@ -25,12 +29,11 @@ import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -659,10 +662,10 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         return classFieldName;
     }
 
-    protected Object setBooleanValue(String classFieldName, boolean value){
-        if(value){
+    protected Object setBooleanValue(String classFieldName, boolean value) {
+        if (value) {
             return 1;
-        }else {
+        } else {
             return 0;
         }
     }
@@ -671,18 +674,22 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * 非基本类型转换为使用者自定义的类型
      *
      * @param field
-
      * @return
      */
     private SQLFieldType conversionSQLiteType(Field field) {
-        NoBasicTypeSetting noBasicTypeSetting = field.getAnnotation(NoBasicTypeSetting.class);
-        SQLFieldTypeEnum sqlFieldTypeEnum = noBasicTypeSetting.sqlFiledType();
-        int length = noBasicTypeSetting.length();
+        if(reflactionHelper.isDataStructure(field)){
+            //如果是数据结构类型的属性，SQL中存储的类型为TEXT且无线长度类型
+            SQLFieldType sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT,-1);
+            return  sqlFieldType;
+        }
+        NoBasicType noBasicType = field.getAnnotation(NoBasicType.class);
+        SQLFieldTypeEnum sqlFieldTypeEnum = noBasicType.sqlFiledType();
+        int length = noBasicType.length();
         SQLFieldType sqlFieldType;
-        if(length <= 0) {
+        if (length <= 0) {
             sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, null);
-        }else {
-            sqlFieldType = new SQLFieldType(sqlFieldTypeEnum,length);
+        } else {
+            sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, length);
         }
         return sqlFieldType;
     }
@@ -694,14 +701,18 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * @return
      */
     private Object setConversionValue(Field field, T t) {
+        //先判断是不是数据结构类型
+        if (reflactionHelper.isDataStructure(field)) {
+            return getDataStructureJson(t,field);
+        }
         //先看转换类型的操作
         Class typeClass = field.getType();
-        NoBasicTypeSetting noBasicTypeSetting = field.getAnnotation(NoBasicTypeSetting.class);
-        Operate operate = noBasicTypeSetting.operate();
+        Operate operate = field.getAnnotation(Operate.class);
+        OperateEnum operateEnum = operate.operate();
         Object value = null;
-        if (operate == Operate.VALUE) {
+        if (operateEnum == OperateEnum.VALUE) {
             //仅仅存值
-            String valueName = noBasicTypeSetting.valueName();
+            String valueName = operate.valueName();
             Field valueField = null;
             try {
                 valueField = typeClass.getDeclaredField(valueName);
@@ -723,12 +734,44 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         return value;
     }
 
-    private String toJson(Object obj, Class targetClass){
+    private String toJson(Object obj, Class targetClass) {
         return jsonHelper.toJson(obj);
     }
 
-    private <E> E resumeValue(String json, Class targetClass){
-        return jsonHelper.toObject(json,targetClass);
+    private <E> E resumeValue(String json, Class targetClass) {
+        return jsonHelper.toObject(json, targetClass);
+    }
+
+    protected Object resumeDataStructure(String classFieldName,String json){
+        return null;
+    }
+
+
+    private String getDataStructureJson(T t,Field field){
+        String json = null;
+        if(field.getType().isArray()) {
+            //数组
+            Object[] objectArray = reflactionHelper.getValueArray(t, field);
+            if (objectArray != null) {
+                List list = Arrays.asList(objectArray);
+                json = jsonHelper.toJsonByList(list);
+            }
+        }else {
+            //其他数据结构
+            Object obj = reflactionHelper.getValue(t,field);
+            if(obj != null) {
+                json = jsonHelper.toJson(obj);
+            }
+        }
+        return json;
+    }
+
+    private Object getDataStructureObj(Field field,String json){
+        if(json != null) {
+            return resumeDataStructure(field.getName(), json);
+        }else {
+            return null;
+        }
     }
 
     /**
@@ -738,12 +781,16 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
      * @return
      */
     private Object resumeConversionObject(Field field, Object value) {
-        NoBasicTypeSetting noBasicTypeSetting = field.getAnnotation(NoBasicTypeSetting.class);
-        String filedName = noBasicTypeSetting.valueName();
-        Operate operate = noBasicTypeSetting.operate();
+        //先判断是不是数据结构类型
+        if (reflactionHelper.isDataStructure(field)) {
+            return getDataStructureObj(field, (String) value);
+        }
+        Operate operate = field.getAnnotation(Operate.class);
+        String filedName = operate.valueName();
+        OperateEnum operateEnum = operate.operate();
         Class typeClass = field.getType();
         Object object = null;
-        if (operate == Operate.VALUE) {
+        if (operateEnum == OperateEnum.VALUE) {
             try {
                 object = getT(typeClass);
                 Field targetField = typeClass.getDeclaredField(filedName);
@@ -766,7 +813,7 @@ public abstract class ZxyReflectionTable<T> extends ZxyTable {
         return object;
     }
 
-    protected JsonLibraryType getJsonLibraryType(){
+    protected JsonLibraryType getJsonLibraryType() {
         return JsonLibraryType.Gson;
     }
 

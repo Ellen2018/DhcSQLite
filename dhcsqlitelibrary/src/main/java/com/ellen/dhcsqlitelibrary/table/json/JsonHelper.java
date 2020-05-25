@@ -6,6 +6,7 @@ import com.ellen.dhcsqlitelibrary.table.exception.JsonNoCanFormatException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 public class JsonHelper implements JsonFormat {
 
@@ -30,7 +31,11 @@ public class JsonHelper implements JsonFormat {
 
         if (gsonClass == null && fastJsonClass == null) {
             //报异常
-            throw new JsonNoCanFormatException("无法进行json映射,可能是没有导入Gson或者FastJson库");
+            if(jsonLibraryType == JsonLibraryType.Gson) {
+                throw new JsonNoCanFormatException("无法进行json映射,因为您选择了使用com.google.gson.Gson进行Json映射,但您未导入此库。");
+            }else {
+                throw new JsonNoCanFormatException("无法进行json映射,因为您选择了使用com.alibaba.fastjson.JSONObject进行Json映射,但您未导入此库。");
+            }
         } else {
             try {
                 if (gsonClass != null) {
@@ -71,4 +76,10 @@ public class JsonHelper implements JsonFormat {
     public <E> E toObject(String json, Class jsonClass) {
         return jsonFormat.toObject(json, jsonClass);
     }
+
+    @Override
+    public <T> String toJsonByList(List<T> tList) {
+        return jsonFormat.toJsonByList(tList);
+    }
+
 }

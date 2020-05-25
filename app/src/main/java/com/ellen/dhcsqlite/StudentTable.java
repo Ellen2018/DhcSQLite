@@ -1,12 +1,20 @@
 package com.ellen.dhcsqlite;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyReflectionTable;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class StudentTable extends ZxyReflectionTable<Student> {
 
@@ -78,7 +86,7 @@ public class StudentTable extends ZxyReflectionTable<Student> {
      *
      *  非常注意:如果你的项目中没有导入Json解析库:Gson或者是FastJson,那么在映射的时候就会抛出JsonNoCanFormatException
      *  一旦出现这个异常，你需要导入Gson或者FastJson库即可解决这个异常
-     *  
+     *
      * @return
      */
     @Override
@@ -86,4 +94,29 @@ public class StudentTable extends ZxyReflectionTable<Student> {
         return JsonLibraryType.FastJson;
     }
 
+    /**
+     * 将json恢复成成数据结构的形式
+     * @param classFieldName
+     * @param json
+     * @return
+     */
+    @Override
+    protected Object resumeDataStructure(String  classFieldName, String json) {
+        if(classFieldName.equals("fatherSet")) {
+            Type founderSetType = new TypeToken<Map<Integer, Father>>() {}.getType();
+            return new Gson().fromJson(json, founderSetType);
+        }else if(classFieldName.equals("fatherList")){
+            Type founderSetType = new TypeToken<List<Father>>() {}.getType();
+            return new Gson().fromJson(json, founderSetType);
+        }else if(classFieldName.equals("fathers")){
+            Type founderSetType = new TypeToken<List<Father>>() {}.getType();
+            List<Father> fathers = new Gson().fromJson(json, founderSetType);
+            Father[] fathers1 = new Father[fathers.size()];
+            for(int i=0;i<fathers.size();i++){
+                fathers1[i] = fathers.get(i);
+            }
+            return fathers1;
+        }
+        return null;
+    }
 }

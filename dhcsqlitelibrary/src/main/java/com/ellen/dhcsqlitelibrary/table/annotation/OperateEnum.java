@@ -1,6 +1,6 @@
-package com.ellen.dhcsqlitelibrary.table.reflection.annotation;
+package com.ellen.dhcsqlitelibrary.table.annotation;
 
-public enum Operate {
+public enum OperateEnum {
 
     /**
      * 固定值映射模式

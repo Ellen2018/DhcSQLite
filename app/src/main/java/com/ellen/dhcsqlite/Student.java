@@ -1,11 +1,15 @@
 package com.ellen.dhcsqlite;
 
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Ignore;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.NoBasicTypeSetting;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Operate;
-import com.ellen.dhcsqlitelibrary.table.reflection.annotation.Primarykey;
+import com.ellen.dhcsqlitelibrary.table.annotation.DataStructure;
+import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
+import com.ellen.dhcsqlitelibrary.table.annotation.NoBasicType;
+import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
+import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.Primarykey;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
+
+import java.util.Arrays;
 
 public class Student {
 
@@ -20,16 +24,38 @@ public class Student {
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     private boolean isMan;
-    @NoBasicTypeSetting(sqlFiledType = SQLFieldTypeEnum.TEXT,length = 100,operate = Operate.JSON)
+    @NoBasicType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
+    @Operate(operate = OperateEnum.JSON)
     @DhcSqlFieldName("your_father")
     private Father father;
+    @DataStructure
+    private Father[] fathers;
 
-    public Student(int id,String name, int age, String phoneNumber, String address) {
+    public Student(int id, String name, int age, String phoneNumber, String address) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        fathers = new Father[5];
+        for (int i = 0; i < fathers.length; i++) {
+            fathers[i] = new Father("名字：" + i, "ID:" + i);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address + '\'' +
+                ", ingoreString='" + ingoreString + '\'' +
+                ", isMan=" + isMan +
+                ", father=" + father +
+                ", fathers=" + Arrays.toString(fathers) +
+                '}';
     }
 
     public String getName() {
@@ -78,20 +104,6 @@ public class Student {
 
     public void setMan(boolean man) {
         isMan = man;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", address='" + address + '\'' +
-                ", ingoreString='" + ingoreString + '\'' +
-                ", isMan=" + isMan +
-                ", father=" + father +
-                '}';
     }
 
     public int getId() {

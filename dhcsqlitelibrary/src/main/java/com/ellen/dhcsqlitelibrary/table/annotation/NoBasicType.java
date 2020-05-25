@@ -1,4 +1,4 @@
-package com.ellen.dhcsqlitelibrary.table.reflection.annotation;
+package com.ellen.dhcsqlitelibrary.table.annotation;
 
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface NoBasicTypeSetting {
+public @interface NoBasicType {
 
     /**
      * 数据类型
@@ -23,18 +23,5 @@ public @interface NoBasicTypeSetting {
      * > 0  设置固定长度
      * @return
      */
-    int length();
-
-    /**
-     * 操作类型
-     * 固定值类型
-     */
-    Operate operate() default Operate.JSON;
-
-    /**
-     * 存储哪个值 需要指定属性名字
-     */
-
-    String valueName() default "";
-
+    int length() default -1;
 }
