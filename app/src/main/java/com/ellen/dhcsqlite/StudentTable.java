@@ -97,7 +97,6 @@ public class StudentTable extends ZxyReflectionTable<Student> {
     /**
      * 将json恢复成成数据结构的形式
      *
-     * 
      * @param classFieldName
      * @param json
      * @return
