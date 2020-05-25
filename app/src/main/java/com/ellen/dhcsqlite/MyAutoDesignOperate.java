@@ -36,10 +36,8 @@ public interface MyAutoDesignOperate extends AutoDesignOperate {
     @TotalSearchSql("SELECT * FROM Student WHERE your_age > 50;")
     List<Student> search();
 
-
     @TotalUpdateSql("UPDATE Student SET my_name = '@newName' WHERE my_name = '@oldName';")
     void update(@Value("newName") String newName,@Value("oldName") String oldName);
-
-
+    
 }
 
