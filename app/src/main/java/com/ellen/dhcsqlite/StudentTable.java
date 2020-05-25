@@ -91,7 +91,7 @@ public class StudentTable extends ZxyReflectionTable<Student> {
      */
     @Override
     protected JsonLibraryType getJsonLibraryType() {
-        return JsonLibraryType.FastJson;
+        return JsonLibraryType.Gson;
     }
 
     /**

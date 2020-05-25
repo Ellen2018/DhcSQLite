@@ -28,7 +28,7 @@ public class Student {
     @Operate(operate = OperateEnum.JSON)
     @DhcSqlFieldName("your_father")
     private Father father;
-    @DataStructure
+    @DataStructure //表示这个属性是数据类型属性，需要用注解区分，才能正确的进行json映射，否则会报错
     private Father[] fathers;
 
     public Student(int id, String name, int age, String phoneNumber, String address) {
