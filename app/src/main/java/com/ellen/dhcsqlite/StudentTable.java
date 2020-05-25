@@ -78,6 +78,7 @@ public class StudentTable extends ZxyReflectionTable<Student> {
      *
      *  非常注意:如果你的项目中没有导入Json解析库:Gson或者是FastJson,那么在映射的时候就会抛出JsonNoCanFormatException
      *  一旦出现这个异常，你需要导入Gson或者FastJson库即可解决这个异常
+     *  
      * @return
      */
     @Override
