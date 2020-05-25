@@ -1,5 +1,7 @@
 package com.ellen.dhcsqlitelibrary.table;
 
+import com.ellen.dhcsqlitelibrary.table.operate.SearchSingle;
+
 /**
  * 自动化设计你的操作
  * 用一个接口继承该接口，你可以自定义你所有想要的操作
@@ -9,5 +11,6 @@ package com.ellen.dhcsqlitelibrary.table;
  *
  * 在此接口中你可以完成一些比较复杂的sql语句
  */
-public interface AutoDesignOperate {
+public interface AutoDesignOperate{
+
 }

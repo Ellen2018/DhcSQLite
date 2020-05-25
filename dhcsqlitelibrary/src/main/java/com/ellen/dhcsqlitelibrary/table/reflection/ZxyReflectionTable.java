@@ -27,6 +27,7 @@ import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
+import java.io.ObjectOutput;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -447,6 +448,28 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
     }
 
     /**
+     * 更具主建查询数据
+     * @param value
+     * @return
+     */
+    public T getDataByPrimaryKey(Object value){
+        T t = null;
+        if (primarykeySqlField == null) {
+            //说明没有主键,抛出无主键异常
+            throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据!");
+        } else {
+            String whereSql = Where.getInstance(false)
+                    .addAndWhereValue(primarykeySqlField.getName(), WhereSymbolEnum.EQUAL, value)
+                    .createSQL();
+            List<T> tList = search(whereSql,null);
+            if(tList != null & tList.size() > 0){
+                t = tList.get(0);
+            }
+        }
+        return t;
+    }
+
+    /**
      * 判断是否存在该条数据(根据主键判断)
      *
      * @param t
@@ -629,8 +652,6 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
         return dataList;
     }
 
-
-
     /**
      * 提供给懒得写转换类型代码的人
      *
@@ -638,7 +659,7 @@ public abstract class ZxyReflectionTable<T,O extends AutoDesignOperate> extends 
      * @param typeClass
      * @return
      */
-    protected SQLFieldType defaultGetSQLFieldType(String classFieldName, Class typeClass) {
+    private SQLFieldType defaultGetSQLFieldType(String classFieldName, Class typeClass) {
         return new SQLFieldType(getSqlStringType(typeClass), null);
     }
 

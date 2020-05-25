@@ -58,13 +58,15 @@ public class MainActivity extends AppCompatActivity {
         //other();
 
 
-        studentTable.getAutoDesignOperate().update("傻逼","Ellen2018");
+        studentTable.getAutoDesignOperate().update("逗比","Ellen2018");
 
-        List<Student> studentList = studentTable.getAutoDesignOperate().getSearchList1(17,"傻逼");
+        List<Student> studentList = studentTable.getAutoDesignOperate().getSearchList1(17,"逗比");
 
         for(Student student:studentList){
             Log.e("Ellen2018",student.toString());
         }
+
+        Log.e("Ellen2018","主建查询出来的值"+studentTable.getDataByPrimaryKey(88).toString());
 
     }
 
