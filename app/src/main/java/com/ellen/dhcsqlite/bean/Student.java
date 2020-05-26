@@ -125,13 +125,5 @@ public class Student {
     public void setId(int id) {
         this.id = id;
     }
-
-    public String getIngoreString() {
-        return ingoreString;
-    }
-
-    public void setIngoreString(String ingoreString) {
-        this.ingoreString = ingoreString;
-    }
 }
 
