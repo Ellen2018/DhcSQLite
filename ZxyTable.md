@@ -315,7 +315,7 @@ Father类：
 如何新建ZxyTable对象？ 
 
     ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
-    SQLiteDatabase sqLiteDatabase = appLibrary.getWriteDataBase();
+    SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
     StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
 
 ## 3.1 创建表
