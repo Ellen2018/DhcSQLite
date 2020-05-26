@@ -3,7 +3,11 @@ package com.ellen.dhcsqlitelibrary.table.reflection;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.ellen.dhcsqlitelibrary.table.annotation.EndAutoString;
+import com.ellen.dhcsqlitelibrary.table.annotation.Unique;
 import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.Proxy.AutoOperateProxy;
 import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
@@ -128,15 +132,45 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
                 } else {
                     sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, false);
                 }
+                EndAutoString endAutoString = field.getAnnotation(EndAutoString.class);
+                if (endAutoString != null) {
+                    String endString = endAutoString.value();
+                    if (TextUtils.isEmpty(sqlField.getAutoEndString())) {
+                        sqlField.setAutoEndString(" " + endString);
+                    } else {
+                        sqlField.setAutoEndString(sqlField.getAutoEndString() + "_" + endString);
+                    }
+                }
                 this.isAutoIncrement = isAutoIncrement;
                 majorKeyField = field;
                 majorKeySqlField = sqlField;
             } else {
-                NotNull notNull = field.getAnnotation(NotNull.class);
-                if (notNull != null) {
-                    sqlField = SQLField.getNotNullValueField(fieldName, fieldType);
+                EndAutoString endAutoString = field.getAnnotation(EndAutoString.class);
+                if (endAutoString != null) {
+                    String endString = endAutoString.value();
+                    sqlField = SQLField.getAutoEndStringField(fieldName, fieldType,endString);
                 } else {
-                    sqlField = SQLField.getOrdinaryField(fieldName, fieldType);
+                    NotNull notNull = field.getAnnotation(NotNull.class);
+                    Unique unique = field.getAnnotation(Unique.class);
+                    if (unique == null) {
+                        if (notNull != null) {
+                            sqlField = SQLField.getNotNullValueField(fieldName, fieldType);
+                        } else {
+                            sqlField = SQLField.getOrdinaryField(fieldName, fieldType);
+                        }
+                    } else {
+                        //携带有Unique
+                        if (notNull != null) {
+                            sqlField = SQLField.getNotNullValueField(fieldName, fieldType);
+                        } else {
+                            sqlField = SQLField.getOrdinaryField(fieldName, fieldType);
+                        }
+                        if (TextUtils.isEmpty(sqlField.getAutoEndString())) {
+                            sqlField.setAutoEndString(" UNIQUE");
+                        } else {
+                            sqlField.setAutoEndString(sqlField.getAutoEndString() + " UNIQUE");
+                        }
+                    }
                 }
             }
             sqlNameMap.put(sqlField, field);
@@ -240,9 +274,10 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
 
     /**
      * 判断表是否存在
+     *
      * @return
      */
-    public boolean isExist(){
+    public boolean isExist() {
         String searchTableExistSql = SerachTableExist.getInstance()
                 .setTableName(tableName)
                 .createSQL();
@@ -619,9 +654,10 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
 
     /**
      * 获取表中所有数据不带排序效果
+     *
      * @return
      */
-    public List<T> getAllData(){
+    public List<T> getAllData() {
         return getAllData(null);
     }
 
@@ -833,8 +869,8 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
      */
     private SQLFieldType conversionSQLiteType(Field field) {
         if (reflectHelper.isDataStructure(field)) {
-            //如果是数据结构类型的属性，SQL中存储的类型为TEXT且无线长度类型
-            SQLFieldType sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT, -1);
+            //如果是数据结构类型的属性，SQL中存储的类型为TEXT且无限长度类型
+            SQLFieldType sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT, null);
             return sqlFieldType;
         }
         SqlType sqlType = field.getAnnotation(SqlType.class);

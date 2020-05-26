@@ -3,11 +3,13 @@ package com.ellen.dhcsqlite.bean;
 import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlitelibrary.table.annotation.DataStructure;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.annotation.EndAutoString;
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
 import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.Unique;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.util.Arrays;
@@ -18,6 +20,7 @@ public class Student {
     @MajorKey(isAutoIncrement = true)
     private int id;
     @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
+    @EndAutoString("CHECK(name like 'Ellen%')")
     private String name;
     @DhcSqlFieldName(sqlFieldName = "your_age")
     private int age;

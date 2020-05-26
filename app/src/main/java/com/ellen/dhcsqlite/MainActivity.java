@@ -45,7 +45,25 @@ public class MainActivity extends AppCompatActivity {
         this.studentTable = studentTable;
 
         //创建表
-        onCreateTable();
+        //onCreateTable();
+
+        studentTable.onCreateTableIfNotExits(new ZxyTable.OnCreateSQLiteCallback() {
+            @Override
+            public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            @Override
+            public void onCreateTableFailure(String errMessage, String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            @Override
+            public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+                Log.e("Ellen2018","表sql:"+createSQL);
+            }
+        });
+
         Log.e("Ellen2018","表是否存在:"+zxyLibrary.isExist(studentTable.getTableName()));
 
         studentTable.clear();
@@ -61,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         //其他用法
         //other();
         //元操作
-        yuanOperate();
+        //yuanOperate();
     }
 
     private void yuanOperate() {
@@ -292,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
         //多条数据添加
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            student = new Student("Ellen2018", i, "18272167574", "火星");
+            student = new Student("Ellen2018_"+i, i, "18272167574", "火星");
             father = new Father("Ellen2019", ""+i);
             student.setFather(father);
             student.setMan(true);
