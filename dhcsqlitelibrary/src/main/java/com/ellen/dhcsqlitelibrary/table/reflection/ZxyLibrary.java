@@ -1,10 +1,12 @@
 package com.ellen.dhcsqlitelibrary.table.reflection;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.sqlitecreate.createsql.delete.DeleteTable;
 import com.ellen.sqlitecreate.createsql.delete.DeleteTableDataRow;
+import com.ellen.sqlitecreate.createsql.serach.SerachTableExist;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableName;
 
 public abstract class ZxyLibrary {
@@ -75,6 +77,18 @@ public abstract class ZxyLibrary {
     public void clearTable(String tableName){
         String clearTableSql = DeleteTableDataRow.getInstance().setTableName(tableName).createDeleteAllDataSQL();
         getWriteDataBase().execSQL(clearTableSql);
+    }
+
+    /**
+     * 判断表是否存在
+     * @return
+     */
+    public boolean isExist(String tableName){
+        String searchTableExistSql = SerachTableExist.getInstance()
+                .setTableName(tableName)
+                .createSQL();
+        Cursor cursor = zxySQLiteHelper.getWritableDatabase().rawQuery(searchTableExistSql,null);
+        return cursor.getCount() != 0;
     }
 
 }

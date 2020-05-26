@@ -40,12 +40,13 @@ public class MainActivity extends AppCompatActivity {
         ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
         SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
         StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class, MyAutoDesignOperate.class);
-
+        Log.e("Ellen2018","表是否存在:"+zxyLibrary.isExist(studentTable.getTableName()));
         this.appLibrary = (AppLibrary) zxyLibrary;
         this.studentTable = studentTable;
 
         //创建表
         onCreateTable();
+        Log.e("Ellen2018","表是否存在:"+zxyLibrary.isExist(studentTable.getTableName()));
 
         studentTable.clear();
 

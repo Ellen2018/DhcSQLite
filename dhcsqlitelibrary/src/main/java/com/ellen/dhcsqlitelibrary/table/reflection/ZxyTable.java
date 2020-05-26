@@ -23,6 +23,7 @@ import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.ellen.sqlitecreate.createsql.helper.Value;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
+import com.ellen.sqlitecreate.createsql.serach.SerachTableExist;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
@@ -235,6 +236,18 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
             this.tableName = newName;
             onRenameTableCallback.onRenameSuccess(tableName, newName, reNameTableSql);
         }
+    }
+
+    /**
+     * 判断表是否存在
+     * @return
+     */
+    public boolean isExist(){
+        String searchTableExistSql = SerachTableExist.getInstance()
+                .setTableName(tableName)
+                .createSQL();
+        Cursor cursor = searchBySQL(searchTableExistSql);
+        return cursor.getCount() != 0;
     }
 
     public void deleteTable() {
