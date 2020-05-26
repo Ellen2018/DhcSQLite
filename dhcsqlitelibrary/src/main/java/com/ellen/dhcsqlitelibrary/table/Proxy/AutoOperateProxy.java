@@ -3,7 +3,6 @@ package com.ellen.dhcsqlitelibrary.table.Proxy;
 import android.database.Cursor;
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -86,12 +85,10 @@ public class AutoOperateProxy implements InvocationHandler {
             if(isReturnValue){
                 //具有返回值
                 String sql = newSql(totalSqlString, method, args);
-                Log.e("Ellen2018","执行的Sql语句(有返回值):"+sql);
                 return zxyTable.searchDataBySql(sql);
             }else {
                 //不具有返回值
                 String sql = newSql(totalSqlString, method, args);
-                Log.e("Ellen2018","执行的Sql语句(无返回值):"+sql);
                 zxyTable.exeSQL(newSql(totalSqlString, method, args));
                 return null;
             }
@@ -108,7 +105,6 @@ public class AutoOperateProxy implements InvocationHandler {
             stringBuilder.append(whereSql);
             stringBuilder.append(";");
             String updateSql  = stringBuilder.toString();
-            Log.e("Ellen2018","执行的Sql语句："+updateSql);
             zxyTable.exeSQL(updateSql);
             return null;
         }

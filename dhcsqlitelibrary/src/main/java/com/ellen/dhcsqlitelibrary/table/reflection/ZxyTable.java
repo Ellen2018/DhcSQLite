@@ -3,7 +3,6 @@ package com.ellen.dhcsqlitelibrary.table.reflection;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.Proxy.AutoOperateProxy;
@@ -384,7 +383,6 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
     public void delete(String whereSQL) {
         String deleteSQL = getDeleteTableDataRow().setTableName(tableName).createSQLAutoWhere(whereSQL);
         exeSQL(deleteSQL);
-        Log.e("Ellen2018","执行的Sql语句:"+deleteSQL);
         if (zxyChangeListener != null) {
             zxyChangeListener.onDataChange();
         }
@@ -550,7 +548,6 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             updateTableDataRow.addSetValue(fieldName, value);
         }
         String updateSql = updateTableDataRow.createSQLAutoWhere(whereSQL);
-        Log.e("Ellen2018","执行的Sql语句："+updateSql);
         exeSQL(updateSql);
         if (zxyChangeListener != null) {
             zxyChangeListener.onDataChange();
@@ -601,7 +598,6 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         } else {
             serachSQL = serachTableData.createSQLAutoWhere(whereSQL);
         }
-        Log.e("Ellen2018","执行的Sql语句："+serachSQL);
         return searchDataBySql(serachSQL);
     }
 
