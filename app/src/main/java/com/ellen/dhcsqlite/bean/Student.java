@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class Student {
 
     //主键
-    @MajorKey(isAutoIncrement = true)
+    @MajorKey(isAutoIncrement = false)
     private int id;
     @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
     private String name;
@@ -31,6 +31,7 @@ public class Student {
     @DhcSqlFieldName(sqlFieldName = "your_father")
     private Father father;
     @Operate(operate = OperateEnum.VALUE,valueName = "id")
+    @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 50)
     private Father father2;
     @DataStructure //表示这个属性是数据类型属性，需要用注解区分，才能正确的进行json映射，否则会报错
     @DhcSqlFieldName(sqlFieldName = "爸爸们")

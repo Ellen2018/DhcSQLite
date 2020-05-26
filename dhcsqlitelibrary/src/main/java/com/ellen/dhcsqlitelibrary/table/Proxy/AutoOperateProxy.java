@@ -1,5 +1,6 @@
 package com.ellen.dhcsqlitelibrary.table.Proxy;
 
+import android.database.Cursor;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -9,10 +10,8 @@ import androidx.annotation.RequiresApi;
 import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
 import com.ellen.dhcsqlitelibrary.table.operate.Delete;
 import com.ellen.dhcsqlitelibrary.table.operate.SearchByMajorKey;
-import com.ellen.dhcsqlitelibrary.table.operate.TotalSearchSql;
 import com.ellen.dhcsqlitelibrary.table.operate.Search;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalSql;
-import com.ellen.dhcsqlitelibrary.table.operate.TotalUpdateSql;
 import com.ellen.dhcsqlitelibrary.table.operate.Update;
 import com.ellen.dhcsqlitelibrary.table.operate.Value;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
@@ -69,6 +68,9 @@ public class AutoOperateProxy implements InvocationHandler {
             if(orderSql != null && orderSql.equals("")){
                 orderSql = null;
             }
+            if(orderSql != null){
+                orderSql = newSql(orderSql,method,args);
+            }
             return zxyTable.search(newSql(whereSql, method, args), orderSql);
         }
         Delete delete = method.getAnnotation(Delete.class);
@@ -77,16 +79,22 @@ public class AutoOperateProxy implements InvocationHandler {
             zxyTable.delete(newSql(deleteSql, method, args));
             return null;
         }
-        TotalSearchSql totalSearchSql = method.getAnnotation(TotalSearchSql.class);
-        if (totalSearchSql != null) {
-            String totalSearchSqlString = totalSearchSql.value();
-            return zxyTable.searchDataBySql(newSql(totalSearchSqlString, method, args));
-        }
         TotalSql totalSql = method.getAnnotation(TotalSql.class);
         if (totalSql != null) {
-            String totalSqlString = totalSql.value();
-            zxyTable.exeSQL(newSql(totalSqlString, method, args));
-            return null;
+            String totalSqlString = totalSql.sql();
+            boolean isReturnValue = totalSql.isReturnValue();
+            if(isReturnValue){
+                //具有返回值
+                String sql = newSql(totalSqlString, method, args);
+                Log.e("Ellen2018","执行的Sql语句(有返回值):"+sql);
+                return zxyTable.searchDataBySql(sql);
+            }else {
+                //不具有返回值
+                String sql = newSql(totalSqlString, method, args);
+                Log.e("Ellen2018","执行的Sql语句(无返回值):"+sql);
+                zxyTable.exeSQL(newSql(totalSqlString, method, args));
+                return null;
+            }
         }
         Update update = method.getAnnotation(Update.class);
         if (update != null) {
@@ -100,14 +108,7 @@ public class AutoOperateProxy implements InvocationHandler {
             stringBuilder.append(whereSql);
             stringBuilder.append(";");
             String updateSql  = stringBuilder.toString();
-            zxyTable.exeSQL(updateSql);
-            return null;
-        }
-        TotalUpdateSql totalUpdateSql = method.getAnnotation(TotalUpdateSql.class);
-        if(totalUpdateSql != null){
-            String totalUpdateSqlString = totalUpdateSql.value();
-            String updateSql  =newSql(totalUpdateSqlString,method,args);
-            Log.e("Ellen2018","update语句:"+updateSql);
+            Log.e("Ellen2018","执行的Sql语句："+updateSql);
             zxyTable.exeSQL(updateSql);
             return null;
         }
@@ -117,6 +118,9 @@ public class AutoOperateProxy implements InvocationHandler {
             String orderSql = searchByMajorKey.orderSql();
             if(orderSql != null && orderSql.equals("")){
                 orderSql = null;
+            }
+            if(orderSql != null){
+                orderSql = newSql(orderSql,method,args);
             }
             String majorKeyName = zxyTable.getMajorKeyName();
             if(!TextUtils.isEmpty(majorKeyName)) {

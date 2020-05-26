@@ -19,6 +19,7 @@ import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.delete.DeleteTableDataRow;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.order.Order;
+import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
 import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
@@ -37,8 +38,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tvAll = findViewById(R.id.tv_all);
         ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
-        SQLiteDatabase sqLiteDatabase = appLibrary.getWriteDataBase();
+        SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
         StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class, MyAutoDesignOperate.class);
+
+        this.appLibrary = (AppLibrary) zxyLibrary;
+        this.studentTable = studentTable;
 
         //创建表
         onCreateTable();
@@ -55,18 +59,14 @@ public class MainActivity extends AppCompatActivity {
         //searchData();
         //其他用法
         //other();
+        //元操作
+        yuanOperate();
+    }
 
-
-        studentTable.getAutoDesignOperate().update("逗比","Ellen2018");
-
-        List<Student> studentList = studentTable.getAutoDesignOperate().searchByMajorKey(10);
-
-        for(Student student:studentList){
-            Log.e("Ellen2018",student.toString());
-        }
-
-        Log.e("Ellen2018","主建查询出来的值"+studentTable.getDataByMajorKey(88).toString());
-
+    private void yuanOperate() {
+        MyAutoDesignOperate myAutoDesignOperate = studentTable.getAutoDesignOperate();
+        myAutoDesignOperate.getStudentByName("Ellen2018");
+        myAutoDesignOperate.delete(3,"周杰伦");
     }
 
     private void other() {
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
         studentTable.saveData(studentList);
 
         //存储数据之前清空数据
-        studentTable.saveOrUpdateByMajorKey(studentList);
-        studentTable.saveOrUpdateByMajorKey(student);
+        //studentTable.saveOrUpdateByMajorKey(studentList);
+        //studentTable.saveOrUpdateByMajorKey(student);
     }
 }
