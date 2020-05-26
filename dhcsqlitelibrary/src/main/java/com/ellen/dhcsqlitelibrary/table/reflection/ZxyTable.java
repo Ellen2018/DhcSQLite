@@ -605,7 +605,7 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
     }
 
     /**
-     * 获取表中所有数据
+     * 获取表中所有数据带排序效果
      *
      * @param orderSQL
      * @return
@@ -618,7 +618,7 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
     }
 
     /**
-     * 获取表中所有数据
+     * 获取表中所有数据不带排序效果
      * @return
      */
     public List<T> getAllData(){
