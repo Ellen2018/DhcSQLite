@@ -1,4 +1,4 @@
-package com.ellen.dhcsqlite;
+package com.ellen.dhcsqlite.sql;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

@@ -1,7 +1,9 @@
-package com.ellen.dhcsqlite;
+package com.ellen.dhcsqlite.sql;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.ellen.dhcsqlite.bean.Father;
+import com.ellen.dhcsqlite.bean.Student;
 import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;

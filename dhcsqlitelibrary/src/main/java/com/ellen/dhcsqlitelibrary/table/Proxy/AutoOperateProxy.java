@@ -6,7 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
-import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
+import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
 import com.ellen.dhcsqlitelibrary.table.operate.Delete;
 import com.ellen.dhcsqlitelibrary.table.operate.SearchByMajorKey;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalSearchSql;
@@ -126,7 +126,7 @@ public class AutoOperateProxy implements InvocationHandler {
                     whereSql = zxyTable.getMajorKeyName() + " "+whereSql;
                 }
             }else {
-                throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据!");
+                throw new NoMajorKeyException("没有主键,无法根据主键查询数据!");
             }
             return zxyTable.search(newSql(whereSql,method,args),orderSql);
         }

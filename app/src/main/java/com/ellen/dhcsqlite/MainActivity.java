@@ -7,6 +7,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.ellen.dhcsqlite.bean.Father;
+import com.ellen.dhcsqlite.bean.Student;
+import com.ellen.dhcsqlite.sql.AppLibrary;
+import com.ellen.dhcsqlite.sql.MyAutoDesignOperate;
+import com.ellen.dhcsqlite.sql.StudentTable;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyChangeListener;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyLibrary;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
@@ -33,14 +38,7 @@ public class MainActivity extends AppCompatActivity {
         tvAll = findViewById(R.id.tv_all);
         ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
         SQLiteDatabase sqLiteDatabase = appLibrary.getWriteDataBase();
-        StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
-
-        studentTable.setZxyChangeListener(new ZxyChangeListener() {
-            @Override
-            public void onDataChange() {
-                //当数据库增加，删除数据时，也就是数据发生了变化都会回调这里
-            }
-        });
+        StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class, MyAutoDesignOperate.class);
 
         //创建表
         onCreateTable();
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Ellen2018",student.toString());
         }
 
-        Log.e("Ellen2018","主建查询出来的值"+studentTable.getDataByPrimaryKey(88).toString());
+        Log.e("Ellen2018","主建查询出来的值"+studentTable.getDataByMajorKey(88).toString());
 
     }
 
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
         Father father = new Father("Ellen2019", "1");
         student.setFather(father);
-        boolean isContains = studentTable.isContainsByPrimaryKey(student);
+        boolean isContains = studentTable.isContainsByMajorKey(student);
         if(isContains){
             //存在该数据
         }else {
@@ -87,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
         //获取表名字
         String tableName = studentTable.getTableName();
+
+        studentTable.reNameTable("修改的表名");
 
         //修改表名
         studentTable.reNameTable("my_student", new ZxyTable.OnRenameTableCallback() {
@@ -104,8 +104,27 @@ public class MainActivity extends AppCompatActivity {
         //删除表
         studentTable.deleteTable();
 
+        //删除表带回调
+        studentTable.deleteTable(new ZxyTable.OnDeleteTableCallback() {
+            @Override
+            public void onDeleteTableFailure(String errMessage, String deleteTableSQL) {
+
+            }
+
+            @Override
+            public void onDeleteTableSuccess(String deleteTableSQL) {
+
+            }
+        });
+
         //也可以通过Library对象进行删除
         appLibrary.deleteTable(studentTable.getTableName());
+
+        //获取主键字段名
+        String majorKeyName = studentTable.getMajorKeyName();
+        if(majorKeyName == null){
+            //说明无主键
+        }
 
         //删除表 & 带回调
         studentTable.deleteTable(new ZxyTable.OnDeleteTableCallback() {
@@ -119,25 +138,13 @@ public class MainActivity extends AppCompatActivity {
                 //删除成功回调这里
             }
         });
-
-        //删除其他表
-        studentTable.deleteTable("father");
-        studentTable.deleteTable("father", new ZxyTable.OnDeleteTableCallback() {
-            @Override
-            public void onDeleteTableFailure(String errMessage, String deleteTableSQL) {
-
-            }
-
-            @Override
-            public void onDeleteTableSuccess(String deleteTableSQL) {
-
-            }
-        });
-
     }
 
     private void searchData() {
-        //查询my_name字段中含有"Ellen"的数据,然后根据age进行排序(Desc方式)
+
+        Student student = studentTable.searchByMajorKey(3);
+
+        //查询my_name字段中含有"Ellen"的数据,然后根据your_age进行排序(Desc方式)
         String whereSql =
                 Where.getInstance(false)
                         .addAndWhereValue("my_name", WhereSymbolEnum.LIKE, "%Ellen%")
@@ -161,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
         Father father = new Father("Ellen2019", "1");
         student.setFather(father);
-        studentTable.updateByPrimaryKey(student);
+        studentTable.updateByMajorKey(student);
 
         String whereSql =
                 Where.getInstance(false)
@@ -194,8 +201,8 @@ public class MainActivity extends AppCompatActivity {
             studentList.add(student);
         }
         //save or update 根据主键判断,根据主键查询没有该数据就存储，有就进行更新
-        studentTable.saveOrUpdateByPrimaryKey(student);
-        studentTable.saveOrUpdateByPrimaryKey(studentList);
+        studentTable.saveOrUpdateByMajorKey(student);
+        studentTable.saveOrUpdateByMajorKey(studentList);
 
     }
 
@@ -220,6 +227,9 @@ public class MainActivity extends AppCompatActivity {
 
         //清空数据
         studentTable.clear();
+
+        //根据主键删除数据
+        studentTable.deleteByMajorKey(3);
 
     }
 
@@ -252,6 +262,23 @@ public class MainActivity extends AppCompatActivity {
 
         //不建议使用这种
         //studentTable.onCreateTable();
+
+        studentTable.onCreateTable(new ZxyTable.OnCreateSQLiteCallback() {
+            @Override
+            public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            @Override
+            public void onCreateTableFailure(String errMessage, String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            @Override
+            public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+        });
     }
 
     private void addData() {
@@ -275,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
         studentTable.saveData(studentList);
 
         //存储数据之前清空数据
-        //studentTable.saveDataAndDeleteAgo(studentList);
-        //studentTable.saveDataAndDeleteAgo(student);
+        studentTable.saveOrUpdateByMajorKey(studentList);
+        studentTable.saveOrUpdateByMajorKey(student);
     }
 }

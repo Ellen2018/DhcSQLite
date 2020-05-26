@@ -56,7 +56,20 @@ bean类代码：
 
 - @Operate 
  
-&emsp;&emsp;此注解为不是基本类型数据(Sttring除外)而使用的，比如上述代码中的father属性，因为框架本身不知道您要以怎样的方式去存储它，所以此注解的作用就是告诉框架以怎样的方式来存储它，笔者封装了2种方式，一种是JSON方式,一种是VALUE存储方式，json方式我无需解析，就是将它以json进行映射，value的方式我必须要着重讲一讲，它是通过反射将属性中的某个属性进行存储，比如Father中有个id的属性，那么如你为它指定注解 @Operate(operate = OperateEnum.VALUE,valueName = "id")，那么映射的时候father最终会以id的值进行存储，恢复数据的时候father中只有id是读取的，father其他的属性值由于没有映射到数据库表中，因此其他属性皆为初始化状态，代码示例如下：  
+&emsp;&emsp;此注解为不是基本类型数据(Sttring除外)而使用的，比如上述代码中的father属性，因为框架本身不知道您要以怎样的方式去存储它，所以此注解的作用就是告诉框架以怎样的方式来存储它，笔者封装了2种方式，一种是JSON方式,一种是VALUE存储方式，json方式我无需解释，就是将它以json进行映射，value的方式我必须要着重讲一讲，它是通过反射将属性中的某个属性进行存储，比如Father中有个id的属性，那么如你为它指定注解 @Operate(operate = OperateEnum.VALUE,valueName = "id")，那么映射的时候father最终会以id的值进行存储，恢复数据的时候father中只有id是读取的，father其他的属性值由于没有映射到数据库表中，因此其他属性皆为初始化状态，目前VALUE方式仅仅支持基本类型和String类型，代码示例如下：  
+
+Father类： 
+
+    public class Father {
+ 
+        private String name;
+        //@Operate(operate = OperateEnum.VALUE,valueName = "id")保存的是这个id的数据
+        private String id;
+
+        ......
+    }
+
+@Operate注解的使用:
 
     //以JSON方式完成存储
     @Operate(operate = OperateEnum.JSON)
@@ -299,40 +312,248 @@ bean类代码：
 
 # 3.详细操作
 
+如何新建ZxyTable对象？ 
+
+    ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
+    SQLiteDatabase sqLiteDatabase = appLibrary.getWriteDataBase();
+    StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
+
 ## 3.1 创建表
 
 - 创建表(4种方式:2种不带回调，2种带回调)
 
+        //创建表带回调
+        studentTable.onCreateTableIfNotExits(new ZxyTable.OnCreateSQLiteCallback() {
+            @Override
+            public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            @Override
+            public void onCreateTableFailure(String errMessage, String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            @Override
+            public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+               
+            }
+        });
+
+        //创建表不带回调-->建议使用这种
+        studentTable.onCreateTableIfNotExits();
+
+        //不建议使用这种
+        studentTable.onCreateTable();
+
+        //不建议使用这种
+        studentTable.onCreateTable(new ZxyTable.OnCreateSQLiteCallback() {
+            @Override
+            public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+                
+            }
+
+            @Override
+            public void onCreateTableFailure(String errMessage, String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+
+            @Override
+            public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
+
+            }
+        });
+
+
 ## 3.2 表本身相关操作
 
 - 重命名表  
+
+        //重命名表不带回调  
+        studentTable.reNameTable("修改的表名");
+        
+        //修改表名带回调
+        studentTable.reNameTable("my_student", new ZxyTable.OnRenameTableCallback() {
+            @Override
+            public void onRenameFailure(String errMessage, String currentName, String newName, String reNameTableSQL) {
+                //修改失败回调这里
+            }
+
+            @Override
+            public void onRenameSuccess(String oldName, String newName, String reNameTableSQL) {
+                //修改成功回调这里
+            }
+        });
+
 - 删除表
+
+        //删除表
+        studentTable.deleteTable();
+
+        //删除表带回调
+        studentTable.deleteTable(new ZxyTable.OnDeleteTableCallback() {
+            @Override
+            public void onDeleteTableFailure(String errMessage, String deleteTableSQL) {
+                
+            }
+
+            @Override
+            public void onDeleteTableSuccess(String deleteTableSQL) {
+
+            }
+        });
+
 - 清空表
+
+        //清空数据
+        studentTable.clear();
+
 - 获取表名
+
+        //获取表名字
+        String tableName = studentTable.getTableName();
+
 - 获取主建字段名(没有主建时返回null)
+
+        //获取主键字段名
+        String majorKeyName = studentTable.getMajorKeyName();
+        if(majorKeyName == null){
+            //说明无主键
+        }
 
 ## 3.3 添加数据
 
 - 添加单条数据
+
+        Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
+        student.setMan(true);
+        Father father = new Father("Ellen2019", "1");
+        student.setFather(father);
+
+        //单条数据添加
+        studentTable.saveData(student);
+
 - 添加多条数据
+
+        //多条数据添加
+        List<Student> studentList = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            student = new Student(i, "Ellen2018", i, "18272167574", "火星");
+            father = new Father("Ellen2019", ""+i);
+            student.setFather(father);
+            student.setMan(true);
+            studentList.add(student);
+        }
+
+        studentTable.saveData(studentList);
+
 - 添加或者更新(根据主键进行判断)
-- 添加或者更新(根据传入的WHERE SQL语句进行判断)
+
+        //save or update 根据主键判断,根据主键查询没有该数据就存储，有就进行更新
+        studentTable.saveOrUpdateByMajorKey(student);
+        studentTable.saveOrUpdateByMajorKey(studentList);
+
+- 添加之前清空表  
+
+        //多条数据 
+        studentTable.saveDataAndDeleteAgo(studentList);
+
+        //单条数据
+        studentTable.saveDataAndDeleteAgo(student);
 
 ## 3.4 删除数据
 
 - 删除数据(根据主建判断)
+
+        //根据主键删除数据(删除主键为3的数据)
+        studentTable.deleteByMajorKey(3);
+
 - 删除数据(根据WHERE SQL语句进行判断)
+
+        //删除my_name为Ellen2018 且age > 20 的数据
+        String whereSql =
+                Where.getInstance(false)
+                        .addAndWhereValue("my_name", WhereSymbolEnum.EQUAL, "Ellen2018")
+                        .addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 20)
+                        .createSQL();
+
+        studentTable.delete(whereSql);
+
 - 清空表
+
+        //清空数据
+        studentTable.clear();
 
 ## 3.5 修改数据
 
 - 修改数据(根据主建判断)
-- 修改数据(根据WHERE SQL进行判断)
+
+        //注意如果你的bean类没有声明主键，那么调用此方法就会抛 NoPrimaryKeyException
+        Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
+        Father father = new Father("Ellen2019", "1");
+        student.setFather(father);
+
+        //根据主键进行修改
+        studentTable.updateByMajorKey(student);
+
+- 修改数据(根据WHERE SQL进行判断,注意这里是整个对象进行映射)
+
+        String whereSql =
+                Where.getInstance(false)
+                        .addAndWhereValue("my_name", WhereSymbolEnum.EQUAL, "Ellen2018")
+                        .addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 20)
+                        .createSQL();
+        //注意这种修改方式为全映射修改，如果只修改部分数据，请使用下面的方式
+        //什么是全映射修改？就是将对象的整个属性数据覆盖在whereSql满足的条件里
+        studentTable.update(student, whereSql);
+
+- 修改数据(只修改表中的部分值)
+
+        //自定义updateSql进行修改数据
+        //将your_age > 20岁年龄的数据的 age 的值全部修改为 your_age = 18,my_name = "永远18岁"
+        String whereSqlByAge =
+                Where.getInstance(false)
+                        .addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 20)
+                        .createSQL();
+
+        String updateSql = UpdateTableDataRow.getInstance()
+                .setTableName(studentTable.getTableName())
+                .addSetValue("your_age", 18)
+                .addSetValue("my_name", "永远18岁")
+                .createSQLAutoWhere(whereSqlByAge);
+
+        studentTable.exeSQL(updateSql);
 
 ## 3.6 查询语句
 
 - 查询单数据(根据主建进行查询)
+        
+        //查询主键为3的数据，没有返回为null
+        Student student = studentTable.searchByMajorKey(3);
+
 - 查询多数据(根据WHERE SQL语句进行查询，结果可排序->根据传入的ORDER SQL语句进行排序)
+
+        //查询my_name字段中含有"Ellen"的数据,然后根据your_age进行排序(Desc方式)
+        String whereSql =
+                Where.getInstance(false)
+                        .addAndWhereValue("my_name", WhereSymbolEnum.LIKE, "%Ellen%")
+                        .createSQL();
+
+        String orderSql = Order.getInstance(false)
+                .setFirstOrderFieldName("your_age")
+                .setIsDesc(true)
+                .createSQL();
+
+        List<Student> studentList = studentTable.search(whereSql, orderSql);
+
 - 获取表中所有数据(结果可排序->根据传入的ORDER SQL语句进行排序)
 
+        String orderSql = Order.getInstance(false)
+                .setFirstOrderFieldName("your_age")
+                .setIsDesc(true)
+                .createSQL();
 
+        //查询表中所有数据，没有排列顺序
+        List<Student> studentList1 = studentTable.getAllData(null);
+        //查询表中所有数据，根据your_age进行排序(Desc方式)
+        List<Student> studentList2 = studentTable.getAllData(orderSql);

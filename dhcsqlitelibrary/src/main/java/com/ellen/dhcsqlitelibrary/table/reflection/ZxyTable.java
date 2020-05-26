@@ -8,7 +8,7 @@ import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.Proxy.AutoOperateProxy;
 import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
-import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
+import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
 import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
@@ -247,7 +247,7 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      *
      * @param tableName
      */
-    public void deleteTable(String tableName) {
+    private void deleteTable(String tableName) {
         String deleteTableSQL = getDeleteTable().setTableName(tableName).createSQL();
         exeSQL(deleteTableSQL);
     }
@@ -257,7 +257,7 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      *
      * @param tableName
      */
-    public void deleteTable(String tableName, OnDeleteTableCallback onDeleteTableCallback) {
+    private void deleteTable(String tableName, OnDeleteTableCallback onDeleteTableCallback) {
         boolean isException = false;
         String deleteTableSQL = getDeleteTable().setTableName(tableName).createSQL();
         try {
@@ -269,10 +269,6 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         if (!isException) {
             onDeleteTableCallback.onDeleteTableSuccess(deleteTableSQL);
         }
-    }
-
-    public void deleteData(String deleteSql){
-        exeSQL(deleteSql);
     }
 
     /**
@@ -357,7 +353,7 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      *
      * @param dataList
      */
-    public void saveDataAndDeleteAgo(List<T> dataList) {
+    public void saveDataAndClearAgo(List<T> dataList) {
         if (dataList == null || dataList.size() == 0) {
             return;
         }
@@ -370,7 +366,7 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      *
      * @param
      */
-    public void saveDataAndDeleteAgo(T data) {
+    public void saveDataAndClearAgo(T data) {
         if (data == null) {
             return;
         }
@@ -389,6 +385,22 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         exeSQL(deleteSQL);
         if (zxyChangeListener != null) {
             zxyChangeListener.onDataChange();
+        }
+    }
+
+    /**
+     * 根据主键删除数据
+     * @param majorKeyValue
+     */
+    public void deleteByMajorKey(Object majorKeyValue){
+        if(majorKeyField == null){
+            //说明没有主键,抛出无主键异常
+            throw new NoMajorKeyException("没有主键,无法根据主键删除数据!");
+        }else {
+           String whereSql =  getWhere(false)
+                   .addAndWhereValue(majorKeySqlField.getName(),WhereSymbolEnum.EQUAL,majorKeyValue)
+                   .createSQL();
+           delete(whereSql);
         }
     }
 
@@ -416,10 +428,10 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      *
      * @param t
      */
-    public void saveOrUpdateByPrimaryKey(T t) {
-        if (isContainsByPrimaryKey(t)) {
+    public void saveOrUpdateByMajorKey(T t) {
+        if (isContainsByMajorKey(t)) {
             //进行更新
-            updateByPrimaryKey(t);
+            updateByMajorKey(t);
         } else {
             saveData(t);
         }
@@ -432,11 +444,11 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      *
      * @param tList
      */
-    public void saveOrUpdateByPrimaryKey(List<T> tList) {
+    public void saveOrUpdateByMajorKey(List<T> tList) {
         List<T> saveList = new ArrayList<>();
         for (T t : tList) {
-            if (isContainsByPrimaryKey(t)) {
-                updateByPrimaryKey(t);
+            if (isContainsByMajorKey(t)) {
+                updateByMajorKey(t);
             } else {
                 saveList.add(t);
             }
@@ -449,10 +461,10 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      *
      * @param t
      */
-    public void updateByPrimaryKey(T t) {
+    public void updateByMajorKey(T t) {
         if (majorKeySqlField == null) {
             //说明没有主键,抛出无主键异常
-            throw new NoPrimaryKeyException("没有主键,无法根据主键更新数据!");
+            throw new NoMajorKeyException("没有主键,无法根据主键更新数据!");
         } else {
             String whereSql = Where.getInstance(false)
                     .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, reflectHelper.getValue(t, majorKeyField))
@@ -466,11 +478,11 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      * @param value
      * @return
      */
-    public T getDataByPrimaryKey(Object value){
+    public T getDataByMajorKey(Object value){
         T t = null;
         if (majorKeySqlField == null) {
             //说明没有主键,抛出无主键异常
-            throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据!");
+            throw new NoMajorKeyException("没有主键,无法根据主键查询数据!");
         } else {
             String whereSql = Where.getInstance(false)
                     .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, value)
@@ -489,11 +501,11 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      * @param t
      * @return
      */
-    public boolean isContainsByPrimaryKey(T t) {
+    public boolean isContainsByMajorKey(T t) {
         boolean isContains = false;
         if (majorKeySqlField == null) {
             //说明没有主键,抛出无主键异常
-            throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据的存在!");
+            throw new NoMajorKeyException("没有主键,无法根据主键查询数据的存在!");
         } else {
             String whereSql = Where.getInstance(false)
                     .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, reflectHelper.getValue(t, majorKeyField))
@@ -564,6 +576,27 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         return searchDataBySql(searchSql);
     }
 
+    /**
+     * 根据主键查询数据
+     * @param majorKeyValue
+     * @return
+     */
+    public T searchByMajorKey(Object majorKeyValue){
+        if(majorKeyField == null){
+            throw new NoMajorKeyException("没有主键,无法根据主键删除数据!");
+        }else {
+            String whereSql = getWhere(false)
+                    .addAndWhereValue(majorKeySqlField.getName(),WhereSymbolEnum.EQUAL,majorKeyValue)
+                    .createSQL();
+            T t = null;
+            List<T> tList = search(whereSql,null);
+            if(tList != null && tList.size() > 0){
+                t = tList.get(0);
+            }
+            return t;
+        }
+    }
+
     public List<T> search(String whereSQL, String orderSQL) {
         List<T> dataList = new ArrayList<>();
         SerachTableData serachTableData = getSearchTableData().setTableName(tableName);
@@ -577,9 +610,13 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         return searchDataBySql(serachSQL);
     }
 
-    public List<T> searchDataBySql(String sql) {
+    /**
+     * 更具Cursor获取数据
+     * @param cursor
+     * @return
+     */
+    private List<T> getDataListByCursor(Cursor cursor){
         List<T> dataList = new ArrayList<>();
-        Cursor cursor = searchBySQL(sql);
         while (cursor.moveToNext()) {
             T t = null;
             try {
@@ -664,6 +701,16 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             cursor.close();
         }
         return dataList;
+    }
+
+    /**
+     * 查询数据
+     * @param sql 整段的sql
+     * @return
+     */
+    public List<T> searchDataBySql(String sql) {
+        Cursor cursor = searchBySQL(sql);
+        return getDataListByCursor(cursor);
     }
 
     /**

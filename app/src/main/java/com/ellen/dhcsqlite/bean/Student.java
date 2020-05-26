@@ -1,5 +1,6 @@
-package com.ellen.dhcsqlite;
+package com.ellen.dhcsqlite.bean;
 
+import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlitelibrary.table.annotation.DataStructure;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;

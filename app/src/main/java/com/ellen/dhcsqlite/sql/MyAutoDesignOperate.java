@@ -1,5 +1,6 @@
-package com.ellen.dhcsqlite;
+package com.ellen.dhcsqlite.sql;
 
+import com.ellen.dhcsqlite.bean.Student;
 import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.Delete;
 import com.ellen.dhcsqlitelibrary.table.operate.Search;
@@ -17,7 +18,7 @@ public interface MyAutoDesignOperate extends AutoDesignOperate {
      * @return
      */
     @Search(whereSql = "your_age > @ageValue and my_name = '@name'",orderSql = "id ASC")
-    List<Student> getSearchList1(@Value("ageValue") int ageValue,@Value("name") String name);
+    List<Student> getSearchList1(@Value("ageValue") int ageValue, @Value("name") String name);
 
     /**
      * 查找且排序

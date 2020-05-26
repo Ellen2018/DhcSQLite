@@ -1,4 +1,4 @@
-package com.ellen.dhcsqlite;
+package com.ellen.dhcsqlite.bean;
 
 public class Father {
 
