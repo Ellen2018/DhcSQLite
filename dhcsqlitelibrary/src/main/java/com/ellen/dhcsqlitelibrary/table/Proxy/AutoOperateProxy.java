@@ -27,10 +27,10 @@ import java.util.Set;
 
 public class AutoOperateProxy implements InvocationHandler {
 
-    private ZxyTable zxyReflectionTable;
+    private ZxyTable zxyTable;
 
     public AutoOperateProxy(ZxyTable zxyTable) {
-        this.zxyReflectionTable = zxyTable;
+        this.zxyTable = zxyTable;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -69,23 +69,23 @@ public class AutoOperateProxy implements InvocationHandler {
             if(orderSql != null && orderSql.equals("")){
                 orderSql = null;
             }
-            return zxyReflectionTable.search(newSql(whereSql, method, args), orderSql);
+            return zxyTable.search(newSql(whereSql, method, args), orderSql);
         }
         Delete delete = method.getAnnotation(Delete.class);
         if (delete != null) {
             String deleteSql = delete.value();
-            zxyReflectionTable.delete(newSql(deleteSql, method, args));
+            zxyTable.delete(newSql(deleteSql, method, args));
             return null;
         }
         TotalSearchSql totalSearchSql = method.getAnnotation(TotalSearchSql.class);
         if (totalSearchSql != null) {
             String totalSearchSqlString = totalSearchSql.value();
-            return zxyReflectionTable.searchDataBySql(newSql(totalSearchSqlString, method, args));
+            return zxyTable.searchDataBySql(newSql(totalSearchSqlString, method, args));
         }
         TotalSql totalSql = method.getAnnotation(TotalSql.class);
         if (totalSql != null) {
             String totalSqlString = totalSql.value();
-            zxyReflectionTable.exeSQL(newSql(totalSqlString, method, args));
+            zxyTable.exeSQL(newSql(totalSqlString, method, args));
             return null;
         }
         Update update = method.getAnnotation(Update.class);
@@ -94,13 +94,13 @@ public class AutoOperateProxy implements InvocationHandler {
             String whereSql = update.whereSql();
             valueSql = newSql(valueSql,method,args);
             whereSql = newSql(whereSql,method,args);
-            StringBuilder stringBuilder = new StringBuilder("UPDATE "+zxyReflectionTable.getTableName()+" SET ");
+            StringBuilder stringBuilder = new StringBuilder("UPDATE "+zxyTable.getTableName()+" SET ");
             stringBuilder.append(valueSql);
             stringBuilder.append(" WHERE ");
             stringBuilder.append(whereSql);
             stringBuilder.append(";");
             String updateSql  = stringBuilder.toString();
-            zxyReflectionTable.exeSQL(updateSql);
+            zxyTable.exeSQL(updateSql);
             return null;
         }
         TotalUpdateSql totalUpdateSql = method.getAnnotation(TotalUpdateSql.class);
@@ -108,7 +108,7 @@ public class AutoOperateProxy implements InvocationHandler {
             String totalUpdateSqlString = totalUpdateSql.value();
             String updateSql  =newSql(totalUpdateSqlString,method,args);
             Log.e("Ellen2018","update语句:"+updateSql);
-            zxyReflectionTable.exeSQL(updateSql);
+            zxyTable.exeSQL(updateSql);
             return null;
         }
         SearchByMajorKey searchByMajorKey = method.getAnnotation(SearchByMajorKey.class);
@@ -118,17 +118,17 @@ public class AutoOperateProxy implements InvocationHandler {
             if(orderSql != null && orderSql.equals("")){
                 orderSql = null;
             }
-            String majorKeyName = zxyReflectionTable.getMajorKeyName();
+            String majorKeyName = zxyTable.getMajorKeyName();
             if(!TextUtils.isEmpty(majorKeyName)) {
                 if(whereSql.contains("{}")) {
-                    whereSql = whereSql.replace("{}", zxyReflectionTable.getMajorKeyName());
+                    whereSql = whereSql.replace("{}", zxyTable.getMajorKeyName());
                 }else {
-                    whereSql = zxyReflectionTable.getMajorKeyName() + " "+whereSql;
+                    whereSql = zxyTable.getMajorKeyName() + " "+whereSql;
                 }
             }else {
                 throw new NoPrimaryKeyException("没有主键,无法根据主键查询数据!");
             }
-            return zxyReflectionTable.search(newSql(whereSql,method,args),orderSql);
+            return zxyTable.search(newSql(whereSql,method,args),orderSql);
         }
         return null;
     }

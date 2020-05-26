@@ -119,7 +119,12 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             SQLField sqlField = null;
             if (majorKeykey != null) {
                 //这里是主键
-                sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, false);
+                boolean isAutoIncrement = majorKeykey.isAutoIncrement();
+                if(isAutoIncrement){
+                    sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, true);
+                }else {
+                    sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, false);
+                }
                 majorKeyField = field;
                 majorKeySqlField = sqlField;
             } else {
