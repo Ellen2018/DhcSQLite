@@ -52,7 +52,7 @@ bean类代码：
 
 - @MajorKey 
  
-&emsp;&emsp;这个注解的作用就是用来指定主键的,它可以传递一个booleane类型的参数进去，这个参数代表主键是否自增，如果传参数，默认值为false。注意当您在bean类中指定了多个@MajorKey就会报异常。
+&emsp;&emsp;这个注解的作用就是用来指定主键的,它可以传递一个booleane类型的参数进去，这个参数代表主键是否自增，如果不传参数，默认值为false。注意当您在bean类中指定了多个@MajorKey就会报异常。
 
 - @Operate 
  
