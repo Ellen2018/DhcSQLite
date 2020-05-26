@@ -27,14 +27,20 @@
 &emsp;&emsp;DhcSqlite里面有4个比较重要的角色:
 
 - ZxySQLiteCreate(SQL语句制作者)  
-&emsp;&emsp;这个笔者已经提到了，它是用来帮助您完成各种Sql语句构建的，如果您想要完整看此框架的用法，请移步到[基于Android SQLite语句构建库的轮子](https://blog.csdn.net/ClAndEllen/article/details/103909339),一定要注意的是此框架DhcSqlite已经内部集成了，您无须单独集成，整个项目任何位置均可使用。  
+&emsp;&emsp;这个笔者已经提到了，它是用来帮助您完成各种Sql语句构建的，如果您想要完整看此框架的用法，请移步到[**基于Android SQLite语句构建库的轮子**](https://blog.csdn.net/ClAndEllen/article/details/103909339),一定要注意的是此框架DhcSqlite已经内部集成了，您无须单独集成，整个项目任何位置均可使用。  
 
 - ZxyLibrary(数据库管理者)  
-&emsp;&emsp;这个是用来对数据库进行一系列操作的，您可以通过此类对库的名字，存储地址进行定义，它还包括对表的删除，重命名，清空等等操作，反是对表操作的都在里面已经封装好了，一个对象对应一个库。详细用法请查看[ZxyLibrary](https://github.com/Ellen2018/DhcSQLite/blob/master/ZxyLibrary.md)  
+&emsp;&emsp;这个是用来对数据库进行一系列操作的，您可以通过此类对库的名字，存储地址进行定义，它还包括对表的删除，重命名，清空等等操作，反是对表操作的都在里面已经封装好了，一个对象对应一个库。 
+
+&emsp;&emsp;**详细用法请查看**[**ZxyLibrary**](https://github.com/Ellen2018/DhcSQLite/blob/master/ZxyLibrary.md)  
 
 - ZxyTable(数据库中表的管理者)   
-&emsp;&emsp;这个是用来对数据库中表进行一系列操作的，例如：增删改查，清空等等操作，它是一个泛型类，就是说泛型的参数指定的是关联的映射类， 此外还提供了好几个注解给您的bean类提供方便的数据库映射逻辑，例如:@MajorKey是用来bean类中指定主键的注解,@Ignore是用来bean类中不想该属性映射到数据库中的注解，还有很多其他的注解，详细用法请查看[ZxyTable](https://github.com/Ellen2018/DhcSQLite/blob/master/ZxyTable.md)
+&emsp;&emsp;这个是用来对数据库中表进行一系列操作的，例如：增删改查，清空等等操作，它是一个泛型类，就是说泛型的参数指定的是关联的映射类， 此外还提供了好几个注解给您的bean类提供方便的数据库映射逻辑，例如:@MajorKey是用来bean类中指定主键的注解,@Ignore是用来bean类中不想该属性映射到数据库中的注解，还有很多其他的注解。
+
+&emsp;&emsp;**详细用法请查看**[**ZxyTable**](https://github.com/Ellen2018/DhcSQLite/blob/master/ZxyTable.md)
 
 - AutoDesignOperate(自定义元操作者)  
-&emsp;&emsp;这个是一个接口，它是用来具体定义您项目中具体业务逻辑的接口，以动态代理的方式为您完成各种骚操作，您只需要在实现AutoDesignOperate里面声明方法，方法中使用@Search,@Update,@Value等注解帮您自动操作数据库，好处就是你不需要自动手动写代码，您只需要注意sql语句的填写即可。详细用法请查看[AutoDesignOperate]()
+&emsp;&emsp;这个是一个接口，它是用来具体定义您项目中具体业务逻辑的接口，以动态代理的方式为您完成各种骚操作，您只需要在实现AutoDesignOperate里面声明方法，方法中使用@Search,@Update,@Value等注解帮您自动操作数据库，好处就是你不需要自动手动写代码，您只需要注意sql语句的填写即可。  
+
+&emsp;&emsp;**详细用法请查看**[**AutoDesignOperate**](https://github.com/Ellen2018/DhcSQLite/blob/master/AutoDesignOperate.md)
 

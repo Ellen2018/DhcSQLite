@@ -1,7 +1,7 @@
 
 # 1.简介  
 
-&emsp;&emsp;你使用此库的第二步就是创建一个ZxyTable类，在继承它的时候需要传入2个泛型，第一个泛型指的是映射的bean类型，第二个参数就是您自定义的元操作角色对应的接口[AutoDesignOperate]()。
+&emsp;&emsp;你使用此库的第二步就是创建一个ZxyTable类，在继承它的时候需要传入2个泛型，第一个泛型指的是映射的bean类型，第二个参数就是您自定义的元操作角色对应的接口[**AutoDesignOperate**](https://github.com/Ellen2018/DhcSQLite/blob/master/AutoDesignOperate.md)。
 这个类能帮你做到很多操作表相关的事情也是您最需要仔细了解的一个类，里面封装了很多api,增删改查功能非常健全，此外您还可以自定义AutoDesignOperate来自定义您的元操作(更多的是业务操作)。
 
 # 2.api介绍
@@ -233,7 +233,7 @@ Father类：
 
     //先声明一个ZxyLibrary对象
     ZxyLibrary zxyLibrary = new AppLibrary(this, "数据库名", 1);
-    SQLiteDatabase sqLiteDatabase = appLibrary.getWriteDataBase();
+    SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
     
     //再声明要给ZxyTable对象
     StudentTable StudentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
@@ -245,11 +245,11 @@ Father类：
 
 - StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, Class<? extends AutoDesignOperate> autoClass)
 
-&emsp;&emsp;调用此构造器它的表名为它绑定的bean类的类名。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取，dataClass为绑定的映射类的字节码对象，autoClass为元操作代理接口字节码对象，关于元操作代理接口使用请查阅[AutoDesignOperate]()。
+&emsp;&emsp;调用此构造器它的表名为它绑定的bean类的类名。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取，dataClass为绑定的映射类的字节码对象，autoClass为元操作代理接口字节码对象，关于元操作代理接口使用请查阅[**AutoDesignOperate**](https://github.com/Ellen2018/DhcSQLite/blob/master/AutoDesignOperate.md)。
 
 -  StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, String autoTableName, Class<? extends AutoDesignOperate> autoClass)
 
-&emsp;&emsp;调用此构造器它的表名为传入的autoTableName。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取，dataClass为绑定的映射类的字节码对象，autoClass为元操作代理接口字节码对象，关于元操作代理接口使用请查阅[AutoDesignOperate]()。  
+&emsp;&emsp;调用此构造器它的表名为传入的autoTableName。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取，dataClass为绑定的映射类的字节码对象，autoClass为元操作代理接口字节码对象，关于元操作代理接口使用请查阅[**AutoDesignOperate**](https://github.com/Ellen2018/DhcSQLite/blob/master/AutoDesignOperate.md)。  
 
 - SQLFieldType getSqlFieldType(String classFieldName, Class typeClass)  
 
