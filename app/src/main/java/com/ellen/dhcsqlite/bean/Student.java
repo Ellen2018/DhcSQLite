@@ -6,6 +6,7 @@ import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.annotation.EndAutoString;
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
 import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
+import com.ellen.dhcsqlitelibrary.table.annotation.NotNull;
 import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
@@ -32,6 +33,8 @@ public class Student {
     @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
     @Operate(operate = OperateEnum.JSON)
     @DhcSqlFieldName(sqlFieldName = "your_father")
+    @Unique
+    @NotNull
     private Father father;
     @Operate(operate = OperateEnum.VALUE,valueName = "id")
     @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 50)

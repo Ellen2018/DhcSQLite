@@ -166,7 +166,7 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
                             sqlField = SQLField.getOrdinaryField(fieldName, fieldType);
                         }
                         if (TextUtils.isEmpty(sqlField.getAutoEndString())) {
-                            sqlField.setAutoEndString(" UNIQUE");
+                            sqlField.setAutoEndString("UNIQUE");
                         } else {
                             sqlField.setAutoEndString(sqlField.getAutoEndString() + " UNIQUE");
                         }
