@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyChangeListener;
+import com.ellen.dhcsqlitelibrary.table.reflection.ZxyLibrary;
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.delete.DeleteTableDataRow;
@@ -30,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvAll = findViewById(R.id.tv_all);
-        appLibrary = new AppLibrary(this, "sqlite_library", 1);
+        ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
         SQLiteDatabase sqLiteDatabase = appLibrary.getWriteDataBase();
-        studentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
+        StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
 
         studentTable.setZxyChangeListener(new ZxyChangeListener() {
             @Override

@@ -802,7 +802,6 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         return null;
     }
 
-
     private String getDataStructureJson(T t,Field field){
         String json = null;
         if(field.getType().isArray()) {

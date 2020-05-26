@@ -62,10 +62,14 @@ public class StudentTable extends ZxyTable<Student, MyAutoDesignOperate> {
      */
     @Override
     protected Object setBooleanValue(String classFieldName, boolean value) {
-        if(value){
-            return "男";
+        if(classFieldName.equals("isMan")) {
+            if (value) {
+                return "男";
+            } else {
+                return "女";
+            }
         }else {
-            return "女";
+            return super.setBooleanValue(classFieldName,value);
         }
     }
 
@@ -89,7 +93,8 @@ public class StudentTable extends ZxyTable<Student, MyAutoDesignOperate> {
      */
     @Override
     protected JsonLibraryType getJsonLibraryType() {
-        return JsonLibraryType.Gson;
+        //JsonLibraryType.FastJson; ->FastJson方式
+        return JsonLibraryType.Gson; //Gson方式
     }
 
     /**
