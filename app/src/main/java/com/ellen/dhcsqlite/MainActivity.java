@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void other() {
-
         //是否包含该条数据 & 根据主键来判断
         //注意这种方式换成search方式完成，并不一定使用该方法，当然这只是笔者提供的一个方法而已
         Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
@@ -252,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
-                BaseLog.log("创建表", createSQL);
                 tvAll.setText(createSQL);
             }
         });
