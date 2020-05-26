@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class Student {
 
     //主键
-    @MajorKey(isAutoIncrement = false)
+    @MajorKey(isAutoIncrement = true)
     private int id;
     @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
     private String name;
@@ -37,8 +37,7 @@ public class Student {
     @DhcSqlFieldName(sqlFieldName = "爸爸们")
     private Father[] fathers;
 
-    public Student(int id, String name, int age, String phoneNumber, String address) {
-        this.id = id;
+    public Student(String name, int age, String phoneNumber, String address) {
         this.name = name;
         this.age = age;
         this.phoneNumber = phoneNumber;

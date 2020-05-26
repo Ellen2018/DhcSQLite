@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private void other() {
         //是否包含该条数据 & 根据主键来判断
         //注意这种方式换成search方式完成，并不一定使用该方法，当然这只是笔者提供的一个方法而已
-        Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
+        Student student = new Student("Ellen2018", 19, "18272167574", "火星");
         Father father = new Father("Ellen2019", "1");
         student.setFather(father);
         boolean isContains = studentTable.isContainsByMajorKey(student);
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateData() {
         //根据主键进行修改
         //注意如果你的bean类没有声明主键，那么调用此方法就会抛 NoPrimaryKeyException
-        Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
+        Student student = new Student("Ellen2018", 19, "18272167574", "火星");
         Father father = new Father("Ellen2019", "1");
         student.setFather(father);
         studentTable.updateByMajorKey(student);
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            student = new Student(i, "Ellen2018", 19, "18272167574", "火星");
+            student = new Student("Ellen2018", 19, "18272167574", "火星");
             studentList.add(student);
         }
         //save or update 根据主键判断,根据主键查询没有该数据就存储，有就进行更新
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addData() {
-        Student student = new Student(-1, "Ellen2018", 19, "18272167574", "火星");
+        Student student = new Student("Ellen2018", 19, "18272167574", "火星");
         student.setMan(true);
         Father father = new Father("Ellen2019", "1");
         student.setFather(father);
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
         //多条数据添加
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            student = new Student(i, "Ellen2018", i, "18272167574", "火星");
+            student = new Student("Ellen2018", i, "18272167574", "火星");
             father = new Father("Ellen2019", ""+i);
             student.setFather(father);
             student.setMan(true);

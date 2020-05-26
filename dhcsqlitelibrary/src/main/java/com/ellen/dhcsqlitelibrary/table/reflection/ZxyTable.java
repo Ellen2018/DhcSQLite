@@ -38,7 +38,7 @@ import java.util.List;
  * 此类是基于反射对类进行自动建表
  * 完全类似于LitePal的用法
  */
-public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTable {
+public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTable {
 
     private Class dataClass;
 
@@ -50,13 +50,14 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
     private Field majorKeyField = null;
     private SQLField majorKeySqlField = null;
     private JsonHelper jsonHelper;
+    private boolean isAutoIncrement = false;
 
     private ZxyChangeListener zxyChangeListener;
     private Class<? extends AutoDesignOperate> autoClass;
 
-    public ZxyTable(SQLiteDatabase db, Class<? extends T> dataClass,Class<? extends AutoDesignOperate> autoClass) {
+    public ZxyTable(SQLiteDatabase db, Class<? extends T> dataClass, Class<? extends AutoDesignOperate> autoClass) {
         super(db);
-        init(dataClass.getSimpleName(), dataClass,autoClass);
+        init(dataClass.getSimpleName(), dataClass, autoClass);
     }
 
     public O getAutoDesignOperate() {
@@ -65,29 +66,30 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
 
     /**
      * 获取主键的字段名字
+     *
      * @return
      */
-    public String getMajorKeyName(){
+    public String getMajorKeyName() {
         String majorKeyName = null;
-        if(majorKeySqlField != null){
+        if (majorKeySqlField != null) {
             majorKeyName = majorKeySqlField.getName();
         }
         return majorKeyName;
     }
 
-    public ZxyTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName,Class<? extends AutoDesignOperate> autoClass) {
+    public ZxyTable(SQLiteDatabase db, Class<? extends T> dataClass, String autoTableName, Class<? extends AutoDesignOperate> autoClass) {
         super(db);
-        init(autoTableName, dataClass,autoClass);
+        init(autoTableName, dataClass, autoClass);
     }
 
-    private void init(String tableName, Class<? extends T> dataClass,Class<? extends AutoDesignOperate> autoClass) {
+    private void init(String tableName, Class<? extends T> dataClass, Class<? extends AutoDesignOperate> autoClass) {
         this.dataClass = dataClass;
         this.tableName = tableName;
         reflectHelper = new ReflectHelper<>();
         sqlNameMap = new HashMap<>();
         getFields();
         jsonHelper = new JsonHelper(getJsonLibraryType());
-        autoDesignOperate = (O) AutoOperateProxy.newMapperProxy(autoClass,this);
+        autoDesignOperate = (O) AutoOperateProxy.newMapperProxy(autoClass, this);
     }
 
     public void setZxyChangeListener(ZxyChangeListener zxyChangeListener) {
@@ -120,11 +122,12 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             if (majorKey != null) {
                 //这里是主键
                 boolean isAutoIncrement = majorKey.isAutoIncrement();
-                if(isAutoIncrement){
+                if (isAutoIncrement) {
                     sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, true);
-                }else {
+                } else {
                     sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, false);
                 }
+                this.isAutoIncrement = isAutoIncrement;
                 majorKeyField = field;
                 majorKeySqlField = sqlField;
             } else {
@@ -295,8 +298,19 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             }
 
             //此处可以添加记录数据库数据之前的操作:加密数据等
-
-            addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
+            //先判断是否有主键
+            if (majorKeyField != null) {
+                if (majorKeySqlField.getName().equals(sqlFieldList.get(i))) {
+                    //当前是主键
+                    if (!isAutoIncrement) {
+                        addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
+                    }
+                } else {
+                    addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
+                }
+            } else {
+                addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
+            }
         }
         String addDataSql = addSingleRowToTable.createSQL();
         exeSQL(addDataSql);
@@ -320,7 +334,23 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         }
         AddManyRowToTable addManyRowToTable = getAddManyRowToTable();
         addManyRowToTable.setTableName(tableName);
-        addManyRowToTable.addFieldList(sqlFieldList);
+        boolean isAddMajorKeyValue = true;
+        if (majorKeySqlField != null) {
+            if (isAutoIncrement) {
+                List<SQLField> currentSqlFieldList = new ArrayList<>();
+                for (SQLField sqlField : sqlFieldList) {
+                    if (!sqlField.getName().equals(majorKeyField.getName())) {
+                        currentSqlFieldList.add(sqlField);
+                    }
+                }
+                addManyRowToTable.addFieldList(currentSqlFieldList);
+                isAddMajorKeyValue = false;
+            } else {
+                addManyRowToTable.addFieldList(sqlFieldList);
+            }
+        } else {
+            addManyRowToTable.addFieldList(sqlFieldList);
+        }
         for (int i = 0; i < dataList.size(); i++) {
             List list = new ArrayList();
             for (int j = 0; j < sqlFieldList.size(); j++) {
@@ -336,8 +366,13 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
                 }
 
                 //此处可以添加记录数据库数据之前的操作:加密数据等
-
-                list.add(value);
+                if (isAddMajorKeyValue) {
+                    list.add(value);
+                } else {
+                    if (!sqlFieldList.get(j).getName().equals(majorKeySqlField.getName())) {
+                        list.add(value);
+                    }
+                }
             }
             addManyRowToTable.addValueList(list);
         }
@@ -390,17 +425,18 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
 
     /**
      * 根据主键删除数据
+     *
      * @param majorKeyValue
      */
-    public void deleteByMajorKey(Object majorKeyValue){
-        if(majorKeyField == null){
+    public void deleteByMajorKey(Object majorKeyValue) {
+        if (majorKeyField == null) {
             //说明没有主键,抛出无主键异常
             throw new NoMajorKeyException("没有主键,无法根据主键删除数据!");
-        }else {
-           String whereSql =  getWhere(false)
-                   .addAndWhereValue(majorKeySqlField.getName(),WhereSymbolEnum.EQUAL,majorKeyValue)
-                   .createSQL();
-           delete(whereSql);
+        } else {
+            String whereSql = getWhere(false)
+                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, majorKeyValue)
+                    .createSQL();
+            delete(whereSql);
         }
     }
 
@@ -475,10 +511,11 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
 
     /**
      * 更具主建查询数据
+     *
      * @param value
      * @return
      */
-    public T getDataByMajorKey(Object value){
+    public T getDataByMajorKey(Object value) {
         T t = null;
         if (majorKeySqlField == null) {
             //说明没有主键,抛出无主键异常
@@ -487,8 +524,8 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             String whereSql = Where.getInstance(false)
                     .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, value)
                     .createSQL();
-            List<T> tList = search(whereSql,null);
-            if(tList != null & tList.size() > 0){
+            List<T> tList = search(whereSql, null);
+            if (tList != null & tList.size() > 0) {
                 t = tList.get(0);
             }
         }
@@ -569,19 +606,20 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
 
     /**
      * 根据主键查询数据
+     *
      * @param majorKeyValue
      * @return
      */
-    public T searchByMajorKey(Object majorKeyValue){
-        if(majorKeyField == null){
+    public T searchByMajorKey(Object majorKeyValue) {
+        if (majorKeyField == null) {
             throw new NoMajorKeyException("没有主键,无法根据主键删除数据!");
-        }else {
+        } else {
             String whereSql = getWhere(false)
-                    .addAndWhereValue(majorKeySqlField.getName(),WhereSymbolEnum.EQUAL,majorKeyValue)
+                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, majorKeyValue)
                     .createSQL();
             T t = null;
-            List<T> tList = search(whereSql,null);
-            if(tList != null && tList.size() > 0){
+            List<T> tList = search(whereSql, null);
+            if (tList != null && tList.size() > 0) {
                 t = tList.get(0);
             }
             return t;
@@ -603,10 +641,11 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
 
     /**
      * 更具Cursor获取数据
+     *
      * @param cursor
      * @return
      */
-    private List<T> getDataListByCursor(Cursor cursor){
+    private List<T> getDataListByCursor(Cursor cursor) {
         List<T> dataList = new ArrayList<>();
         while (cursor.moveToNext()) {
             T t = null;
@@ -696,6 +735,7 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
 
     /**
      * 查询数据
+     *
      * @param sql 整段的sql
      * @return
      */
@@ -771,10 +811,10 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
      * @return
      */
     private SQLFieldType conversionSQLiteType(Field field) {
-        if(reflectHelper.isDataStructure(field)){
+        if (reflectHelper.isDataStructure(field)) {
             //如果是数据结构类型的属性，SQL中存储的类型为TEXT且无线长度类型
-            SQLFieldType sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT,-1);
-            return  sqlFieldType;
+            SQLFieldType sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT, -1);
+            return sqlFieldType;
         }
         SqlType sqlType = field.getAnnotation(SqlType.class);
         SQLFieldTypeEnum sqlFieldTypeEnum = sqlType.sqlFiledType();
@@ -797,7 +837,7 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
     private Object setConversionValue(Field field, T t) {
         //先判断是不是数据结构类型
         if (reflectHelper.isDataStructure(field)) {
-            return getDataStructureJson(t,field);
+            return getDataStructureJson(t, field);
         }
         //先看转换类型的操作
         Class typeClass = field.getType();
@@ -836,33 +876,33 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
         return jsonHelper.toObject(json, targetClass);
     }
 
-    protected Object resumeDataStructure(String classFieldName,String json){
+    protected Object resumeDataStructure(String classFieldName, String json) {
         return null;
     }
 
-    private String getDataStructureJson(T t,Field field){
+    private String getDataStructureJson(T t, Field field) {
         String json = null;
-        if(field.getType().isArray()) {
+        if (field.getType().isArray()) {
             //数组
             Object[] objectArray = reflectHelper.getValueArray(t, field);
             if (objectArray != null) {
                 List list = Arrays.asList(objectArray);
                 json = jsonHelper.toJsonByList(list);
             }
-        }else {
+        } else {
             //其他数据结构
-            Object obj = reflectHelper.getValue(t,field);
-            if(obj != null) {
+            Object obj = reflectHelper.getValue(t, field);
+            if (obj != null) {
                 json = jsonHelper.toJson(obj);
             }
         }
         return json;
     }
 
-    private Object getDataStructureObj(Field field,String json){
-        if(json != null) {
+    private Object getDataStructureObj(Field field, String json) {
+        if (json != null) {
             return resumeDataStructure(field.getName(), json);
-        }else {
+        } else {
             return null;
         }
     }
