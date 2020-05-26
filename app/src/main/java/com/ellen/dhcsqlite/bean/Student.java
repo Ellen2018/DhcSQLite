@@ -21,7 +21,7 @@ public class Student {
     @MajorKey(isAutoIncrement = true)
     private int id;
     @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
-    @EndAutoString("CHECK(name like 'Ellen%')")
+    @EndAutoString("CHECK(my_name like 'Ellen%')")
     private String name;
     @DhcSqlFieldName(sqlFieldName = "your_age")
     private int age;
@@ -33,8 +33,6 @@ public class Student {
     @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
     @Operate(operate = OperateEnum.JSON)
     @DhcSqlFieldName(sqlFieldName = "your_father")
-    @Unique
-    @NotNull
     private Father father;
     @Operate(operate = OperateEnum.VALUE,valueName = "id")
     @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 50)

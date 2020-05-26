@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
 
         //多条数据添加
         List<Student> studentList = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 1; i < 100; i++) {
             student = new Student("Ellen2018_"+i, i, "18272167574", "火星");
             father = new Father("Ellen2019", ""+i);
             student.setFather(father);
