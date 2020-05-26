@@ -12,7 +12,7 @@ import com.ellen.dhcsqlitelibrary.table.exception.NoPrimaryKeyException;
 import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.annotation.NoBasicType;
+import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
 import com.ellen.dhcsqlitelibrary.table.annotation.NotNull;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
@@ -113,13 +113,13 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             if (dhcSqlFieldName == null) {
                 fieldName = getSQLFieldName(field.getName(), field.getType());
             } else {
-                fieldName = dhcSqlFieldName.value();
+                fieldName = dhcSqlFieldName.sqlFieldName();
             }
-            MajorKey majorKeykey = field.getAnnotation(MajorKey.class);
+            MajorKey majorKey = field.getAnnotation(MajorKey.class);
             SQLField sqlField = null;
-            if (majorKeykey != null) {
+            if (majorKey != null) {
                 //这里是主键
-                boolean isAutoIncrement = majorKeykey.isAutoIncrement();
+                boolean isAutoIncrement = majorKey.isAutoIncrement();
                 if(isAutoIncrement){
                     sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, true);
                 }else {
@@ -738,9 +738,9 @@ public abstract class ZxyTable<T,O extends AutoDesignOperate> extends BaseZxyTab
             SQLFieldType sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT,-1);
             return  sqlFieldType;
         }
-        NoBasicType noBasicType = field.getAnnotation(NoBasicType.class);
-        SQLFieldTypeEnum sqlFieldTypeEnum = noBasicType.sqlFiledType();
-        int length = noBasicType.length();
+        SqlType sqlType = field.getAnnotation(SqlType.class);
+        SQLFieldTypeEnum sqlFieldTypeEnum = sqlType.sqlFiledType();
+        int length = sqlType.length();
         SQLFieldType sqlFieldType;
         if (length <= 0) {
             sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, null);

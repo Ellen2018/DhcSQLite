@@ -4,7 +4,7 @@ import com.ellen.dhcsqlitelibrary.table.annotation.DataStructure;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
 import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
-import com.ellen.dhcsqlitelibrary.table.annotation.NoBasicType;
+import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
@@ -16,21 +16,23 @@ public class Student {
     //主键
     @MajorKey(isAutoIncrement = true)
     private int id;
-    @DhcSqlFieldName("my_name") //映射数据库中字段名字为my_name
+    @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
     private String name;
-    @DhcSqlFieldName("your_age")
+    @DhcSqlFieldName(sqlFieldName = "your_age")
     private int age;
     private String phoneNumber;
     private String address;
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     private boolean isMan;
-    @NoBasicType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
+    @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
     @Operate(operate = OperateEnum.JSON)
-    @DhcSqlFieldName("your_father")
+    @DhcSqlFieldName(sqlFieldName = "your_father")
     private Father father;
+    @Operate(operate = OperateEnum.VALUE,valueName = "id")
+    private Father father2;
     @DataStructure //表示这个属性是数据类型属性，需要用注解区分，才能正确的进行json映射，否则会报错
-    @DhcSqlFieldName("爸爸们")
+    @DhcSqlFieldName(sqlFieldName = "爸爸们")
     private Father[] fathers;
 
     public Student(int id, String name, int age, String phoneNumber, String address) {
