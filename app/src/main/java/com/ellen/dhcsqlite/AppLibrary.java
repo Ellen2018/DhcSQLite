@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.dhcsqlitelibrary.table.reflection.ZxyLibrary;
 
-public class SQliteLibrary extends ZxyLibrary {
+public class AppLibrary extends ZxyLibrary {
 
     /**
      *
@@ -13,7 +13,7 @@ public class SQliteLibrary extends ZxyLibrary {
      * @param name 数据库的名字
      * @param version 数据库的版本
      */
-    public SQliteLibrary(Context context, String name, int version) {
+    public AppLibrary(Context context, String name, int version) {
         super(context, name, version);
     }
 
@@ -24,7 +24,7 @@ public class SQliteLibrary extends ZxyLibrary {
      * @param name 数据库的名字
      * @param version 数据库版本号
      */
-    public SQliteLibrary(Context context, String libraryPath, String name, int version) {
+    public AppLibrary(Context context, String libraryPath, String name, int version) {
         super(context, libraryPath, name, version);
     }
 

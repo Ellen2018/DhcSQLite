@@ -2,6 +2,7 @@ package com.ellen.dhcsqlite;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -22,15 +23,16 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tvAll;
     private StudentTable studentTable;
-    private SQliteLibrary sQliteLibrary;
+    private AppLibrary appLibrary;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tvAll = findViewById(R.id.tv_all);
-        sQliteLibrary = new SQliteLibrary(this, "sqlite_library", 1);
-        studentTable = new StudentTable(sQliteLibrary.getWriteDataBase(), Student.class,MyAutoDesignOperate.class);
+        appLibrary = new AppLibrary(this, "sqlite_library", 1);
+        SQLiteDatabase sqLiteDatabase = appLibrary.getWriteDataBase();
+        studentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
 
         studentTable.setZxyChangeListener(new ZxyChangeListener() {
             @Override
@@ -102,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         studentTable.deleteTable();
 
         //也可以通过Library对象进行删除
-        sQliteLibrary.deleteTable(studentTable.getTableName());
+        appLibrary.deleteTable(studentTable.getTableName());
 
         //删除表 & 带回调
         studentTable.deleteTable(new ZxyTable.OnDeleteTableCallback() {

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.sqlitecreate.createsql.delete.DeleteTable;
+import com.ellen.sqlitecreate.createsql.delete.DeleteTableDataRow;
+import com.ellen.sqlitecreate.createsql.update.UpdateTableName;
 
 public abstract class ZxyLibrary {
 
@@ -63,6 +65,16 @@ public abstract class ZxyLibrary {
     public void deleteTable(String tableName){
         String deleteTableSql = DeleteTable.getInstance().setTableName(tableName).createSQL();
         getWriteDataBase().execSQL(deleteTableSql);
+    }
+
+    public void reNameTable(String oldTableName,String newTableName){
+        String updateTableName = UpdateTableName.getInstance().setOldTableName(oldTableName).setNewTableName(newTableName).createSQL();
+        getWriteDataBase().execSQL(updateTableName);
+    }
+
+    public void clearTable(String tableName){
+        String clearTableSql = DeleteTableDataRow.getInstance().setTableName(tableName).createDeleteAllDataSQL();
+        getWriteDataBase().execSQL(clearTableSql);
     }
 
 }
