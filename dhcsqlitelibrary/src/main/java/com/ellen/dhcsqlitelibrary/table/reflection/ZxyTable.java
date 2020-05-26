@@ -618,6 +618,14 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
     }
 
     /**
+     * 获取表中所有数据
+     * @return
+     */
+    public List<T> getAllData(){
+        return getAllData(null);
+    }
+
+    /**
      * 根据主键查询数据
      *
      * @param majorKeyValue
