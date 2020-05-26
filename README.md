@@ -53,7 +53,7 @@ Student类代码:
          * 科目以及成绩
          */
         @DataStructure //声明它是属于数据结构的属性
-        private Map<Subject,Integer> subjectMap;
+        private Map<String,Integer> subjectMap;
 
         /**
          * 总分
@@ -99,8 +99,8 @@ Student类代码:
          * @param str
          * @return
          */
-        @Search(whereSql = "name like '@str'", orderSql = "id ASC")
-        List<Student> searchByLikeName(@Value("str") String str);
+         @Search(whereSql = "name like '%@str%'", orderSql = "sid ASC")
+         List<Student> searchByLikeName(@Value("str") String str);
     
     }
 
