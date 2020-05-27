@@ -94,7 +94,7 @@ Student类代码:
         void updateStudentNameById(@Value("sid") int sid, @Value("newName") String newName);
 
         /**
-         * 查询名字中带有str的数据，结果按照id进行排序
+         * 查询名字中带有str的数据，结果按照sid进行排序
          *
          * @param str
          * @return
