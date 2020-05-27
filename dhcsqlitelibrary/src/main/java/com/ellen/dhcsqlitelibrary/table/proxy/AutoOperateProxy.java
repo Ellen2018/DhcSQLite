@@ -6,13 +6,13 @@ import android.text.TextUtils;
 import androidx.annotation.RequiresApi;
 
 import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
-import com.ellen.dhcsqlitelibrary.table.operate.Delete;
-import com.ellen.dhcsqlitelibrary.table.operate.SearchByMajorKey;
-import com.ellen.dhcsqlitelibrary.table.operate.Search;
-import com.ellen.dhcsqlitelibrary.table.operate.TotalSql;
-import com.ellen.dhcsqlitelibrary.table.operate.Update;
-import com.ellen.dhcsqlitelibrary.table.operate.Value;
-import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Delete;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.SearchByMajorKey;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Search;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.TotalSql;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Update;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Value;
+import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

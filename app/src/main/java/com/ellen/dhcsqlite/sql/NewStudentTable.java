@@ -4,8 +4,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlite.bean.Student;
-import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
-import com.ellen.dhcsqlitelibrary.table.reflection.ZxyTable;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
+import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

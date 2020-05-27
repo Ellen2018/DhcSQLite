@@ -1,8 +1,7 @@
 package com.ellen.dhcsqlitelibrary.table.type;
 
-import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
-import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 

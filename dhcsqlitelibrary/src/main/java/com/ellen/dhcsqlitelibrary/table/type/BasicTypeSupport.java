@@ -1,7 +1,7 @@
 package com.ellen.dhcsqlitelibrary.table.type;
 
-import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.operate.ReflectHelper;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 
 import java.lang.reflect.Field;

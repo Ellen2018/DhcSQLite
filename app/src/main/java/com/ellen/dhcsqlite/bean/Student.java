@@ -1,19 +1,16 @@
 package com.ellen.dhcsqlite.bean;
 
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.Check;
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.CreateEndString;
-import com.ellen.dhcsqlitelibrary.table.annotation.DataStructure;
-import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.Default;
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.DefaultValueEnum;
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.EndAutoString;
-import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.MajorKey;
-import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
-import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
-import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.NotNull;
-import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Check;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.CreateEndString;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.DataStructure;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Default;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.DefaultValueEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.EndAutoString;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.Ignore;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.MajorKey;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.Operate;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.OperateEnum;
 
 import java.util.Arrays;
 

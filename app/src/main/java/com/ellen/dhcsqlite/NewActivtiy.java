@@ -13,7 +13,7 @@ import com.ellen.dhcsqlite.sql.AppLibrary;
 import com.ellen.dhcsqlite.sql.MyAutoDesignOperate;
 import com.ellen.dhcsqlite.sql.NewStudentTable;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
-import com.ellen.dhcsqlitelibrary.table.reflection.ZxyLibrary;
+import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.where.Where;
 

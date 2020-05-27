@@ -1,13 +1,12 @@
 package com.ellen.dhcsqlitelibrary.table.type;
 
-import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
-import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
-import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.Operate;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.OperateEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.SqlType;
 import com.ellen.dhcsqlitelibrary.table.exception.NoCanSaveToSqlException;
-import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
-import com.ellen.dhcsqlitelibrary.table.operate.ReflectHelper;
-import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
+import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 

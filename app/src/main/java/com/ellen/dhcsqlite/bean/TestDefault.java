@@ -1,7 +1,7 @@
 package com.ellen.dhcsqlite.bean;
 
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.Default;
-import com.ellen.dhcsqlitelibrary.table.annotation.bound.DefaultValueEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Default;
+import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.DefaultValueEnum;
 
 public class TestDefault {
 

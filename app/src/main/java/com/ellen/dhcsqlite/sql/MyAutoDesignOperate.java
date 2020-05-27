@@ -1,13 +1,13 @@
 package com.ellen.dhcsqlite.sql;
 
 import com.ellen.dhcsqlite.bean.Student;
-import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
-import com.ellen.dhcsqlitelibrary.table.operate.Delete;
-import com.ellen.dhcsqlitelibrary.table.operate.Search;
-import com.ellen.dhcsqlitelibrary.table.operate.SearchByMajorKey;
-import com.ellen.dhcsqlitelibrary.table.operate.TotalSql;
-import com.ellen.dhcsqlitelibrary.table.operate.Update;
-import com.ellen.dhcsqlitelibrary.table.operate.Value;
+import com.ellen.dhcsqlitelibrary.table.proxy.AutoDesignOperate;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Delete;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Search;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.SearchByMajorKey;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.TotalSql;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Update;
+import com.ellen.dhcsqlitelibrary.table.annotation.auto.Value;
 
 import java.util.List;
 
