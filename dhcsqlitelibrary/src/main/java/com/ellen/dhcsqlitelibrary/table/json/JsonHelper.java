@@ -1,12 +1,8 @@
 package com.ellen.dhcsqlitelibrary.table.json;
 
-import android.util.Log;
-
 import com.ellen.dhcsqlitelibrary.table.exception.JsonNoCanFormatException;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 public class JsonHelper implements JsonFormat {
 
@@ -41,7 +37,7 @@ public class JsonHelper implements JsonFormat {
                 if (gsonClass != null) {
                     jsonFormat = new GsonFormat(getT(gsonClass));
                 } else if (fastJsonClass != null) {
-                    jsonFormat = new FastJsonFormat(fastJsonClass);
+                    jsonFormat = new FastJsonFormat();
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -76,10 +72,4 @@ public class JsonHelper implements JsonFormat {
     public <E> E toObject(String json, Class jsonClass) {
         return jsonFormat.toObject(json, jsonClass);
     }
-
-    @Override
-    public <T> String toJsonByList(List<T> tList) {
-        return jsonFormat.toJsonByList(tList);
-    }
-
 }

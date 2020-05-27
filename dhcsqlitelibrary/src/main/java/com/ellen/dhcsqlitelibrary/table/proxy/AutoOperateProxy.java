@@ -1,6 +1,5 @@
-package com.ellen.dhcsqlitelibrary.table.Proxy;
+package com.ellen.dhcsqlitelibrary.table.proxy;
 
-import android.database.Cursor;
 import android.os.Build;
 import android.text.TextUtils;
 
@@ -89,7 +88,7 @@ public class AutoOperateProxy implements InvocationHandler {
             }else {
                 //不具有返回值
                 String sql = newSql(totalSqlString, method, args);
-                zxyTable.exeSQL(newSql(totalSqlString, method, args));
+                zxyTable.exeSql(newSql(totalSqlString, method, args));
                 return null;
             }
         }
@@ -99,13 +98,13 @@ public class AutoOperateProxy implements InvocationHandler {
             String whereSql = update.whereSql();
             valueSql = newSql(valueSql,method,args);
             whereSql = newSql(whereSql,method,args);
-            StringBuilder stringBuilder = new StringBuilder("UPDATE "+zxyTable.getTableName()+" SET ");
+            StringBuilder stringBuilder = new StringBuilder("UPDATE "+ zxyTable.getTableName()+" SET ");
             stringBuilder.append(valueSql);
             stringBuilder.append(" WHERE ");
             stringBuilder.append(whereSql);
             stringBuilder.append(";");
             String updateSql  = stringBuilder.toString();
-            zxyTable.exeSQL(updateSql);
+            zxyTable.exeSql(updateSql);
             return null;
         }
         SearchByMajorKey searchByMajorKey = method.getAnnotation(SearchByMajorKey.class);

@@ -1,26 +1,22 @@
-package com.ellen.dhcsqlitelibrary.table.reflection;
+package com.ellen.dhcsqlitelibrary.table.operate;
+
+import android.database.Cursor;
 
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
 import com.ellen.dhcsqlitelibrary.table.annotation.bound.Default;
+import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.Vector;
 
 public class ReflectHelper<T> {
 
-    List<Field> getClassFieldList(Class<? extends T> dataClass, boolean isAddStatic) {
+    public List<Field> getClassFieldList(Class<? extends T> dataClass, boolean isAddStatic) {
         List<Field> fieldList = new ArrayList<>();
         Field[] fields = dataClass.getDeclaredFields();
         if (fields != null && fields.length != 0) {
@@ -47,102 +43,65 @@ public class ReflectHelper<T> {
         return fieldList;
     }
 
-    /**
-     * 判断该field是否为数据结构类型
-     * 如果您需要支持更多的数据结构，那么您需要更改此处以便让它告诉整个框架他就是数据结构类型
-     * @param field
-     * @return
-     */
-    boolean isDataStructure(Field field){
-        //数组
-        boolean isDataStructure = false;
-        if(field.getType().isArray()){
-            isDataStructure = true;
-        }
-        Class typeClass = field.getType();
-        //List
-        if(typeClass == List.class ||
-                typeClass == ArrayList.class || typeClass == LinkedList.class || typeClass == Vector.class){
-           isDataStructure = true;
-        }
-        //Set
-        if(typeClass == Set.class ||
-                typeClass == HashSet.class || typeClass == TreeSet.class){
-            isDataStructure = true;
-        }
-        //Map
-        if(typeClass == Map.class ||
-                typeClass == HashMap.class || typeClass == TreeMap.class){
-            isDataStructure = true;
-        }
-        //Stack
-        if(typeClass == Stack.class){
-            isDataStructure = true;
-        }
-        return isDataStructure;
-    }
-
-
-    Object[] getValueArray(Object object, Field targetFiled) {
-        Object value = getValue(object,targetFiled);
+    public Object[] getValueArray(Object value) {
         if(value == null)return null;
         String name = value.getClass().getSimpleName();
         Object[] objectArray = null;
         if(name.equals("byte[]")){
-            byte[] byteArray = (byte[]) getValue(object, targetFiled);
+            byte[] byteArray = (byte[]) value;
             objectArray = new Byte[byteArray.length];
             for (int i = 0; i < byteArray.length; i++) {
                 objectArray[i] = byteArray[i];
             }
         }else if(name.equals("short[]")){
-            short[] shortArray = (short[]) getValue(object, targetFiled);
+            short[] shortArray = (short[]) value;
             objectArray = new Short[shortArray.length];
             for (int i = 0; i < shortArray.length; i++) {
                 objectArray[i] = shortArray[i];
             }
         } else if (name.equals("int[]")) {
-            int[] intArray = (int[]) getValue(object, targetFiled);
+            int[] intArray = (int[]) value;
             objectArray = new Integer[intArray.length];
             for (int i = 0; i < intArray.length; i++) {
                 objectArray[i] = intArray[i];
             }
         }else if(name.equals("long[]")){
-            long[] longArray = (long[]) getValue(object, targetFiled);
+            long[] longArray = (long[]) value;
             objectArray = new Long[longArray.length];
             for (int i = 0; i < longArray.length; i++) {
                 objectArray[i] = longArray[i];
             }
         }else if(name.equals("boolean[]")){
-            boolean[] booleanArray = (boolean[])getValue(object, targetFiled);
+            boolean[] booleanArray = (boolean[])value;
             objectArray = new Boolean[booleanArray.length];
             for (int i = 0; i < booleanArray.length; i++) {
                objectArray[i] = booleanArray[i];
             }
         }else if(name.equals("float[]")){
-            float[] floatArray = (float[]) getValue(object, targetFiled);
+            float[] floatArray = (float[]) value;
             objectArray = new Float[floatArray.length];
             for (int i = 0; i < floatArray.length; i++) {
                 objectArray[i] = floatArray[i];
             }
         }else if(name.equals("double[]")){
-            double[] doubleArray = (double[]) getValue(object, targetFiled);
+            double[] doubleArray = (double[]) value;
             objectArray = new Double[doubleArray.length];
             for (int i = 0; i < doubleArray.length; i++) {
                 objectArray[i] = doubleArray[i];
             }
         }else if(name.equals("char[]")){
-            char[] charArray = (char[]) getValue(object, targetFiled);
+            char[] charArray = (char[]) value;
             objectArray = new Character[charArray.length];
             for (int i = 0; i < charArray.length; i++) {
                 objectArray[i] = charArray[i];
             }
         }else {
-            objectArray = (Object[]) getValue(object, targetFiled);
+            objectArray = (Object[]) value;
         }
         return objectArray;
     }
 
-    Object getValue(Object obj, Field targetField) {
+    public Object getValue(Object obj, Field targetField) {
         targetField.setAccessible(true);
         Object value = null;
         try {
@@ -153,7 +112,11 @@ public class ReflectHelper<T> {
         return value;
     }
 
-    boolean isBasicType(Field field) {
+    public boolean isBooleanType(Field field){
+        return field.getType() == Boolean.class || field.getType().getName().equals("boolean");
+    }
+
+    public boolean isBasicType(Field field) {
         boolean b = false;
         if (field.getType() == Byte.class || field.getType().getName().equals("byte")) {
             b = true;
@@ -177,7 +140,7 @@ public class ReflectHelper<T> {
         return b;
     }
 
-    Object getDefaultValue(Class classType) {
+    public Object getDefaultValue(Class classType) {
         if (classType == Byte.class || classType.getName().equals("byte")) {
             return 0;
         } else if (classType == Short.class || classType.getName().equals("short")) {
@@ -201,7 +164,7 @@ public class ReflectHelper<T> {
         }
     }
 
-    SQLFieldTypeEnum getSqlStringType(Class<?> ziDuanJavaType) {
+    public SQLFieldTypeEnum getSqlStringType(Class<?> ziDuanJavaType) {
         SQLFieldTypeEnum sqlType = null;
         if (ziDuanJavaType == Byte.class || ziDuanJavaType.getName().equals("byte")) {
             sqlType = SQLFieldTypeEnum.INTEGER;
@@ -227,7 +190,7 @@ public class ReflectHelper<T> {
         return sqlType;
     }
 
-    Object getDefaultAValue(Default d){
+    public Object getDefaultAValue(Default d){
         Object obj = null;
         switch (d.defaultValueEnum()){
             case BYTE:
@@ -256,6 +219,60 @@ public class ReflectHelper<T> {
                 break;
         }
         return obj;
+    }
+
+    public Object readValueFromCursor(Cursor cursor, Field field, SQLField sqlField,String sqlDataType){
+        Object value = null;
+        int index = cursor.getColumnIndex(sqlField.getName());
+        Class type = field.getType();
+        if (sqlDataType.equals(SQLFieldTypeEnum.INTEGER.getTypeName())) {
+            value = cursor.getInt(index);
+        } else if (sqlDataType.equals(SQLFieldTypeEnum.BIG_INT.getTypeName())) {
+            value = cursor.getLong(index);
+        } else if (sqlDataType.equals(SQLFieldTypeEnum.REAL.getTypeName())) {
+            if (type == Float.class || type.getName().equals("float")) {
+                value = cursor.getFloat(index);
+            } else if (type == Double.class || type.getName().equals("double")) {
+                value = cursor.getDouble(index);
+            } else {
+                value = cursor.getDouble(index);
+            }
+        } else if (sqlDataType.equals(SQLFieldTypeEnum.TEXT.getTypeName())) {
+            if (type == Character.class || type.getName().equals("char")) {
+                String str = cursor.getString(index);
+                if (str != null) {
+                    value = cursor.getString(index).charAt(0);
+                } else {
+                    value = null;
+                }
+            } else {
+                value = cursor.getString(index);
+            }
+        } else if (sqlDataType.equals(SQLFieldTypeEnum.BLOB.getTypeName())) {
+            value = cursor.getBlob(index);
+        } else if (sqlDataType.equals(SQLFieldTypeEnum.DATE.getTypeName())) {
+            value = cursor.getString(index);
+        } else if (sqlDataType.equals(SQLFieldTypeEnum.NUMERIC.getTypeName())) {
+            value = cursor.getString(index);
+        }
+        return value;
+    }
+
+    public <E> E getT(Class dataClass) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Constructor[] constructors = dataClass.getDeclaredConstructors();
+        Constructor constructor = constructors[0];
+        constructor.setAccessible(true);
+        Class[] classArray = constructor.getParameterTypes();
+        if (classArray != null && classArray.length > 0) {
+            Object[] objects = new Object[classArray.length];
+            for (int i = 0; i < classArray.length; i++) {
+                Object value = getDefaultValue(classArray[i]);
+                objects[i] = value;
+            }
+            return (E) constructor.newInstance(objects);
+        } else {
+            return (E) constructor.newInstance();
+        }
     }
 
 }

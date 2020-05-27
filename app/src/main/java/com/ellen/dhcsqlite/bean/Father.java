@@ -4,12 +4,14 @@ public class Father {
 
     private String name;
     private String id;
+    private String student;
 
     public Father(){}
 
-    public Father(String name, String id) {
+    public Father(String name, String id,String s) {
         this.name = name;
         this.id = id;
+        this.student = s;
     }
 
     public String getName() {
@@ -28,11 +30,13 @@ public class Father {
         this.id = id;
     }
 
+
     @Override
     public String toString() {
         return "Father{" +
                 "name='" + name + '\'' +
                 ", id='" + id + '\'' +
+                ", student='" + student + '\'' +
                 '}';
     }
 }

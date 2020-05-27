@@ -35,7 +35,7 @@ public class Student {
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     private boolean isMan;
-    @NotNull
+    @Operate(operate = OperateEnum.VALUE,valueName = "student")
     private Father father;
     private Father father2;
     @DataStructure //表示这个属性是数据类型属性，需要用注解区分，才能正确的进行json映射，否则会报错
@@ -50,7 +50,7 @@ public class Student {
 
         fathers = new Father[5];
         for (int i = 0; i < fathers.length; i++) {
-            fathers[i] = new Father("名字：" + i, "ID:" + i);
+            fathers[i] = new Father("名字：" + i, "ID:" + i,"好尼玛"+i);
         }
     }
 
@@ -65,6 +65,7 @@ public class Student {
                 ", ingoreString='" + ingoreString + '\'' +
                 ", isMan=" + isMan +
                 ", father=" + father +
+                ", father2=" + father2 +
                 ", fathers=" + Arrays.toString(fathers) +
                 '}';
     }

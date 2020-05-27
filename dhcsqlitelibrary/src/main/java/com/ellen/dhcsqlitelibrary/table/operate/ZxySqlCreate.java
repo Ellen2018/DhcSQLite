@@ -1,9 +1,5 @@
-package com.ellen.dhcsqlitelibrary.table.reflection;
+package com.ellen.dhcsqlitelibrary.table.operate;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
-import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddTableColumn;
@@ -19,31 +15,10 @@ import com.ellen.sqlitecreate.createsql.where.Between;
 import com.ellen.sqlitecreate.createsql.where.Where;
 import com.ellen.sqlitecreate.createsql.where.WhereIn;
 
-class BaseZxyTable<T,O extends AutoDesignOperate> {
-
-    protected SQLiteDatabase db;
-    protected Class<T> dataClass;
-    protected Class<O> autoClass;
-    private String tableName;
-
-    public BaseZxyTable(SQLiteDatabase db, Class<T> dataClass, Class<O> autoClass, String tableName) {
-        this.db = db;
-        this.dataClass = dataClass;
-        this.autoClass = autoClass;
-        this.tableName = tableName;
-    }
-
-    SQLiteDatabase getSQLiteDatabase(){
-        return db;
-    }
-
-    public void exeSQL(String sql){
-        getSQLiteDatabase().execSQL(sql);
-    }
-
-    Cursor searchBySQL(String sql){
-        return getSQLiteDatabase().rawQuery(sql,null);
-    }
+/**
+ * SQL语句制作封装类
+ */
+public class ZxySqlCreate {
 
     /**
      * 创建表的SQL语句生产类
@@ -156,4 +131,5 @@ class BaseZxyTable<T,O extends AutoDesignOperate> {
     public Order getOrder(boolean isContainsOrderBy) {
         return Order.getInstance(isContainsOrderBy);
     }
+
 }

@@ -24,7 +24,7 @@ public interface MyAutoDesignOperate extends AutoDesignOperate {
      * 查找且排序
      * @return
      */
-    @Search(whereSql = "id > 80",orderSql = "id DESC")
+    @Search(whereSql = "id > 3",orderSql = "id DESC")
     List<Student> getSearchList2();
 
     /**
