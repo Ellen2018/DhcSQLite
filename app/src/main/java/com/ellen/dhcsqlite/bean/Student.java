@@ -12,6 +12,7 @@ import com.ellen.dhcsqlitelibrary.table.annotation.bound.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.NotNull;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.util.Arrays;
@@ -34,12 +35,8 @@ public class Student {
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     private boolean isMan;
-    @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
-    @Operate(operate = OperateEnum.JSON)
-    @DhcSqlFieldName(sqlFieldName = "your_father")
+    @NotNull
     private Father father;
-    @Operate(operate = OperateEnum.VALUE,valueName = "id")
-    @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 50)
     private Father father2;
     @DataStructure //表示这个属性是数据类型属性，需要用注解区分，才能正确的进行json映射，否则会报错
     @DhcSqlFieldName(sqlFieldName = "爸爸们")

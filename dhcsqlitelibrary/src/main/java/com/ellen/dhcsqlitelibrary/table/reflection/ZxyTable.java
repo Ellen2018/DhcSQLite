@@ -873,13 +873,18 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
             return sqlFieldType;
         }
         SqlType sqlType = field.getAnnotation(SqlType.class);
-        SQLFieldTypeEnum sqlFieldTypeEnum = sqlType.sqlFiledType();
-        int length = sqlType.length();
-        SQLFieldType sqlFieldType;
-        if (length <= 0) {
-            sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, null);
-        } else {
-            sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, length);
+        SQLFieldType sqlFieldType = null;
+        if(sqlType != null) {
+            SQLFieldTypeEnum sqlFieldTypeEnum = sqlType.sqlFiledType();
+            int length = sqlType.length();
+
+            if (length <= 0) {
+                sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, null);
+            } else {
+                sqlFieldType = new SQLFieldType(sqlFieldTypeEnum, length);
+            }
+        }else {
+            sqlFieldType = new SQLFieldType(SQLFieldTypeEnum.TEXT,null);
         }
         return sqlFieldType;
     }
@@ -895,29 +900,34 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
         if (reflectHelper.isDataStructure(field)) {
             return getDataStructureJson(t, field);
         }
-        //先看转换类型的操作
-        Class typeClass = field.getType();
         Operate operate = field.getAnnotation(Operate.class);
-        OperateEnum operateEnum = operate.operate();
         Object value = null;
-        if (operateEnum == OperateEnum.VALUE) {
-            //仅仅存值
-            String valueName = operate.valueName();
-            Field valueField = null;
-            try {
-                valueField = typeClass.getDeclaredField(valueName);
-                valueField.setAccessible(true);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            }
-            Object zValue = reflectHelper.getValue(t, field);
-            if (zValue != null) {
-                value = reflectHelper.getValue(zValue, valueField);
+        Class typeClass = field.getType();
+        if(operate != null) {
+            //先看转换类型的操作
+            OperateEnum operateEnum = operate.operate();
+            if (operateEnum == OperateEnum.VALUE) {
+                //仅仅存值
+                String valueName = operate.valueName();
+                Field valueField = null;
+                try {
+                    valueField = typeClass.getDeclaredField(valueName);
+                    valueField.setAccessible(true);
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                }
+                Object zValue = reflectHelper.getValue(t, field);
+                if (zValue != null) {
+                    value = reflectHelper.getValue(zValue, valueField);
+                } else {
+                    value = null;
+                }
             } else {
-                value = null;
+                //Json存储
+                Object zValue = reflectHelper.getValue(t, field);
+                value = toJson(zValue, typeClass);
             }
-        } else {
-            //Json存储
+        }else {
             Object zValue = reflectHelper.getValue(t, field);
             value = toJson(zValue, typeClass);
         }
