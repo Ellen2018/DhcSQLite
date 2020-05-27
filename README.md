@@ -170,8 +170,8 @@ Student类代码:
         @Override
         protected Object resumeDataStructure(String classFieldName, String json) {
             if(classFieldName.equals("subjectMap")){
-                Type type = new TypeToken<HashMap<Subject,Integer>>() {}.getType();
-                Map<Subject,Integer> subjectMap = new Gson().fromJson(json, type);
+                Type type = new TypeToken<HashMap<String,Integer>>() {}.getType();
+                HashMap<String,Integer> subjectMap = new Gson().fromJson(json, type);
                 return subjectMap;
             }
             return super.resumeDataStructure(classFieldName, json);

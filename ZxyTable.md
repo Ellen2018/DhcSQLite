@@ -50,10 +50,6 @@ bean类代码：
  
 &emsp;&emsp;这个注解专门用于映射数组,List,Set,Map,Stack数据结构类型数据的，目前仅仅支持这些,如果您想要扩展其它数据结构，您需要了解原理进行修改，数据结构属性的数据框架自动帮您以JSON的方式进行存储。注意的是你可以不需要添加此注解，框架内部自动判断当前属性是否为数据结构类型，如果是数据结构类型，则自行按照数据结构类型进行处理。还需要注意的是存的操作基本又框架自动帮您完成，但是取的操作您需要在ZxyTable中实现resumeDataStructure方法进行去恢复这个数据结构的数据。
 
-- @MajorKey 
- 
-&emsp;&emsp;这个注解的作用就是用来指定主键的,它可以传递一个booleane类型的参数进去，这个参数代表主键是否自增，如果不传参数，默认值为false。注意当您在bean类中指定了多个@MajorKey就会报异常。
-
 - @Operate 
  
 &emsp;&emsp;此注解为不是基本类型数据(Sttring除外)而使用的，比如上述代码中的father属性，因为框架本身不知道您要以怎样的方式去存储它，所以此注解的作用就是告诉框架以怎样的方式来存储它，笔者封装了2种方式，一种是JSON方式,一种是VALUE存储方式，json方式我无需解释，就是将它以json进行映射，value的方式我必须要着重讲一讲，它是通过反射将属性中的某个属性进行存储，比如Father中有个id的属性，那么如你为它指定注解 @Operate(operate = OperateEnum.VALUE,valueName = "id")，那么映射的时候father最终会以id的值进行存储，恢复数据的时候father中只有id是读取的，father其他的属性值由于没有映射到数据库表中，因此其他属性皆为初始化状态，目前VALUE方式仅仅支持基本类型和String类型，代码示例如下：  
@@ -100,9 +96,78 @@ Father类：
     NUMERIC("numeric"),
     DATE("date");
 
+#### 以下是约束注解(对应于SQL中的约束条件设置)
+
+- @MajorKey 
+ 
+&emsp;&emsp;这个注解的作用就是用来指定主键的,它可以传递一个booleane类型的参数进去，这个参数代表主键是否自增，如果不传参数，默认值为false。注意当您在bean类中指定了多个@MajorKey就会报异常。
+
 - @NotNull 
 
 &emsp;&emsp;它的左右就是映射到数据库中的字段添加一个不能为nll的特性。意思就是这个数据不能填塞nll,否则会报错。
+
+- @Unique
+
+&emsp;&emsp;这个是一个约束，加上之后具有唯一性的作用，也就是说，您往数据库的该字段中映射的值必须保持唯一，不然就会奔溃报错。
+
+- @Check
+
+&emsp;&emsp;这个也是一个约束，此注解需要传入一个条件判断的sql语句，例如:"age > 8",类似这样的，这代表此字段只能被age大于8的数据进行填塞，否则就会奔溃报错。此外，如果您不想写具体的字段名称，您可以用"{}"来代替，笔者将自动为您进行修改成当前的属性对应的数据库中的字段名，就拿"age > 8"为例子，如果您不想写"age"，那么您只需要这么写："{} > 8"即可。
+
+- @Default
+
+&emsp;&emsp;从字面上理解它是为字段设置默认值的意思，它需要传递两个参数，一个是枚举(DefaultValueEnum)代表您设置的默认值类型，另一个则是您设置的具体默认值。用法如下
+
+    public class TestDefault {
+
+        @Default(defaultValueEnum = DefaultValueEnum.BYTE,byteValue = 1)
+        private byte a1;
+        @Default(defaultValueEnum = DefaultValueEnum.SHORT,shortValue = 2)
+        private short a2;
+        @Default(defaultValueEnum = DefaultValueEnum.INT,intValue = 3)
+        private int a3;
+        @Default(defaultValueEnum = DefaultValueEnum.LONG,intValue = 4)
+        private long a4;
+    
+        ......
+    }
+
+&emsp;&emsp;不仅仅支持以上类型的默认值设置，以下是所有支持的类型:
+
+- BYTE
+- SHORT
+- INT
+- LONG
+- FLOAT
+- DOUBLE
+- CHAR
+- STRING
+
+就拿STRING做一个说明，如果您的属性映射到数据库中的字段类型是TEXT,那么您为这个属性指定默认值的时候就需要这么写: 
+    
+    @Default(defaultValueEnum = DefaultValueEnum.STRING,strValue = "字符串默认值")
+
+- @EndAutoString
+
+&emsp;&emsp;这个是笔者考虑到约束注解太多了，有些同学不太想那么多注解，因为不太清晰优雅，那么笔者专门提供这个注解来完成所有字段约束的，它可以用来完成以上所有约束注解的功能。代码示例：
+
+我想让一个字段id非空且唯一：
+
+    @EndAutoString("NOT NULL UNIQUE")
+    private int id;
+
+我想让一个字段id为主键且约束Check条件为"id > 8"：
+
+    @EndAutoString("PRIMARY KEY CHECK(id > 8)")
+    private int id;
+
+我想让一个字段age约束Check条件为"age > 0 & age < 200"：
+
+    @EndAutoString("CHECK(age > 0 & age < 200)")
+    private int age;
+
+另外一定要注意的是@EndAutoString的优先级高于以上所有约束注解，也就是说您同时为属性设置了@EndAutoString和其它任意约束注解，那么其它的约束注解会失效，一切约束将会以@EndAutoString为主。
+
 
 ## 2.2 声明ZxyTable类介绍
  

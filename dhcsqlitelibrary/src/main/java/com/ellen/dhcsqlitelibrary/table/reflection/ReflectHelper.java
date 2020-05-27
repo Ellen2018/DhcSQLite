@@ -1,6 +1,7 @@
 package com.ellen.dhcsqlitelibrary.table.reflection;
 
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.Default;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.lang.reflect.Field;
@@ -224,6 +225,37 @@ public class ReflectHelper<T> {
             sqlType = SQLFieldTypeEnum.TEXT;
         }
         return sqlType;
+    }
+
+    Object getDefaultAValue(Default d){
+        Object obj = null;
+        switch (d.defaultValueEnum()){
+            case BYTE:
+                obj = d.byteValue();
+                break;
+            case SHORT:
+                obj = d.shortValue();
+                break;
+            case INT:
+                obj = d.intValue();
+                break;
+            case LONG:
+                obj = d.longValue();
+                break;
+            case FLOAT:
+                obj = d.floatValue();
+                break;
+            case DOUBLE:
+                obj = d.doubleValue();
+                break;
+            case CHAR:
+                obj = d.charValue();
+                break;
+            case STRING:
+                obj = d.strValue();
+                break;
+        }
+        return obj;
     }
 
 }

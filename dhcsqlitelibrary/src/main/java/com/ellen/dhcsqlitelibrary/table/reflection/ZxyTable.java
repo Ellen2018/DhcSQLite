@@ -3,21 +3,21 @@ package com.ellen.dhcsqlitelibrary.table.reflection;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
-import android.util.Log;
 
-import com.ellen.dhcsqlitelibrary.table.annotation.EndAutoString;
-import com.ellen.dhcsqlitelibrary.table.annotation.Unique;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.Check;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.Default;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.EndAutoString;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.Unique;
 import com.ellen.dhcsqlitelibrary.table.operate.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.Proxy.AutoOperateProxy;
-import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
 import com.ellen.dhcsqlitelibrary.table.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
-import com.ellen.dhcsqlitelibrary.table.annotation.NotNull;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.NotNull;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
 import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
@@ -122,60 +122,59 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
             } else {
                 fieldName = dhcSqlFieldName.sqlFieldName();
             }
-            MajorKey majorKey = field.getAnnotation(MajorKey.class);
-            SQLField sqlField = null;
-            if (majorKey != null) {
-                //这里是主键
-                boolean isAutoIncrement = majorKey.isAutoIncrement();
-                if (isAutoIncrement) {
-                    sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, true);
-                } else {
-                    sqlField = SQLField.getPrimaryKeyField(fieldName, fieldType, false);
-                }
-                EndAutoString endAutoString = field.getAnnotation(EndAutoString.class);
-                if (endAutoString != null) {
-                    String endString = endAutoString.value();
-                    if (TextUtils.isEmpty(sqlField.getAutoEndString())) {
-                        sqlField.setAutoEndString(" " + endString);
-                    } else {
-                        sqlField.setAutoEndString(sqlField.getAutoEndString() + "_" + endString);
-                    }
-                }
-                this.isAutoIncrement = isAutoIncrement;
-                majorKeyField = field;
-                majorKeySqlField = sqlField;
-            } else {
-                EndAutoString endAutoString = field.getAnnotation(EndAutoString.class);
-                if (endAutoString != null) {
-                    String endString = endAutoString.value();
-                    sqlField = SQLField.getAutoEndStringField(fieldName, fieldType,endString);
-                } else {
-                    NotNull notNull = field.getAnnotation(NotNull.class);
-                    Unique unique = field.getAnnotation(Unique.class);
-                    if (unique == null) {
-                        if (notNull != null) {
-                            sqlField = SQLField.getNotNullValueField(fieldName, fieldType);
-                        } else {
-                            sqlField = SQLField.getOrdinaryField(fieldName, fieldType);
-                        }
-                    } else {
-                        //携带有Unique
-                        if (notNull != null) {
-                            sqlField = SQLField.getNotNullValueField(fieldName, fieldType);
-                        } else {
-                            sqlField = SQLField.getOrdinaryField(fieldName, fieldType);
-                        }
-                        if (TextUtils.isEmpty(sqlField.getAutoEndString())) {
-                            sqlField.setAutoEndString("UNIQUE");
-                        } else {
-                            sqlField.setAutoEndString(sqlField.getAutoEndString() + " UNIQUE");
-                        }
-                    }
-                }
-            }
+            SQLField sqlField = handlerSqlField(field,fieldName,fieldType);
             sqlNameMap.put(sqlField, field);
             sqlFieldList.add(sqlField);
         }
+    }
+
+    /**
+     * 处理映射的字段sql数据
+     * @param field
+     * @param filedName
+     * @param filedType
+     * @return
+     */
+    private SQLField handlerSqlField(Field field,String filedName,String filedType){
+        SQLField sqlField = null;
+        //先判断有没有EndAutoString
+        EndAutoString endAutoString = field.getAnnotation(EndAutoString.class);
+        if(endAutoString != null){
+            sqlField = SQLField.getAutoEndStringField(filedName,filedType,endAutoString.value());
+        }else {
+            sqlField = SQLField.getInstance(filedName,filedType);
+            //判断有没有主键
+            MajorKey majorKey = field.getAnnotation(MajorKey.class);
+            if(majorKey != null){
+                sqlField.setMajorKey(true);
+                if(majorKey.isAutoIncrement()){
+                    sqlField.setAuto(true);
+                    isAutoIncrement = true;
+                }
+                majorKeySqlField = sqlField;
+                majorKeyField = field;
+            }
+            if(field.getAnnotation(NotNull.class) != null){
+                sqlField.setNotNull(true);
+            }
+            if(field.getAnnotation(Unique.class) != null){
+                sqlField.setUnique(true);
+            }
+            Default defaultA = field.getAnnotation(Default.class);
+            if(defaultA != null){
+                sqlField.setDefaultValue(reflectHelper.getDefaultAValue(defaultA));
+            }
+            Check check = field.getAnnotation(Check.class);
+            if(check != null){
+                String checkWhereSql = check.value();
+                if(checkWhereSql.contains("{}")){
+                    checkWhereSql = checkWhereSql.replace("{}",filedName);
+                }
+                sqlField.setCheckWhereSql(checkWhereSql);
+            }
+            sqlField.createSqlFiled();
+        }
+        return sqlField;
     }
 
     public void onCreateTable() {
@@ -348,7 +347,7 @@ public abstract class ZxyTable<T, O extends AutoDesignOperate> extends BaseZxyTa
             //此处可以添加记录数据库数据之前的操作:加密数据等
             //先判断是否有主键
             if (majorKeyField != null) {
-                if (majorKeySqlField.getName().equals(sqlFieldList.get(i))) {
+                if (majorKeySqlField.getName().equals(sqlFieldList.get(i).getName())) {
                     //当前是主键
                     if (!isAutoIncrement) {
                         addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));

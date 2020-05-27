@@ -1,20 +1,22 @@
 package com.ellen.dhcsqlite.bean;
 
-import com.ellen.dhcsqlite.bean.Father;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.Check;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.CreateEndString;
 import com.ellen.dhcsqlitelibrary.table.annotation.DataStructure;
 import com.ellen.dhcsqlitelibrary.table.annotation.DhcSqlFieldName;
-import com.ellen.dhcsqlitelibrary.table.annotation.EndAutoString;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.Default;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.DefaultValueEnum;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.EndAutoString;
 import com.ellen.dhcsqlitelibrary.table.annotation.Ignore;
-import com.ellen.dhcsqlitelibrary.table.annotation.MajorKey;
-import com.ellen.dhcsqlitelibrary.table.annotation.NotNull;
+import com.ellen.dhcsqlitelibrary.table.annotation.bound.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.SqlType;
 import com.ellen.dhcsqlitelibrary.table.annotation.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.OperateEnum;
-import com.ellen.dhcsqlitelibrary.table.annotation.Unique;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.util.Arrays;
 
+@CreateEndString("整个表的约束")
 public class Student {
 
     //主键
@@ -24,6 +26,8 @@ public class Student {
     @EndAutoString("CHECK(my_name like 'Ellen%')")
     private String name;
     @DhcSqlFieldName(sqlFieldName = "your_age")
+    @Default(defaultValueEnum = DefaultValueEnum.BYTE,byteValue = 3)
+    @Check("{} > -1")
     private int age;
     private String phoneNumber;
     private String address;
@@ -114,14 +118,6 @@ public class Student {
 
     public void setMan(boolean man) {
         isMan = man;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }
 
