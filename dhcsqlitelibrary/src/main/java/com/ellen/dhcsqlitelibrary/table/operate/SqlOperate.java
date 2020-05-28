@@ -11,6 +11,7 @@ import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.NotNull;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Unique;
 import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
+import com.ellen.dhcsqlitelibrary.table.exception.SqlFieldDuplicateException;
 import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
@@ -94,6 +95,11 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
             SQLFieldType sqlFieldType = typeSupport.setSQLiteType(field);
             SQLField sqlField = handlerSqlField(field, typeSupport.setSqlFieldName(field), sqlFieldType.getSQLFieldTypeString());
             sqlNameMap.put(sqlField, field);
+            for(SQLField s:sqlFieldList){
+                if(s.getName().equals(sqlField.getName())){
+                    throw new SqlFieldDuplicateException("存在重复字段名:"+sqlField.getName()+"");
+                }
+            }
             sqlFieldList.add(sqlField);
         }
     }
