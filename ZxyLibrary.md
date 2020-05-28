@@ -79,6 +79,18 @@
 
 - 执行任意sql语句(建议不使用这种，因为笔者封装了另外一套，方便简洁)
 
-    appLibrary.getWriteDataBase().exeSQL("sql语句")
+    appLibrary.getWriteDataBase().exeSQL("sql语句");
+
+- 删除库中所有表
+
+    appLibrary.clearLibrary();
+
+- 获取所有表名
+
+    String[] tableNameArray = appLibrary.getAllTableName()
+
+- 获取表的个数
+
+    appLibrary.getTableCount()
 
 

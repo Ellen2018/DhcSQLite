@@ -130,13 +130,13 @@ Student类代码:
 ### 2.4 步骤四：声明ZxyTable类(声明一个类去继承ZxyTable)
 
     public class StudentTable extends ZxyTable<Student,StudentOperate> {
-
-        public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, Class<? extends AutoDesignOperate> autoClass) {
-            super(db, dataClass, autoClass);
+    
+        public StudentTable(SQLiteDatabase db, String tableName) {
+            super(db, tableName);
         }
 
-        public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, String autoTableName, Class<? extends AutoDesignOperate> autoClass) {
-            super(db, dataClass, autoTableName, autoClass);
+        public StudentTable(SQLiteDatabase db) {
+            super(db);
         }
 
         @Override

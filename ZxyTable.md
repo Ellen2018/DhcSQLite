@@ -179,23 +179,20 @@ Father类：
         /**
          *
          * 调用此构造器表名为类名：Student
-         * db：SQLiteDatabase对象，可以通过ZxyLibrary传入
-         * dataClass:bean类对应的字节码对象: Student.calss
-         * autoClass:元操作的接口字节码对象：MyAutoDesignOperate.class
+         * db：SQLiteDatabase对象，可以通过ZxyLibrary传入       
          */ 
-        public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, Class<? extends AutoDesignOperate> autoClass) {
-            super(db, dataClass, autoClass);
+        public StudentTable(SQLiteDatabase db) {
+            super(db,);
         }
 
         /**
          *
          * 调用此构造器表名传入的：autoTableName
          * db：SQLiteDatabase对象，可以通过ZxyLibrary传入
-         * dataClass:bean类对应的字节码对象: Student.calss
-         * autoClass:元操作的接口字节码对象：MyAutoDesignOperate.class
+         * autoTableName:自定义表名
          */ 
-        public StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, String autoTableName, Class<? extends AutoDesignOperate> autoClass) {
-            super(db, dataClass, autoTableName, autoClass);
+        public StudentTable(SQLiteDatabase db, String autoTableName) {
+            super(db,autoTableName);
         }
 
 
@@ -287,13 +284,13 @@ Father类：
 
 &emsp;&emsp;在继承这个的类的时候，很多方法都不需要重写，但是如果你的bean类中存在比较复杂的属性，例如Father[]，List<Father>等数据结构类型的属性，那么就需要重写一些方法以便帮您完成映射，再比如如果您的boolean类型不想在数据库表中仅存储1或者0,比如isMan字段，您想存储为"男"或者"女"，您也需要对某些方法进行重写以达到目的，下面我对这些方法进行一一介绍:
 
-- StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, Class<? extends AutoDesignOperate> autoClass)
+- StudentTable(SQLiteDatabase db)
 
-&emsp;&emsp;调用此构造器它的表名为它绑定的bean类的类名。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取，dataClass为绑定的映射类的字节码对象，autoClass为元操作代理接口字节码对象，关于元操作代理接口使用请查阅[**AutoDesignOperate**](https://github.com/Ellen2018/DhcSQLite/blob/master/AutoDesignOperate.md)。
+&emsp;&emsp;调用此构造器它的表名为它绑定的bean类的类名。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取。
 
--  StudentTable(SQLiteDatabase db, Class<? extends Student> dataClass, String autoTableName, Class<? extends AutoDesignOperate> autoClass)
+-  StudentTable(SQLiteDatabase db,String autoTableName)
 
-&emsp;&emsp;调用此构造器它的表名为传入的autoTableName。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取，dataClass为绑定的映射类的字节码对象，autoClass为元操作代理接口字节码对象，关于元操作代理接口使用请查阅[**AutoDesignOperate**](https://github.com/Ellen2018/DhcSQLite/blob/master/AutoDesignOperate.md)。  
+&emsp;&emsp;调用此构造器它的表名为传入的autoTableName。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取。 
 
 - Object setBooleanValue(String classFieldName, boolean value)
 
@@ -346,7 +343,7 @@ Father类：
 
     ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
     SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
-    StudentTable studentTable = new StudentTable(sqLiteDatabase, Student.class,MyAutoDesignOperate.class);
+    StudentTable studentTable = new StudentTable(sqLiteDatabase);
 
 ## 3.1 创建表
 
