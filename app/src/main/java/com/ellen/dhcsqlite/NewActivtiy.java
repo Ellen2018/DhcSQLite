@@ -59,7 +59,7 @@ public class NewActivtiy extends Activity {
 
             }
         });
-        
+
         Student student = new Student("Ellen2018", 19, "18272167574", "火星");
         student.setMan(true);
         Father father = new Father("Ellen2019", "1", "尼玛");
