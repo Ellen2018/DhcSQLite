@@ -36,6 +36,24 @@ bean类代码：
 
     }
 
+目前支持的属性类型:
+
+- 基本数据类型 & 装箱类型
+- String类型
+- 数据结构类型  
+&emsp;&emsp;所有类型数组  
+&emsp;&emsp;ArrayList  
+&emsp;&emsp;LinkedList  
+&emsp;&emsp;Vector  
+&emsp;&emsp;HashSet  
+&emsp;&emsp;TreeSet  
+&emsp;&emsp;HashMap  
+&emsp;&emsp;TreeMap
+- 其它任意非数据结构类型的引用类型(例如上面代码中的Father)
+
+
+
+
 关于这些注解的说明
 
 - @Ignore 
@@ -71,15 +89,13 @@ Father类：
     @Operate(operate = OperateEnum.JSON)
     private Father father;
 
-    //以VALUE方式完成存储,这里必须指定valueName
-    //还需要注意的是这种方式下必须指定@SqlType
-    @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
+    //以VALUE方式完成存储,这里必须指定valueName   
     @Operate(operate = OperateEnum.VALUE,valueName = "id")
     private Father father2;
 
 - @SqlType(不再建议使用) 
  
-&emsp;&emsp;此注解与@Operate注解搭配使用，它的作用就是告诉框架,这个属性映射到数据库表中的字段类型以及数据长度，当数据长度为0或者负值时，长度不受限制，当您不传入length时它默认为-1，注意如果您将它用于基本类型以及String，数据结构类型的属性上没有任何作用。示例代码如下
+&emsp;&emsp;此注解与@Operate注解搭配使用，它的作用就是告诉框架,这个属性映射到数据库表中的字段类型以及数据长度，当数据长度为0或者负值时，长度不受限制，当您不传入length时它默认为-1，注意如果您将它用于基本类型以及String，数据结构类型的属性上没有任何作用。注意在新的版本中框架会判断字段在数据中的合适类型，您无须指定@SqlType。示例代码如下
 
     //指定father2映射到数据库字段的类为TEXT类型，长度为100
     @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
@@ -104,15 +120,15 @@ Father类：
 
 - @NotNull 
 
-&emsp;&emsp;它的左右就是映射到数据库中的字段添加一个不能为nll的特性。意思就是这个数据不能填塞nll,否则会报错。
+&emsp;&emsp;它的作用就是映射到数据库中的字段添加一个不能为nll的特性。意思就是这个数据不能填塞nll,否则会报错。
 
 - @Unique
 
-&emsp;&emsp;这个是一个约束，加上之后具有唯一性的作用，也就是说，您往数据库的该字段中映射的值必须保持唯一，不然就会奔溃报错。
+&emsp;&emsp加上之后具有唯一性的作用，也就是说，您往数据库的该字段中映射的值必须保持唯一，不然就会奔溃报错。
 
 - @Check
 
-&emsp;&emsp;这个也是一个约束，此注解需要传入一个条件判断的sql语句，例如:"age > 8",类似这样的，这代表此字段只能被age大于8的数据进行填塞，否则就会奔溃报错。此外，如果您不想写具体的字段名称，您可以用"{}"来代替，笔者将自动为您进行修改成当前的属性对应的数据库中的字段名，就拿"age > 8"为例子，如果您不想写"age"，那么您只需要这么写："{} > 8"即可。
+&emsp;&emsp;此注解需要传入一个条件判断的sql语句，例如:"age > 8",类似这样的，这代表此字段只能被age大于8的数据进行填塞，否则就会奔溃报错。此外，如果您不想写具体的字段名称，您可以用"{}"来代替，笔者将自动为您进行修改成当前的属性对应的数据库中的字段名，就拿"age > 8"为例子，如果您不想写"age"，那么您只需要这么写："{} > 8"即可。
 
 - @Default
 
@@ -250,12 +266,16 @@ Father类：
         /**
          * 将json恢复成成数据结构的形式
          *
-         * @param classFieldName
+         * 您可以根据classFieldName 或者 fieldClass
+         * 再根据json来恢复您bean类中数据结构类型属性数据
+         *         
+         * @param classFieldName 属性的名字；例如Fathers
+         * @param fieldClass 属性的类型：；例如ArrayList.class 
          * @param json
          * @return
          */
         @Override
-        protected Object resumeDataStructure(String  classFieldName, String json) {
+        protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
           if(classFieldName.equals("fathers")){
                 Type founderSetType = new TypeToken<List<Father>>() {}.getType();
                 List<Father> fathers = new Gson().fromJson(json, founderSetType);
@@ -334,11 +354,11 @@ Father类：
         return JsonLibraryType.Gson; //Gson方式
     }
 
-- Object resumeDataStructure(String  classFieldName, String json)
+- Object resumeDataStructure(String classFieldName, Class fieldClass, String json)
 
 &emsp;&emsp;此方法的作用从名字上就可以看出，它是将数据库中的json数据转化为数据结构的，由于笔者不知道你要恢复的数据结构，比如您的属性为List<Father>,虽然笔者知道您的数据结构类型为List,但我无法知道你要将它恢复成ArrayList还是LikedList等，所以此处的逻辑交给您来完成比较好，逻辑也很简单，只需要根据classFieldName和json进行解析，解析成你想要的数据结构类型，然后进行返回即可。比如bean类属性中有个Father[] fathers的数组数据类型结构的数据，那么恢复的示例代码如下:  
 
-    protected Object resumeDataStructure(String  classFieldName, String json) {
+    protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
       if(classFieldName.equals("fathers")){
             Type founderSetType = new TypeToken<List<Father>>() {}.getType();
             List<Father> fathers = new Gson().fromJson(json, founderSetType);
@@ -587,17 +607,9 @@ Father类：
 
 &emsp;&emsp;笔者提供了一个拦截机制，就是让您能修改整个框架的映射过程。举个栗子，我现在想将Father类型数据进行拦截处理,把它的id作为保存和恢复，那么代码如下:
 
-    studentTable.addIntercept(new TypeSupport<Father,String>() {
-
-            /**
-             * 设置表中字段的名字
-             * @param field
-             * @return
-             */
-            @Override
-            public String setSqlFieldName(Field field) {
-                return field.getName();
-            }
+    //第一个泛型代表要拦截的类型
+    //第二个泛型代表此类型映射到数据库中字段类型
+    studentTable.addIntercept(new Intercept<Father,String>() {
 
             /**
              * 设置表中字段类型 & 数据长度
@@ -632,6 +644,12 @@ Father类：
                 return father;
             }
 
+            /**
+             * 将对象映射为数据库中的存储值
+             * @param field
+             * @param sqlValue
+             * @return
+             */
             @Override
             public String toValue(Field field, Father dataValue) {
                 Father father = dataValue;
@@ -645,12 +663,8 @@ Father类：
 
 我们还可以利用这个拦截修改我们的基本类型的映射，我想把属性名为isMan且为boolean类型以"真的"(true)和"假的"(false)进行映射，代码如下:  
 
-        studentTable.addIntercept(new TypeSupport<Boolean,String>() {
-            @Override
-            public String setSqlFieldName(Field field) {
-                return field.getName();
-            }
-
+        studentTable.addIntercept(new Intercept<Boolean,String>() {
+           
             @Override
             public SQLFieldType setSQLiteType(Field field) {
                 return new SQLFieldType(SQLFieldTypeEnum.TEXT,2);
@@ -692,12 +706,8 @@ Father类：
 
 &emsp;&emsp;因为笔者仅支持基本数据类型 & 部分数据结构类型 & 不是数据结构的引用类型，如果您想扩展新的数据结构类型可以像3.7那样添加一个拦截的接口就行了，比如：我现在要对Stack支持，那么代码如下:
 
-       studentTable.addIntercept(new TypeSupport<Stack,String>() {
-            @Override
-            public String setSqlFieldName(Field field) {
-                return ...;
-            }
-
+       studentTable.addIntercept(new Intercept<Stack,String>() {
+           
             @Override
             public SQLFieldType setSQLiteType(Field field) {
                 return ...;
