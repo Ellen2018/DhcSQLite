@@ -377,6 +377,16 @@ Father类：
 
 ## 3.2 表本身相关操作
 
+- 方便调试监听
+
+        studentTable.setDebugListener(new DebugListener() {
+            @Override
+            public void exeSql(String sql) {
+                //sql是框架没执行一个sql语句都会回调这里
+                //您可以以debug的方式输出这些sql语句方便您进行调试
+            }
+        });
+
 - 重命名表  
 
         //重命名表不带回调  
@@ -559,3 +569,143 @@ Father类：
         List<Student> studentList1 = studentTable.getAllData(null);
         //查询表中所有数据，根据your_age进行排序(Desc方式)
         List<Student> studentList2 = studentTable.getAllData(orderSql);
+
+## 3.7 拦截映射过程
+
+&emsp;&emsp;笔者提供了一个拦截机制，就是让您能修改整个框架的映射过程。举个栗子，我现在想将Father类型数据进行拦截处理,把它的id作为保存和恢复，那么代码如下:
+
+    studentTable.addIntercept(new TypeSupport<Father,String>() {
+
+            /**
+             * 设置表中字段的名字
+             * @param field
+             * @return
+             */
+            @Override
+            public String setSqlFieldName(Field field) {
+                return field.getName();
+            }
+
+            /**
+             * 设置表中字段类型 & 数据长度
+             * @param field
+             * @return
+             */
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                return new SQLFieldType(SQLFieldTypeEnum.TEXT,null);
+            }
+
+            /**
+             * 拦截判断
+             * @param field
+             * @return
+             */
+            @Override
+            public boolean isType(Field field) {
+                return field.getType() == Father.class;
+            }
+
+            /**
+             * 将数据库中的sqlValue映射为指定类型
+             * @param field
+             * @param sqlValue
+             * @return
+             */
+            @Override
+            public Father toObj(Field field, String sqlValue) {
+                Father father = new Father();
+                father.setId(sqlValue);
+                return father;
+            }
+
+            @Override
+            public String toValue(Field field, Father dataValue) {
+                Father father = dataValue;
+                if(father == null) {
+                    return null;
+                }else {
+                    return father.getId();
+                }
+            }
+        });
+
+我们还可以利用这个拦截修改我们的基本类型的映射，我想把属性名为isMan且为boolean类型以"真的"(true)和"假的"(false)进行映射，代码如下:  
+
+        studentTable.addIntercept(new TypeSupport<Boolean,String>() {
+            @Override
+            public String setSqlFieldName(Field field) {
+                return field.getName();
+            }
+
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                return new SQLFieldType(SQLFieldTypeEnum.TEXT,2);
+            }
+
+            @Override
+            public boolean isType(Field field) {
+                if(field.getName().equals("isMan")) {
+                    return field.getType() == Boolean.class || field.getType().getName().equals("boolean");
+                }else {
+                    return false;
+                }
+            }
+
+            @Override
+            public Boolean toObj(Field field, String sqlValue) {
+                if(sqlValue.equals("真的")){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+
+            @Override
+            public String toValue(Field field, Boolean dataValue) {
+                if(dataValue){
+                    return "真的";
+                }else {
+                    return "假的";
+                }
+            }
+        });
+
+注意添加拦截是按照顺序来进行拦截的，因此后添加的先判断，先拦截，如果您想移除某个拦截，示例代码如下:  
+
+    studentTable.removeIntercept(intercept);
+
+## 3.8 扩展支持新的属性类型
+
+&emsp;&emsp;因为笔者仅支持基本数据类型 & 部分数据结构类型 & 不是数据结构的引用类型，如果您想扩展新的数据结构类型可以像3.7那样添加一个拦截的接口就行了，比如：我现在要对Stack支持，那么代码如下:
+
+       studentTable.addIntercept(new TypeSupport<Stack,String>() {
+            @Override
+            public String setSqlFieldName(Field field) {
+                return ...;
+            }
+
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                return ...;
+            }
+
+            @Override
+            public boolean isType(Field field) {
+                return field.getType() == Stack.class;
+            }
+
+            @Override
+            public Stack toObj(Field field, String sqlValue) {
+                //将sqlValue(Json)恢复成Stack
+                ...
+                return stack;
+            }
+
+            @Override
+            public String toValue(Field field, Stack dataValue) {
+                //把dataValue转化为json
+                return json;
+            }
+        });
+

@@ -2,6 +2,7 @@ package com.ellen.dhcsqlitelibrary.table.operate;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class BaseOperate<T> extends ZxySqlCreate{
+public class BaseOperate<T> extends ZxySqlCreate {
 
     protected SQLiteDatabase db;
 
@@ -35,8 +36,25 @@ public class BaseOperate<T> extends ZxySqlCreate{
     protected ObjectTypeSupport objectTypeSupport;
     protected TypeSupport typeSupportExpand;
 
+    protected List<TypeSupport> interceptList;
+
     public void setDebugListener(DebugListener debugListener) {
         this.debugListener = debugListener;
+    }
+
+    public void addIntercept(TypeSupport intercept) {
+        if (interceptList == null) {
+            interceptList = new ArrayList<>();
+        }
+        interceptList.add(0, intercept);
+    }
+
+    public void removeIntercept(TypeSupport typeSupport){
+        if(interceptList == null){
+            return;
+        }else {
+            interceptList.remove(typeSupport);
+        }
     }
 
     public BaseOperate(SQLiteDatabase db) {
@@ -44,15 +62,15 @@ public class BaseOperate<T> extends ZxySqlCreate{
         cursorHelper = new CursorHelper();
     }
 
-    protected void exeSql(String sql){
-        if(debugListener != null){
+    protected void exeSql(String sql) {
+        if (debugListener != null) {
             debugListener.exeSql(sql);
         }
         db.execSQL(sql);
     }
 
     protected List<T> search(String sql) {
-        if(debugListener != null){
+        if (debugListener != null) {
             debugListener.exeSql(sql);
         }
         return getDataByCursor(db.rawQuery(sql, null));
@@ -69,8 +87,8 @@ public class BaseOperate<T> extends ZxySqlCreate{
                     String sqlDataType = null;
                     TypeSupport typeSupport = getTypeSupport(field);
                     sqlDataType = typeSupport.setSQLiteType(field).getTypeString();
-                    Object value = cursorHelper.readValueFromCursor(cursor,field,sqlFieldList.get(i),sqlDataType);
-                    field.set(t,typeSupport.toObj(field,value));
+                    Object value = cursorHelper.readValueFromCursor(cursor, field, sqlFieldList.get(i), sqlDataType);
+                    field.set(t, typeSupport.toObj(field, value));
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -88,6 +106,18 @@ public class BaseOperate<T> extends ZxySqlCreate{
     }
 
     protected TypeSupport getTypeSupport(Field field) {
+        if (interceptList != null) {
+            TypeSupport typeSupportResult = null;
+            for (TypeSupport typeSupport : interceptList) {
+                if (typeSupport.isType(field)) {
+                    typeSupportResult = typeSupport;
+                    break;
+                }
+            }
+            if(typeSupportResult != null) {
+                return typeSupportResult;
+            }
+        }
         if (basicTypeSupport.isType(field)) {
             return basicTypeSupport;
         }

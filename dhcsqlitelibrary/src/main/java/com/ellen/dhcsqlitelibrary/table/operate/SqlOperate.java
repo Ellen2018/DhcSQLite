@@ -583,4 +583,13 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         return true;
     }
 
+    @Override
+    public void addIntercept(TypeSupport intercept) {
+        super.addIntercept(intercept);
+    }
+
+    @Override
+    public void removeIntercept(TypeSupport typeSupport) {
+        super.removeIntercept(typeSupport);
+    }
 }

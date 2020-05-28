@@ -19,6 +19,7 @@ import com.ellen.dhcsqlitelibrary.table.operate.update.Update;
 import com.ellen.dhcsqlitelibrary.table.proxy.AutoOperateProxy;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
+import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
 
 import java.util.List;
 
@@ -93,6 +94,22 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
      */
     public void setDebugListener(DebugListener debugListener) {
         sqlOperate.setDebugListener(debugListener);
+    }
+
+    /**
+     * 添加拦截
+     * @param intercept
+     */
+    public void addIntercept(TypeSupport intercept) {
+        sqlOperate.addIntercept(intercept);
+    }
+
+    /**
+     * 移除拦截
+     * @param typeSupport
+     */
+    public void removeIntercept(TypeSupport typeSupport) {
+        sqlOperate.removeIntercept(typeSupport);
     }
 
     public O getAutoDesignOperate() {

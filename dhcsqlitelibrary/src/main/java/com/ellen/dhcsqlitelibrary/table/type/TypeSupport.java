@@ -4,7 +4,12 @@ import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 
 import java.lang.reflect.Field;
 
-public abstract interface TypeSupport {
+/**
+ *
+ * @param <T> T为您要拦截的类型，E为数据库中保存的类型
+ * @param <E>
+ */
+public abstract interface TypeSupport<T,E> {
 
     /**
      * 设置该属性映射到数据库中的字段名字
@@ -33,7 +38,7 @@ public abstract interface TypeSupport {
      * @param sqlValue
      * @return
      */
-    Object toObj(Field field, Object sqlValue);
+    T toObj(Field field, E sqlValue);
 
     /**
      * 类型映射为数据库能存储的值
@@ -41,5 +46,5 @@ public abstract interface TypeSupport {
      * @param dataValue
      * @return
      */
-    Object toValue(Field field, Object dataValue);
+    E toValue(Field field, T dataValue);
 }

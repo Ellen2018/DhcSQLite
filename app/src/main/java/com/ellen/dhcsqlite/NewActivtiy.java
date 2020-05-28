@@ -15,9 +15,13 @@ import com.ellen.dhcsqlite.sql.NewStudentTable;
 import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
+import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
+import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
+import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +39,45 @@ public class NewActivtiy extends Activity {
             @Override
             public void exeSql(String sql) {
                 Log.e("Ellen2018","执行sql语句:"+sql);
+            }
+        });
+
+        studentTable.addIntercept(new TypeSupport<Boolean,String>() {
+            @Override
+            public String setSqlFieldName(Field field) {
+                return field.getName();
+            }
+
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                return new SQLFieldType(SQLFieldTypeEnum.TEXT,2);
+            }
+
+            @Override
+            public boolean isType(Field field) {
+                if(field.getName().equals("isMan")) {
+                    return field.getType() == Boolean.class || field.getType().getName().equals("boolean");
+                }else {
+                    return false;
+                }
+            }
+
+            @Override
+            public Boolean toObj(Field field, String sqlValue) {
+                if(sqlValue.equals("真的")){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+
+            @Override
+            public String toValue(Field field, Boolean dataValue) {
+                if(dataValue){
+                    return "真的";
+                }else {
+                    return "假的";
+                }
             }
         });
 
