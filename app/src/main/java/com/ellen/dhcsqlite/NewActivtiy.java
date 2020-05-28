@@ -42,45 +42,6 @@ public class NewActivtiy extends Activity {
             }
         });
 
-        studentTable.addIntercept(new TypeSupport<Boolean,String>() {
-            @Override
-            public String setSqlFieldName(Field field) {
-                return field.getName();
-            }
-
-            @Override
-            public SQLFieldType setSQLiteType(Field field) {
-                return new SQLFieldType(SQLFieldTypeEnum.TEXT,2);
-            }
-
-            @Override
-            public boolean isType(Field field) {
-                if(field.getName().equals("isMan")) {
-                    return field.getType() == Boolean.class || field.getType().getName().equals("boolean");
-                }else {
-                    return false;
-                }
-            }
-
-            @Override
-            public Boolean toObj(Field field, String sqlValue) {
-                if(sqlValue.equals("真的")){
-                    return true;
-                }else {
-                    return false;
-                }
-            }
-
-            @Override
-            public String toValue(Field field, Boolean dataValue) {
-                if(dataValue){
-                    return "真的";
-                }else {
-                    return "假的";
-                }
-            }
-        });
-
         if (studentTable.isExist()) {
             studentTable.deleteTable();
         }
@@ -112,19 +73,20 @@ public class NewActivtiy extends Activity {
         List<Student> studentList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             student = new Student("Ellen2018_" + i, i, "18272167574", "火星");
-            student.setMan(true);
             father = new Father("Ellen2019", "1", "尼玛" + i);
             student.setFather(father);
+            if(i == 3){
+                student.setMan(true);
+            }
             studentList.add(student);
         }
         studentTable.saveData(studentList);
 
         String whereSql = Where.getInstance(false).addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 3).createSQL();
 
-        for (Student student1 : studentTable.getAutoDesignOperate().getSearchList1(3,"3333","my_name")) {
+        for (Student student1 : studentTable.getAllData()) {
             Log.e("Ellen2018", "数据:" + student1.toString());
         }
 
-        Log.e("Ellen2018","查询:"+studentTable.searchByMajorKey(3));
     }
 }

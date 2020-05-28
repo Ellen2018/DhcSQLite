@@ -87,20 +87,24 @@ public class BasicTypeSupport implements TypeSupport {
     @Override
     public Object toValue(Field field, Object dataValue) {
         if(reflectHelper.isBooleanType(field)){
-            boolean bool = (boolean) dataValue;
-            Object value = setBooleanValue.setBooleanValue(field.getName(),bool);
-            if(value.getClass() == Character.class){
-                Character character = (Character) value;
-                return character.toString();
-            }else if(value.getClass() == Boolean.class){
-                Boolean b = (Boolean) value;
-                if(b){
-                    return 1;
-                }else {
-                    return 0;
+            if(dataValue != null) {
+                boolean bool = (boolean) dataValue;
+                Object value = setBooleanValue.setBooleanValue(field.getName(), bool);
+                if (value.getClass() == Character.class) {
+                    Character character = (Character) value;
+                    return character.toString();
+                } else if (value.getClass() == Boolean.class) {
+                    Boolean b = (Boolean) value;
+                    if (b) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return value;
                 }
-            } else {
-                return value;
+            }else {
+                return null;
             }
         } else {
             return dataValue;
