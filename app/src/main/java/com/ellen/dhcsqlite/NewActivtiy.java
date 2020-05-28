@@ -21,7 +21,7 @@ import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
 import com.ellen.sqlitecreate.createsql.where.Where;
 
-import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +32,9 @@ public class NewActivtiy extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
+        zxyLibrary.clearLibrary();
         SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
-        NewStudentTable studentTable = new NewStudentTable(sqLiteDatabase, Student.class, MyAutoDesignOperate.class);
+        NewStudentTable studentTable = new NewStudentTable(sqLiteDatabase);
 
         studentTable.setDebugListener(new DebugListener() {
             @Override

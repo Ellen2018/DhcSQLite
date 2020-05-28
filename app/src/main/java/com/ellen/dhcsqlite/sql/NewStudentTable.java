@@ -13,13 +13,12 @@ import java.lang.reflect.Type;
 
 public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
 
-
-    public NewStudentTable(SQLiteDatabase db, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass, String tableName) {
-        super(db, dataClass, autoClass, tableName);
+    public NewStudentTable(SQLiteDatabase db, String tableName) {
+        super(db, tableName);
     }
 
-    public NewStudentTable(SQLiteDatabase db, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
-        super(db, dataClass, autoClass);
+    public NewStudentTable(SQLiteDatabase db) {
+        super(db);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.ellen.dhcsqlitelibrary.table.impl;
 
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
@@ -21,6 +22,8 @@ import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
 import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>, Search<T>, Delete, Update<T>, Table {
@@ -35,16 +38,33 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     //数据操作
     private SqlOperate<T> sqlOperate;
 
-    private DataStructureSupport dataStructureSupport;
-    private BasicTypeSupport basicTypeSupport;
+    private DataStructureSupport dataStructureSupport = null;
+    private BasicTypeSupport basicTypeSupport = null;
 
-    public ZxyTable(SQLiteDatabase db, Class<T> dataClass, Class<O> autoClass, String tableName) {
-        this.autoClass = autoClass;
-        init(db, dataClass, tableName);
+    public ZxyTable(SQLiteDatabase db, String tableName) {
+        init(db, tableName);
     }
 
-    private void init(SQLiteDatabase db, Class<T> dataClass, String tableName) {
-        this.tableName = tableName;
+    public ZxyTable(SQLiteDatabase db) {
+        init(db, null);
+    }
+
+    private Class getClassByIndex(int index){
+        Class<? extends ZxyTable> zxyTableClass = this.getClass();
+        Type typeZxy = zxyTableClass.getGenericSuperclass();
+        ParameterizedType parameterizedType = (ParameterizedType) typeZxy;
+        Type type = parameterizedType.getActualTypeArguments()[index];
+        return (Class)type;
+    }
+
+    private void init(SQLiteDatabase db, String tableName) {
+        Class<T> dataClass = getClassByIndex(0);
+        this.autoClass = getClassByIndex(1);
+        if(tableName == null){
+            this.tableName = dataClass.getSimpleName();
+        }else {
+            this.tableName = tableName;
+        }
         reflectHelper = new ReflectHelper<>();
         jsonHelper = new JsonHelper(getJsonLibraryType());
         dataStructureSupport = new DataStructureSupport(jsonHelper, new DataStructureSupport.ToObject() {
@@ -63,11 +83,6 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
         //完成代理
         autoDesignOperate = AutoOperateProxy.newMapperProxy(autoClass, this);
-    }
-
-    public ZxyTable(SQLiteDatabase db, Class<T> dataClass, Class<O> autoClass) {
-        this.autoClass = autoClass;
-        init(db, dataClass, dataClass.getSimpleName());
     }
 
     protected JsonLibraryType getJsonLibraryType() {
