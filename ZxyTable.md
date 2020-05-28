@@ -24,7 +24,7 @@ bean类代码：
         @Ignore //不映射这个属性到数据库中
         private String ingoreString;
         private boolean isMan;
-        @NoBasicType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
+        @SqlType(sqlFiledType = SQLFieldTypeEnum.TEXT, length = 100)
         @Operate(operate = OperateEnum.JSON)
         @DhcSqlFieldName(sqlFieldName = "your_father")
         private Father father;
