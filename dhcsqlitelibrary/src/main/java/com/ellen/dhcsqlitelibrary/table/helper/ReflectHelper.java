@@ -140,6 +140,38 @@ public class ReflectHelper<T> {
         return b;
     }
 
+    /**
+     * 更具Value值判断它的类型
+     * @param value
+     * @return
+     */
+    public boolean isBasicType(Object value) {
+        boolean b;
+        Class classType = value.getClass();
+        if (classType == Byte.class) {
+          b = true;
+        } else if (classType == Short.class) {
+            b = true;
+        } else if (classType == Integer.class) {
+            b = true;
+        } else if (classType == Long.class) {
+            b = true;
+        } else if (classType == Float.class) {
+            b = true;
+        } else if (classType == Double.class) {
+            b = true;
+        } else if (classType == Boolean.class) {
+            b = true;
+        } else if (classType == Character.class) {
+            b = true;
+        } else if (classType == String.class) {
+            b = true;
+        } else {
+            b = false;
+        }
+        return b;
+    }
+
     public Object getDefaultValue(Class classType) {
         if (classType == Byte.class || classType.getName().equals("byte")) {
             return 0;
@@ -164,25 +196,25 @@ public class ReflectHelper<T> {
         }
     }
 
-    public SQLFieldTypeEnum getSqlStringType(Class<?> ziDuanJavaType) {
+    public SQLFieldTypeEnum getSqlStringType(Class<?> type) {
         SQLFieldTypeEnum sqlType = null;
-        if (ziDuanJavaType == Byte.class || ziDuanJavaType.getName().equals("byte")) {
+        if (type == Byte.class || type.getName().equals("byte")) {
             sqlType = SQLFieldTypeEnum.INTEGER;
-        } else if (ziDuanJavaType == Short.class || ziDuanJavaType.getName().equals("short")) {
+        } else if (type == Short.class || type.getName().equals("short")) {
             sqlType = SQLFieldTypeEnum.INTEGER;
-        } else if (ziDuanJavaType == Integer.class || ziDuanJavaType.getName().equals("int")) {
+        } else if (type == Integer.class || type.getName().equals("int")) {
             sqlType = SQLFieldTypeEnum.INTEGER;
-        } else if (ziDuanJavaType == Long.class || ziDuanJavaType.getName().equals("long")) {
+        } else if (type == Long.class || type.getName().equals("long")) {
             sqlType = SQLFieldTypeEnum.BIG_INT;
-        } else if (ziDuanJavaType == Float.class || ziDuanJavaType.getName().equals("float")) {
+        } else if (type == Float.class || type.getName().equals("float")) {
             sqlType = SQLFieldTypeEnum.REAL;
-        } else if (ziDuanJavaType == Double.class || ziDuanJavaType.getName().equals("double")) {
+        } else if (type == Double.class || type.getName().equals("double")) {
             sqlType = SQLFieldTypeEnum.REAL;
-        } else if (ziDuanJavaType == Boolean.class || ziDuanJavaType.getName().equals("boolean")) {
+        } else if (type == Boolean.class || type.getName().equals("boolean")) {
             sqlType = SQLFieldTypeEnum.INTEGER;
-        } else if (ziDuanJavaType == Character.class || ziDuanJavaType.getName().equals("char")) {
+        } else if (type == Character.class || type.getName().equals("char")) {
             sqlType = SQLFieldTypeEnum.TEXT;
-        } else if (ziDuanJavaType == String.class) {
+        } else if (type == String.class) {
             sqlType = SQLFieldTypeEnum.TEXT;
         } else {
             sqlType = SQLFieldTypeEnum.TEXT;
@@ -219,43 +251,6 @@ public class ReflectHelper<T> {
                 break;
         }
         return obj;
-    }
-
-    public Object readValueFromCursor(Cursor cursor, Field field, SQLField sqlField,String sqlDataType){
-        Object value = null;
-        int index = cursor.getColumnIndex(sqlField.getName());
-        Class type = field.getType();
-        if (sqlDataType.equals(SQLFieldTypeEnum.INTEGER.getTypeName())) {
-            value = cursor.getInt(index);
-        } else if (sqlDataType.equals(SQLFieldTypeEnum.BIG_INT.getTypeName())) {
-            value = cursor.getLong(index);
-        } else if (sqlDataType.equals(SQLFieldTypeEnum.REAL.getTypeName())) {
-            if (type == Float.class || type.getName().equals("float")) {
-                value = cursor.getFloat(index);
-            } else if (type == Double.class || type.getName().equals("double")) {
-                value = cursor.getDouble(index);
-            } else {
-                value = cursor.getDouble(index);
-            }
-        } else if (sqlDataType.equals(SQLFieldTypeEnum.TEXT.getTypeName())) {
-            if (type == Character.class || type.getName().equals("char")) {
-                String str = cursor.getString(index);
-                if (str != null) {
-                    value = cursor.getString(index).charAt(0);
-                } else {
-                    value = null;
-                }
-            } else {
-                value = cursor.getString(index);
-            }
-        } else if (sqlDataType.equals(SQLFieldTypeEnum.BLOB.getTypeName())) {
-            value = cursor.getBlob(index);
-        } else if (sqlDataType.equals(SQLFieldTypeEnum.DATE.getTypeName())) {
-            value = cursor.getString(index);
-        } else if (sqlDataType.equals(SQLFieldTypeEnum.NUMERIC.getTypeName())) {
-            value = cursor.getString(index);
-        }
-        return value;
     }
 
     public <E> E getT(Class dataClass) throws IllegalAccessException, InvocationTargetException, InstantiationException {

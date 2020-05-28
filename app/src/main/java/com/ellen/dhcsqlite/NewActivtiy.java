@@ -12,6 +12,7 @@ import com.ellen.dhcsqlite.bean.Student;
 import com.ellen.dhcsqlite.sql.AppLibrary;
 import com.ellen.dhcsqlite.sql.MyAutoDesignOperate;
 import com.ellen.dhcsqlite.sql.NewStudentTable;
+import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
 import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
@@ -30,6 +31,13 @@ public class NewActivtiy extends Activity {
         SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
         NewStudentTable studentTable = new NewStudentTable(sqLiteDatabase, Student.class, MyAutoDesignOperate.class);
 
+        studentTable.setDebugListener(new DebugListener() {
+            @Override
+            public void exeSql(String sql) {
+                Log.e("Ellen2018","执行sql语句:"+sql);
+            }
+        });
+
         if (studentTable.isExist()) {
             studentTable.deleteTable();
         }
@@ -44,7 +52,7 @@ public class NewActivtiy extends Activity {
 
             @Override
             public void onCreateTableSuccess(String tableName, String createSQL) {
-                Log.e("Ellen2018", "创建数据库:" + createSQL);
+
             }
         });
 
@@ -69,14 +77,11 @@ public class NewActivtiy extends Activity {
         studentTable.saveData(studentList);
 
         String whereSql = Where.getInstance(false).addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 3).createSQL();
-        int count = studentTable.update(student, whereSql);
 
-        Log.e("Ellen2018", "修改的数据个数:" + count);
-
-        for (Student student1 : studentTable.getAutoDesignOperate().getSearchList2()) {
+        for (Student student1 : studentTable.getAutoDesignOperate().getSearchList1(3,"3333","my_name")) {
             Log.e("Ellen2018", "数据:" + student1.toString());
         }
 
-        Log.e("Ellen2018","查询:"+studentTable.getDataByMajorKey(3));
+        Log.e("Ellen2018","查询:"+studentTable.searchByMajorKey(3));
     }
 }

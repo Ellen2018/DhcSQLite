@@ -1,40 +1,15 @@
 package com.ellen.dhcsqlitelibrary.table.operate;
 
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Check;
-import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Default;
-import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.EndAutoString;
-import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.MajorKey;
-import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.NotNull;
-import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Unique;
-import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
+import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
-import com.ellen.dhcsqlitelibrary.table.operate.add.Add;
-import com.ellen.dhcsqlitelibrary.table.operate.create.Create;
-import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
-import com.ellen.dhcsqlitelibrary.table.operate.delete.Delete;
-import com.ellen.dhcsqlitelibrary.table.operate.search.Search;
-import com.ellen.dhcsqlitelibrary.table.operate.table.Table;
-import com.ellen.dhcsqlitelibrary.table.operate.update.Update;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
-import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.type.ObjectTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
-import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
-import com.ellen.sqlitecreate.createsql.add.AddSingleRowToTable;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
-import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
-import com.ellen.sqlitecreate.createsql.helper.Value;
-import com.ellen.sqlitecreate.createsql.helper.WhereSymbolEnum;
-import com.ellen.sqlitecreate.createsql.serach.SerachTableData;
-import com.ellen.sqlitecreate.createsql.serach.SerachTableExist;
-import com.ellen.sqlitecreate.createsql.update.UpdateTableDataRow;
-import com.ellen.sqlitecreate.createsql.where.Where;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -42,153 +17,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * 包含增删改查等等操作
- *
- * @param <T>
- */
-public class BaseOperate<T> extends ZxySqlCreate implements Create, Add<T>, Search<T>, Delete, Update<T>, Table {
+public class BaseOperate<T> extends ZxySqlCreate{
 
     protected SQLiteDatabase db;
-    protected Class<T> dataClass;
 
-    //解析
-    private List<SQLField> sqlFieldList;
-    private HashMap<SQLField, Field> sqlNameMap;
-    private Field majorKeyField = null;
-    private SQLField majorKeySqlField = null;
-    private boolean isAutoIncrement = false;
 
-    //Helper
-    private ReflectHelper<T> reflectHelper;
-    private JsonHelper jsonHelper;
+    protected Class dataClass;
+    protected List<SQLField> sqlFieldList;
+    protected HashMap<SQLField, Field> sqlNameMap;
+    protected CursorHelper cursorHelper;
+    protected ReflectHelper<T> reflectHelper;
+    protected DebugListener debugListener;
 
     //数据类型支持
-    private BasicTypeSupport basicTypeSupport;
-    private DataStructureSupport dataStructureSupport;
-    private ObjectTypeSupport objectTypeSupport;
-    private TypeSupport typeSupportExpand;
+    protected BasicTypeSupport basicTypeSupport;
+    protected DataStructureSupport dataStructureSupport;
+    protected ObjectTypeSupport objectTypeSupport;
+    protected TypeSupport typeSupportExpand;
 
-    private ZxyTable zxyTable;
+    public void setDebugListener(DebugListener debugListener) {
+        this.debugListener = debugListener;
+    }
 
-    public BaseOperate(SQLiteDatabase db, Class<T> dataClass, JsonHelper jsonHelper, ReflectHelper<T> reflectHelper,DataStructureSupport dataStructureSupport, ZxyTable zxyTable) {
+    public BaseOperate(SQLiteDatabase db) {
         this.db = db;
-        this.dataClass = dataClass;
-        this.jsonHelper = jsonHelper;
-        this.reflectHelper = reflectHelper;
-        this.dataStructureSupport = dataStructureSupport;
-        this.zxyTable = zxyTable;
-        init();
-        //进行解析
-        parsing();
-
+        cursorHelper = new CursorHelper();
     }
 
-    private void init() {
-        basicTypeSupport = new BasicTypeSupport(reflectHelper);
-        objectTypeSupport = new ObjectTypeSupport(reflectHelper, jsonHelper);
-        sqlFieldList = new ArrayList<>();
-        sqlNameMap = new HashMap<>();
-    }
-
-    /**
-     * 进行解析
-     */
-    private void parsing() {
-        List<Field> fieldList = reflectHelper.getClassFieldList(dataClass, false);
-        for (Field field : fieldList) {
-            TypeSupport typeSupport = getTypeSupport(field);
-            SQLFieldType sqlFieldType = typeSupport.setSQLiteType(field);
-            SQLField sqlField = handlerSqlField(field, typeSupport.setSqlFieldName(field), sqlFieldType.getSQLFieldTypeString());
-            sqlNameMap.put(sqlField, field);
-            sqlFieldList.add(sqlField);
+    protected void exeSql(String sql){
+        if(debugListener != null){
+            debugListener.exeSql(sql);
         }
-    }
-
-    /**
-     * 处理映射的字段sql数据
-     *
-     * @param field
-     * @param filedName
-     * @param filedType
-     * @return
-     */
-    private SQLField handlerSqlField(Field field, String filedName, String filedType) {
-        SQLField sqlField = null;
-        //先判断有没有EndAutoString
-        EndAutoString endAutoString = field.getAnnotation(EndAutoString.class);
-        if (endAutoString != null) {
-            sqlField = SQLField.getAutoEndStringField(filedName, filedType, endAutoString.value());
-        } else {
-            sqlField = SQLField.getInstance(filedName, filedType);
-            //判断有没有主键
-            MajorKey majorKey = field.getAnnotation(MajorKey.class);
-            if (majorKey != null) {
-                sqlField.setMajorKey(true);
-                if (majorKey.isAutoIncrement()) {
-                    sqlField.setAuto(true);
-                    isAutoIncrement = true;
-                }
-                majorKeySqlField = sqlField;
-                majorKeyField = field;
-            }
-            if (field.getAnnotation(NotNull.class) != null) {
-                sqlField.setNotNull(true);
-            }
-            if (field.getAnnotation(Unique.class) != null) {
-                sqlField.setUnique(true);
-            }
-            Default defaultA = field.getAnnotation(Default.class);
-            if (defaultA != null) {
-                sqlField.setDefaultValue(reflectHelper.getDefaultAValue(defaultA));
-            }
-            Check check = field.getAnnotation(Check.class);
-            if (check != null) {
-                String checkWhereSql = check.value();
-                if (checkWhereSql.contains("{}")) {
-                    checkWhereSql = checkWhereSql.replace("{}", filedName);
-                }
-                sqlField.setCheckWhereSql(checkWhereSql);
-            }
-            sqlField.createSqlFiled();
-        }
-        return sqlField;
-    }
-
-
-    private TypeSupport getTypeSupport(Field field) {
-        if (basicTypeSupport.isType(field)) {
-            return basicTypeSupport;
-        }
-        if (dataStructureSupport.isType(field)) {
-            return dataStructureSupport;
-        }
-        if (typeSupportExpand != null) {
-            if (typeSupportExpand.isType(field)) {
-                return typeSupportExpand;
-            }
-        }
-        if (objectTypeSupport.isType(field)) {
-            return objectTypeSupport;
-        }
-        return null;
-    }
-
-
-    @Override
-    public String getMajorKeyName() {
-        String majorKeyName = null;
-        if (majorKeySqlField != null) {
-            majorKeyName = majorKeySqlField.getName();
-        }
-        return majorKeyName;
-    }
-
-    public void exeSql(String sql) {
         db.execSQL(sql);
     }
 
     protected List<T> search(String sql) {
+        if(debugListener != null){
+            debugListener.exeSql(sql);
+        }
         return getDataByCursor(db.rawQuery(sql, null));
     }
 
@@ -203,7 +69,7 @@ public class BaseOperate<T> extends ZxySqlCreate implements Create, Add<T>, Sear
                     String sqlDataType = null;
                     TypeSupport typeSupport = getTypeSupport(field);
                     sqlDataType = typeSupport.setSQLiteType(field).getTypeString();
-                    Object value = reflectHelper.readValueFromCursor(cursor,field,sqlFieldList.get(i),sqlDataType);
+                    Object value = cursorHelper.readValueFromCursor(cursor,field,sqlFieldList.get(i),sqlDataType);
                     field.set(t,typeSupport.toObj(field,value));
                 }
             } catch (IllegalAccessException e) {
@@ -221,373 +87,23 @@ public class BaseOperate<T> extends ZxySqlCreate implements Create, Add<T>, Sear
         return dataList;
     }
 
-    @Override
-    public void saveData(T data) {
-        if (data == null) {
-            return;
+    protected TypeSupport getTypeSupport(Field field) {
+        if (basicTypeSupport.isType(field)) {
+            return basicTypeSupport;
         }
-        AddSingleRowToTable addSingleRowToTable = getAddSingleRowToTable();
-        addSingleRowToTable.setTableName(getTableName());
-        for (int i = 0; i < sqlFieldList.size(); i++) {
-            Field field = sqlNameMap.get(sqlFieldList.get(i));
-            Object value = null;
-            TypeSupport typeSupport = getTypeSupport(field);
-            value = typeSupport.toValue(field, reflectHelper.getValue(data, field));
-            //先判断是否有主键
-            if (majorKeyField != null) {
-                if (majorKeySqlField.getName().equals(sqlFieldList.get(i).getName())) {
-                    //当前是主键
-                    if (!isAutoIncrement) {
-                        addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
-                    }
-                } else {
-                    addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
-                }
-            } else {
-                addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
+        if (dataStructureSupport.isType(field)) {
+            return dataStructureSupport;
+        }
+        if (typeSupportExpand != null) {
+            if (typeSupportExpand.isType(field)) {
+                return typeSupportExpand;
             }
         }
-        String addDataSql = addSingleRowToTable.createSQL();
-        exeSql(addDataSql);
-    }
-
-    @Override
-    public void saveData(List<T> dataList) {
-        if (dataList == null || dataList.size() == 0) {
-            return;
+        if (objectTypeSupport.isType(field)) {
+            return objectTypeSupport;
         }
-        AddManyRowToTable addManyRowToTable = getAddManyRowToTable();
-        addManyRowToTable.setTableName(getTableName());
-        boolean isAddMajorKeyValue = true;
-        if (majorKeySqlField != null) {
-            if (isAutoIncrement) {
-                List<SQLField> currentSqlFieldList = new ArrayList<>();
-                for (SQLField sqlField : sqlFieldList) {
-                    if (!sqlField.getName().equals(majorKeyField.getName())) {
-                        currentSqlFieldList.add(sqlField);
-                    }
-                }
-                addManyRowToTable.addFieldList(currentSqlFieldList);
-                isAddMajorKeyValue = false;
-            } else {
-                addManyRowToTable.addFieldList(sqlFieldList);
-            }
-        } else {
-            addManyRowToTable.addFieldList(sqlFieldList);
-        }
-        for (int i = 0; i < dataList.size(); i++) {
-            List list = new ArrayList();
-            for (int j = 0; j < sqlFieldList.size(); j++) {
-                Field field = sqlNameMap.get(sqlFieldList.get(j));
-                Object value = null;
-                TypeSupport typeSupport = getTypeSupport(field);
-                value = typeSupport.toValue(field,reflectHelper.getValue(dataList.get(i),field));
-                //此处可以添加记录数据库数据之前的操作:加密数据等
-                if (isAddMajorKeyValue) {
-                    list.add(value);
-                } else {
-                    if (!sqlFieldList.get(j).getName().equals(majorKeySqlField.getName())) {
-                        list.add(value);
-                    }
-                }
-            }
-            addManyRowToTable.addValueList(list);
-        }
-        String addDataSql = addManyRowToTable.createSQL();
-        exeSql(addDataSql);
+        return null;
     }
 
-    @Override
-    public void onCreateTable() {
-        String createTableSql = getCreateTable()
-                .setTableName(getTableName())
-                .addField(sqlFieldList)
-                .createSQL();
-
-        exeSql(createTableSql);
-    }
-
-    @Override
-    public void onCreateTable(OnCreateTableCallback onCreateTableCallback) {
-        boolean isException = false;
-        String createTableSql = getCreateTable()
-                .setTableName(getTableName())
-                .addField(sqlFieldList)
-                .createSQL();
-        try {
-            exeSql(createTableSql);
-        } catch (SQLException e) {
-            onCreateTableCallback.onCreateTableFailure(e.getMessage(), getTableName(), createTableSql);
-            isException = true;
-        }
-        if (!isException)
-            onCreateTableCallback.onCreateTableSuccess(getTableName(), createTableSql);
-    }
-
-    @Override
-    public void onCreateTableIfNotExits() {
-
-        String createTableSql = getCreateTable()
-                .setTableName(getTableName())
-                .addField(sqlFieldList)
-                .createSQLIfNotExists();
-
-        exeSql(createTableSql);
-    }
-
-    @Override
-    public void onCreateTableIfNotExits(OnCreateTableCallback onCreateTableCallback) {
-        boolean isException = false;
-        String createTableSql = getCreateTable()
-                .setTableName(getTableName())
-                .addField(sqlFieldList)
-                .createSQLIfNotExists();
-        try {
-            exeSql(createTableSql);
-        } catch (SQLException e) {
-            onCreateTableCallback.onCreateTableFailure(e.getMessage(), getTableName(), createTableSql);
-            isException = true;
-        }
-        if (!isException)
-            onCreateTableCallback.onCreateTableSuccess(getTableName(), createTableSql);
-    }
-
-    private String getTableName() {
-        return zxyTable.getTableName();
-    }
-
-    @Override
-    public List<T> search(String whereSQL, String orderSQL) {
-        SerachTableData serachTableData = getSearchTableData().setTableName(getTableName());
-        serachTableData.setIsAddField(false);
-        String searchSql = null;
-        if (orderSQL != null) {
-            searchSql = serachTableData.createSQLAutoWhere(whereSQL, orderSQL);
-        } else {
-            searchSql = serachTableData.createSQLAutoWhere(whereSQL);
-        }
-        return searchDataBySql(searchSql);
-    }
-
-    @Override
-    public List<T> getAllData() {
-        return getAllData(null);
-    }
-
-    @Override
-    public List<T> getAllData(String orderSql) {
-        SerachTableData serachTableData = getSearchTableData().setTableName(getTableName());
-        serachTableData.setIsAddField(false);
-        String getAllTableDataSQL = serachTableData.getTableAllDataSQL(orderSql);
-        return searchDataBySql(getAllTableDataSQL);
-    }
-
-    @Override
-    public List<T> searchDataBySql(String sql) {
-        return search(sql);
-    }
-
-    /**
-     * 是否包含此主键
-     *
-     * @param t
-     * @return
-     */
-    @Override
-    public boolean isContainsByMajorKey(T t) {
-        boolean isContains = false;
-        if (majorKeySqlField == null) {
-            //说明没有主键,抛出无主键异常
-            throw new NoMajorKeyException("没有主键,无法根据主键查询数据的存在!");
-        } else {
-            String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, reflectHelper.getValue(t, majorKeyField))
-                    .createSQL();
-            List<T> tList = search(whereSql, null);
-            if (tList != null && tList.size() > 0) {
-                isContains = true;
-            } else {
-                isContains = false;
-            }
-        }
-        return isContains;
-    }
-
-    @Override
-    public T getDataByMajorKey(Object value) {
-        T t = null;
-        if (majorKeySqlField == null) {
-            //说明没有主键,抛出无主键异常
-            throw new NoMajorKeyException("没有主键,无法根据主键查询数据!");
-        } else {
-            String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, value)
-                    .createSQL();
-            List<T> tList = search(whereSql, null);
-            if (tList != null & tList.size() > 0) {
-                t = tList.get(0);
-            }
-        }
-        return t;
-    }
-
-    /**
-     * 判断表是否存在
-     *
-     * @return
-     */
-    @Override
-    public boolean isExist() {
-        String searchTableExistSql = SerachTableExist.getInstance()
-                .setTableName(getTableName())
-                .createSQL();
-        Cursor cursor = db.rawQuery(searchTableExistSql, null);
-        return cursor.getCount() != 0;
-    }
-
-    @Override
-    public boolean deleteTable() {
-        boolean isDelete = false;
-        if (isExist()) {
-            isDelete = true;
-            String deleteTableSQL = getDeleteTable().setTableName(getTableName()).createSQL();
-            exeSql(deleteTableSQL);
-        }
-        return isDelete;
-    }
-
-    @Override
-    public int delete(String whereSql) {
-        int count = getSearchDataCount(whereSql);
-        if (count > 0) {
-            String deleteSQL = getDeleteTableDataRow().setTableName(getTableName()).createSQLAutoWhere(whereSql);
-            exeSql(deleteSQL);
-            return count;
-        }
-        return 0;
-    }
-
-    private boolean isHaveData(String whereSql) {
-        return getSearchDataCount(whereSql) > 0;
-    }
-
-    private int getSearchDataCount(String whereSql) {
-        List<T> tList = search(whereSql, null);
-        if (tList != null && tList.size() > 0) {
-            return tList.size();
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public boolean deleteByMajorKey(Object majorKeyValue) {
-        if (majorKeyField == null) {
-            //说明没有主键,抛出无主键异常
-            throw new NoMajorKeyException("没有主键,无法根据主键删除数据!");
-        } else {
-            String whereSql = getWhere(false)
-                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, majorKeyValue)
-                    .createSQL();
-            return delete(whereSql) > 0;
-        }
-    }
-
-    @Override
-    public void clear() {
-        String clearTableSQL = getDeleteTableDataRow().setTableName(getTableName()).createDeleteAllDataSQL();
-        exeSql(clearTableSQL);
-    }
-
-    @Override
-    public void saveOrUpdateByMajorKey(T t) {
-        if (isContainsByMajorKey(t)) {
-            //进行更新
-            updateByMajorKey(t);
-        } else {
-            saveData(t);
-        }
-    }
-
-    @Override
-    public void saveOrUpdateByMajorKey(List<T> tList) {
-        List<T> saveList = new ArrayList<>();
-        for (T t : tList) {
-            if (isContainsByMajorKey(t)) {
-                updateByMajorKey(t);
-            } else {
-                saveList.add(t);
-            }
-        }
-        saveData(saveList);
-    }
-
-    @Override
-    public boolean updateByMajorKey(T t) {
-        if (majorKeySqlField == null) {
-            //说明没有主键,抛出无主键异常
-            throw new NoMajorKeyException("没有主键,无法根据主键更新数据!");
-        } else {
-            String whereSql = Where.getInstance(false)
-                    .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, reflectHelper.getValue(t, majorKeyField))
-                    .createSQL();
-            if (isHaveData(whereSql)) {
-                update(t, whereSql);
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    @Override
-    public int update(T t, String whereSQL) {
-        int count = getSearchDataCount(whereSQL);
-        if (count > 0) {
-            UpdateTableDataRow updateTableDataRow = getUpdateTableDataRow();
-            updateTableDataRow.setTableName(getTableName());
-            for (int i = 0; i < sqlFieldList.size(); i++) {
-                String fieldName = sqlFieldList.get(i).getName();
-                Field field = sqlNameMap.get(sqlFieldList.get(i));
-                Object value = null;
-                TypeSupport typeSupport = getTypeSupport(field);
-                value = typeSupport.toValue(field, reflectHelper.getValue(t, field));
-                if(majorKeySqlField != null){
-                    if(field.getName().equals(majorKeyField.getName())){
-                        if(!isAutoIncrement){
-                            updateTableDataRow.addSetValue(fieldName, value);
-                        }
-                    }else {
-                        updateTableDataRow.addSetValue(fieldName, value);
-                    }
-                }else {
-                    updateTableDataRow.addSetValue(fieldName, value);
-                }
-            }
-            String updateSql = updateTableDataRow.createSQLAutoWhere(whereSQL);
-            exeSql(updateSql);
-            return count;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public boolean reNameTable(String newName) {
-        //判断新表是否存在
-        String searchTableExistSql = SerachTableExist.getInstance()
-                .setTableName(newName)
-                .createSQL();
-        Cursor cursor = db.rawQuery(searchTableExistSql, null);
-        if (cursor.getCount() != 0) {
-            return false;
-        }
-        String reNameTableSql = getUpdateTableName()
-                .setOldTableName(getTableName())
-                .setNewTableName(newName)
-                .createSQL();
-        exeSql(reNameTableSql);
-        return true;
-    }
 
 }

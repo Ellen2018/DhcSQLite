@@ -8,7 +8,7 @@ public interface Search<T> {
     List<T> getAllData(String orderSql);
     List<T> searchDataBySql(String sql);
     boolean isContainsByMajorKey(T t);
-    T getDataByMajorKey(Object value);
+    T searchByMajorKey(Object value);
 
     /**
      * 判断表是否存在

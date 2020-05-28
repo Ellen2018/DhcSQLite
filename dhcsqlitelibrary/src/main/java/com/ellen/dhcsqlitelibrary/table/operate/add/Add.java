@@ -14,4 +14,16 @@ public interface Add<T> {
      * 保存多条数据
      */
     void saveData(List<T> dataList);
+
+    /**
+     * 保存之前先清空表
+     * @param dataList
+     */
+    void saveDataAndDeleteAgo(List<T> dataList);
+
+    /**
+     * 保存之前先清空表
+     * @param data
+     */
+    void saveDataAndDeleteAgo(T data);
 }

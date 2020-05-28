@@ -48,7 +48,7 @@ bean类代码：
 
 - @DataStructure 
  
-&emsp;&emsp;这个注解专门用于映射数组,List,Set,Map,Stack数据结构类型数据的，目前仅仅支持这些,如果您想要扩展其它数据结构，您需要了解原理进行修改，数据结构属性的数据框架自动帮您以JSON的方式进行存储。注意的是你可以不需要添加此注解，框架内部自动判断当前属性是否为数据结构类型，如果是数据结构类型，则自行按照数据结构类型进行处理。还需要注意的是存的操作基本又框架自动帮您完成，但是取的操作您需要在ZxyTable中实现resumeDataStructure方法进行去恢复这个数据结构的数据。
+&emsp;&emsp;这个注解专门用于映射数组,List,Set,Map数据结构类型数据的，目前仅仅支持所有数组,ArrayList,LinkedList,Vector,HashSet,TreeSet,HashMap,TreeMap,其它均不支持,如果您想要支持其它类型的转换，笔者提供了一种方式:[如何扩展新的转换类型?](),如果您想要扩展其它数据结构，您需要了解原理进行修改，数据结构属性的数据框架自动帮您以JSON的方式进行存储。注意的是你可以不需要添加此注解，框架内部自动判断当前属性是否为数据结构类型，如果是数据结构类型，则自行按照数据结构类型进行处理。还需要注意的是存的操作基本又框架自动帮您完成，但是取的操作您需要在ZxyTable中实现resumeDataStructure方法进行去恢复这个数据结构的数据。
 
 - @Operate 
  
@@ -59,7 +59,7 @@ Father类：
     public class Father {
  
         private String name;
-        //@Operate(operate = OperateEnum.VALUE,valueName = "id")保存的是这个id的数据
+        //保存的是这个id的数据
         private String id;
 
         ......
@@ -77,7 +77,7 @@ Father类：
     @Operate(operate = OperateEnum.VALUE,valueName = "id")
     private Father father2;
 
-- @SqlType 
+- @SqlType(不再建议使用) 
  
 &emsp;&emsp;此注解与@Operate注解搭配使用，它的作用就是告诉框架,这个属性映射到数据库表中的字段类型以及数据长度，当数据长度为0或者负值时，长度不受限制，当您不传入length时它默认为-1，注意如果您将它用于基本类型以及String，数据结构类型的属性上没有任何作用。示例代码如下
 
@@ -198,36 +198,15 @@ Father类：
             super(db, dataClass, autoTableName, autoClass);
         }
 
-        /**
-         * 设置属性对应的数据库字段的类型
-         * 如果没有特殊的更改，此方法无须重写
-         *
-         * 但是笔者有特殊的要求，就是将isMan字段在数据库中存"男' & "女" 的需求
-         * 那么这个地方我就只能将isMan属性的字段映射为数据库中TEXT类型，并且数据位数调整为1位
-         *
-         * @param classFieldName
-         * @param typeClass
-         * @return
-         */
-        @Override
-        protected SQLFieldType getSqlFieldType(String classFieldName, Class typeClass) {
-            if(classFieldName.equals("isMan")){
-                //将isMan的boolean映射为TEXT类型，且长度为1位
-                return new SQLFieldType(SQLFieldTypeEnum.TEXT,1);
-            }else {
-                return super.getSqlFieldType(classFieldName,typeClass);
-            }
-        }
 
         /**
          * boolean类型值转化为数据库中的存储
          * 此方法默认情况下无须重写
          *
-         * 如果你的bean类中没有boolean类型的存储，此方法返回null即可
+         * 如果你的bean类中没有boolean类型的存储，无须重写这个方法
          *
-         * 如果有:
-         * 默认的没有实现getSqlFieldType方法将它映射成你想要的类型的情况下:需要返回 0 和 1，或者 其他的int类型即可，只要不相同
-         * 如果有实现getSqlFieldType方法并将它映射成你想要的类型的情况下:需要返回true和false存储的值，例如笔者这里返回"男" 和 "女"
+         * 如果有：如果你的boolean类型不想映射为INTEGER类型的0和1(默认),那么您只需要将这个方法
+         * 重写即可，返回基本数据类型 & Sting类型的数据，其他类型均会报异常，仅支持这些
          *
          * 这么实现有什么意义呢？为的是让数据库中的数据变得更加易懂，通常清空下没有这种需求，可万一有这个需求呢
          * @param classFieldName
@@ -316,23 +295,9 @@ Father类：
 
 &emsp;&emsp;调用此构造器它的表名为传入的autoTableName。db为操作数据库的SQLiteDatabase，可由ZxyLibrary获取，也可以通过原生的SQLiteOpenHelper获取，dataClass为绑定的映射类的字节码对象，autoClass为元操作代理接口字节码对象，关于元操作代理接口使用请查阅[**AutoDesignOperate**](https://github.com/Ellen2018/DhcSQLite/blob/master/AutoDesignOperate.md)。  
 
-- SQLFieldType getSqlFieldType(String classFieldName, Class typeClass)  
-
-&emsp;&emsp;此方法的作用就是根据classFieldName以及typeClass来确定数据库映射的字段类型,默认清情况下无需重写。比如我想将isMan的数据库字段类型映射为TEXT且长度为1的类型，因为我需要存储"男"或者"女"，那么代码如下所示:
-
-    protected SQLFieldType getSqlFieldType(String classFieldName, Class typeClass) {
-        if(classFieldName.equals("isMan")){
-            //将isMan的boolean映射为TEXT类型，且长度为1位
-            return new SQLFieldType(SQLFieldTypeEnum.TEXT,1);
-        }else {
-            //不要忘记了调用super.getSqlFieldType否则就会出错(其它的映射不了导致出错)
-            return super.getSqlFieldType(classFieldName,typeClass);
-        }
-    }
-
 - Object setBooleanValue(String classFieldName, boolean value)
 
-&emsp;&emsp;此方法作用就是将bean对象的boolean类型值转换为数据库中能存储的值,无需重写，默认情况下以int类型0(false),1(true)的方式保存如果您在getSqlFieldType方法中修改了某个字段的boolean类型映射的数据库字段类型，那么此处您也需要重写该方法的逻辑，例如：我现在要配合上面isMan的数据库字段类型映射为TEXT且长度为1的类型，那么代码如下： 
+&emsp;&emsp;此方法作用就是将bean对象的boolean类型值转换为数据库中能存储的值,无需重写，默认情况下以int类型0(false),1(true)的方式保存,如果您不希望您的boolean类型字段映射为Integer类型，您可以修改返回值为基本类型或者String类型，其他类型暂时不支持，例如：我现在要isMan的数据库字段类型映射为TEXT类型的“男”和“女”，那么代码如下： 
 
     protected Object setBooleanValue(String classFieldName, boolean value) {
         if(classFieldName.equals("isMan")) {
@@ -388,20 +353,15 @@ Father类：
 - 创建表(4种方式:2种不带回调，2种带回调)
 
         //创建表带回调
-        studentTable.onCreateTableIfNotExits(new ZxyTable.OnCreateSQLiteCallback() {
+       studentTable.onCreateTableIfNotExits(new OnCreateTableCallback() {
             @Override
-            public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
-
+            public void onCreateTableFailure(String errMessage, String tableName, String createSQL) {
+                
             }
 
             @Override
-            public void onCreateTableFailure(String errMessage, String tableName, List<SQLField> sqlFieldList, String createSQL) {
+            public void onCreateTableSuccess(String tableName, String createSQL) {
 
-            }
-
-            @Override
-            public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
-               
             }
         });
 
@@ -412,22 +372,7 @@ Father类：
         studentTable.onCreateTable();
 
         //不建议使用这种
-        studentTable.onCreateTable(new ZxyTable.OnCreateSQLiteCallback() {
-            @Override
-            public void onCreateTableBefore(String tableName, List<SQLField> sqlFieldList, String createSQL) {
-                
-            }
-
-            @Override
-            public void onCreateTableFailure(String errMessage, String tableName, List<SQLField> sqlFieldList, String createSQL) {
-
-            }
-
-            @Override
-            public void onCreateTableSuccess(String tableName, List<SQLField> sqlFieldList, String createSQL) {
-
-            }
-        });
+        studentTable.onCreateTable(...(回调对象));
 
 
 ## 3.2 表本身相关操作
@@ -435,38 +380,22 @@ Father类：
 - 重命名表  
 
         //重命名表不带回调  
-        studentTable.reNameTable("修改的表名");
+        boolean b = studentTable.reNameTable("修改的表名");
+        if(b){
+          //修改成功
+        }else{
+          //修改失败 
+        } 
         
-        //修改表名带回调
-        studentTable.reNameTable("my_student", new ZxyTable.OnRenameTableCallback() {
-            @Override
-            public void onRenameFailure(String errMessage, String currentName, String newName, String reNameTableSQL) {
-                //修改失败回调这里
-            }
-
-            @Override
-            public void onRenameSuccess(String oldName, String newName, String reNameTableSQL) {
-                //修改成功回调这里
-            }
-        });
-
 - 删除表
 
         //删除表
-        studentTable.deleteTable();
-
-        //删除表带回调
-        studentTable.deleteTable(new ZxyTable.OnDeleteTableCallback() {
-            @Override
-            public void onDeleteTableFailure(String errMessage, String deleteTableSQL) {
-                
-            }
-
-            @Override
-            public void onDeleteTableSuccess(String deleteTableSQL) {
-
-            }
-        });
+        boolean b = studentTable.deleteTable();、
+        if(b){
+          //删除成功
+        }else{
+          //删除失败 
+        } 
 
 - 清空表
 
@@ -484,6 +413,14 @@ Father类：
         String majorKeyName = studentTable.getMajorKeyName();
         if(majorKeyName == null){
             //说明无主键
+        }
+
+- 查询表是否存在  
+
+        if (studentTable.isExist()) {
+           //表存在
+        }else{
+           //表不存在
         }
 
 ## 3.3 添加数据
