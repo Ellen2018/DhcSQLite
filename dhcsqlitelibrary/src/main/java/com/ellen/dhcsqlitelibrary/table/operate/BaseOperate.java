@@ -8,6 +8,7 @@ import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
+import com.ellen.dhcsqlitelibrary.table.type.Intercept;
 import com.ellen.dhcsqlitelibrary.table.type.ObjectTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
@@ -35,13 +36,13 @@ public class BaseOperate<T> extends ZxySqlCreate {
     protected DataStructureSupport dataStructureSupport;
     protected ObjectTypeSupport objectTypeSupport;
 
-    protected List<TypeSupport> interceptList;
+    protected List<Intercept> interceptList;
 
     public void setDebugListener(DebugListener debugListener) {
         this.debugListener = debugListener;
     }
 
-    public void addIntercept(TypeSupport intercept) {
+    public void addIntercept(Intercept intercept) {
         if (interceptList == null) {
             interceptList = new ArrayList<>();
         }

@@ -31,14 +31,14 @@ public class Student {
     private String address;
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
-    private Boolean isMan = null;
+    @DhcSqlFieldName(sqlFieldName = "真不真")
+    private boolean isMan;
     @Operate(operate = OperateEnum.VALUE,valueName = "student")
     private Father father;
     private Father father2;
     @DataStructure //表示这个属性是数据类型属性，需要用注解区分，才能正确的进行json映射，否则会报错
     @DhcSqlFieldName(sqlFieldName = "爸爸们")
     private Father[] fathers;
-    @DhcSqlFieldName(sqlFieldName = "my_name")
     private double f = 3.6;
 
     public Student(String name, int age, String phoneNumber, String address) {

@@ -25,6 +25,7 @@ import com.ellen.dhcsqlitelibrary.table.operate.update.Update;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
+import com.ellen.dhcsqlitelibrary.table.type.Intercept;
 import com.ellen.dhcsqlitelibrary.table.type.ObjectTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
 import com.ellen.sqlitecreate.createsql.add.AddManyRowToTable;
@@ -590,7 +591,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     }
 
     @Override
-    public void addIntercept(TypeSupport intercept) {
+    public void addIntercept(Intercept intercept) {
         super.addIntercept(intercept);
     }
 

@@ -20,6 +20,7 @@ import com.ellen.dhcsqlitelibrary.table.operate.update.Update;
 import com.ellen.dhcsqlitelibrary.table.proxy.AutoOperateProxy;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
+import com.ellen.dhcsqlitelibrary.table.type.Intercept;
 import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
 
 import java.lang.reflect.ParameterizedType;
@@ -115,7 +116,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
      * 添加拦截
      * @param intercept
      */
-    public void addIntercept(TypeSupport intercept) {
+    public void addIntercept(Intercept intercept) {
         sqlOperate.addIntercept(intercept);
     }
 
