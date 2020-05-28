@@ -74,10 +74,14 @@ public class BasicTypeSupport implements TypeSupport {
                     trueValue = 0;
                 }
             }
-            if(trueValue.equals(sqlValue)){
-                return true;
+            if(sqlValue != null) {
+                if (trueValue.equals(sqlValue)) {
+                    return true;
+                } else {
+                    return false;
+                }
             }else {
-                return false;
+                return null;
             }
         }else {
             return sqlValue;
