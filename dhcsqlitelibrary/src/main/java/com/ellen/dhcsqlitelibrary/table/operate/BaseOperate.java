@@ -34,7 +34,6 @@ public class BaseOperate<T> extends ZxySqlCreate {
     protected BasicTypeSupport basicTypeSupport;
     protected DataStructureSupport dataStructureSupport;
     protected ObjectTypeSupport objectTypeSupport;
-    protected TypeSupport typeSupportExpand;
 
     protected List<TypeSupport> interceptList;
 
@@ -123,11 +122,6 @@ public class BaseOperate<T> extends ZxySqlCreate {
         }
         if (dataStructureSupport.isType(field)) {
             return dataStructureSupport;
-        }
-        if (typeSupportExpand != null) {
-            if (typeSupportExpand.isType(field)) {
-                return typeSupportExpand;
-            }
         }
         if (objectTypeSupport.isType(field)) {
             return objectTypeSupport;

@@ -140,15 +140,6 @@ Student类代码:
         }
 
         @Override
-        protected SQLFieldType getSqlFieldType(String classFieldName, Class typeClass) {
-            if(classFieldName.equals("isMan")){
-                return new SQLFieldType(SQLFieldTypeEnum.TEXT,1);
-            }else {
-                return super.getSqlFieldType(classFieldName, typeClass);
-            }
-        }
-
-        @Override
         protected Object setBooleanValue(String classFieldName, boolean value) {
         vif(classFieldName.equals("isMan")){
                 if(value){
@@ -164,17 +155,18 @@ Student类代码:
         /**
          * 恢复数据结构数据
          * @param classFieldName
+         * @param fieldClass
          * @param json
          * @return
          */
         @Override
-        protected Object resumeDataStructure(String classFieldName, String json) {
+        protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
             if(classFieldName.equals("subjectMap")){
                 Type type = new TypeToken<HashMap<String,Integer>>() {}.getType();
                 HashMap<String,Integer> subjectMap = new Gson().fromJson(json, type);
                 return subjectMap;
             }
-            return super.resumeDataStructure(classFieldName, json);
+            return super.resumeDataStructure(classFieldName, fieldClass, json);
         }
     }
 
