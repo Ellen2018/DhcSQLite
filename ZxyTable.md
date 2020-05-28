@@ -294,7 +294,7 @@ Father类：
 
 - Object setBooleanValue(String classFieldName, boolean value)
 
-&emsp;&emsp;此方法作用就是将bean对象的boolean类型值转换为数据库中能存储的值,无需重写，默认情况下以int类型0(false),1(true)的方式保存,如果您不希望您的boolean类型字段映射为Integer类型，您可以修改返回值为基本类型或者String类型，其他类型暂时不支持，例如：我现在要isMan的数据库字段类型映射为TEXT类型的“男”和“女”，那么代码如下： 
+&emsp;&emsp;此方法作用就是将bean对象的boolean类型值转换为数据库中能存储的值,无需重写，默认情况下以String类型"0"(false),"1"(true)的方式保存,如果您不希望您的boolean类型字段映射为String类型，您可以修改返回值为基本类型或者String类型其他值，其他类型暂时不支持，例如：我现在要isMan的数据库字段类型映射为TEXT类型的“男”和“女”，那么代码如下： 
 
     protected Object setBooleanValue(String classFieldName, boolean value) {
         if(classFieldName.equals("isMan")) {
@@ -308,6 +308,12 @@ Father类：
             return super.setBooleanValue(classFieldName,value);
         }
     } 
+
+这里有个注意的地方，就是当你设置为基本类型的映射值时，如果您的属性是装箱类型，也就是Boolean,如果您的属性值为null,按照逻辑来讲从数据库中映射出来也应该为null值，但是如果您以int类型0或者1来保存，那么就会出现一个诡异的现象就是Boolean原本应该读取的值为null,但是却被读成了false，原因是读取的时候，以int类型去读取一个为NULL的空数据，它就会返回0给您，因此最终会被映射为false,这里笔者提出来是希望您注意到这点以免给您造成不必要的bug困扰，为此呢，笔者建议您使用使用String类型返回，不建议使用其它类型进行映射，当然如果您的属性不是装箱类型的Boolean,那么您返回任何类型的值都可以。
+
+    //如果数据为NULL,这里value不会读取成NULL,而是读取成0
+    //最终判断的时候以0映射，最终您的Boolean会被映射成false(请一定注意这点)
+    Object value = cursor.getInt(index);
 
 - JsonLibraryType getJsonLibraryType()
 
