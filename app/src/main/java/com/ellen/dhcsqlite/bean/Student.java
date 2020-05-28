@@ -31,7 +31,7 @@ public class Student {
     private String address;
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
-    private boolean isMan;
+    private Boolean isMan = null;
     @Operate(operate = OperateEnum.VALUE,valueName = "student")
     private Father father;
     private Father father2;

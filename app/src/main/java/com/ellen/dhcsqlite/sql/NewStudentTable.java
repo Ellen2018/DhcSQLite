@@ -22,11 +22,6 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
     }
 
     @Override
-    protected Object setBooleanValue(String classFieldName, boolean value) {
-        return value;
-    }
-
-    @Override
     protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
         if(classFieldName.equals("fathers")){
             Type founderSetType = new TypeToken<Father[]>() {}.getType();

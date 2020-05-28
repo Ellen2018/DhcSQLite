@@ -95,9 +95,9 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     protected Object setBooleanValue(String classFieldName, boolean value) {
         if (value) {
-            return 1;
+            return "1";
         } else {
-            return 0;
+            return "0";
         }
     }
 

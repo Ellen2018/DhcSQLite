@@ -16,7 +16,7 @@ public class BasicTypeSupport implements TypeSupport {
     private ReflectHelper reflectHelper;
     private SetBooleanValue setBooleanValue;
 
-    public BasicTypeSupport(ReflectHelper reflectHelper,SetBooleanValue setBooleanValue) {
+    public BasicTypeSupport(ReflectHelper reflectHelper, SetBooleanValue setBooleanValue) {
         this.reflectHelper = reflectHelper;
         this.setBooleanValue = setBooleanValue;
     }
@@ -24,13 +24,13 @@ public class BasicTypeSupport implements TypeSupport {
     @Override
     public String setSqlFieldName(Field field) {
         DhcSqlFieldName dhcSqlFieldName = field.getAnnotation(DhcSqlFieldName.class);
-        if(dhcSqlFieldName != null){
-            if(dhcSqlFieldName.sqlFieldName() != null && dhcSqlFieldName.sqlFieldName().length() > 0){
+        if (dhcSqlFieldName != null) {
+            if (dhcSqlFieldName.sqlFieldName() != null && dhcSqlFieldName.sqlFieldName().length() > 0) {
                 return dhcSqlFieldName.sqlFieldName();
-            }else {
+            } else {
                 return field.getName();
             }
-        }else {
+        } else {
             return field.getName();
         }
     }
@@ -38,17 +38,17 @@ public class BasicTypeSupport implements TypeSupport {
     @Override
     public SQLFieldType setSQLiteType(Field field) {
         SQLFieldType sqlField = null;
-        if(reflectHelper.isBooleanType(field)){
-            Object booleanSaveValue = setBooleanValue.setBooleanValue(field.getName(),true);
-            if(reflectHelper.isBasicType(booleanSaveValue)){
+        if (reflectHelper.isBooleanType(field)) {
+            Object booleanSaveValue = setBooleanValue.setBooleanValue(field.getName(), true);
+            if (reflectHelper.isBasicType(booleanSaveValue)) {
                 //是基本类型
                 SQLFieldTypeEnum sqlFieldTypeEnum = reflectHelper.getSqlStringType(booleanSaveValue.getClass());
-                sqlField = new SQLFieldType(sqlFieldTypeEnum,null);
-            }else {
+                sqlField = new SQLFieldType(sqlFieldTypeEnum, null);
+            } else {
                 //不是 抛出异常
-                throw new BoolNoCanSaveException("布尔值类型只能映射为基本类型，您映射的类型:"+booleanSaveValue.getClass().getName()+" 不被支持!");
+                throw new BoolNoCanSaveException("布尔值类型只能映射为基本类型，您映射的类型:" + booleanSaveValue.getClass().getName() + " 不被支持!");
             }
-        }else {
+        } else {
             sqlField = new SQLFieldType(reflectHelper.getSqlStringType(field.getType()), null);
         }
         return sqlField;
@@ -61,37 +61,36 @@ public class BasicTypeSupport implements TypeSupport {
 
     @Override
     public Object toObj(Field field, Object sqlValue) {
-        if(reflectHelper.isBooleanType(field)){
-            Object trueValue = setBooleanValue.setBooleanValue(field.getName(),true);
-            if(trueValue.getClass() == Character.class){
-                String str  = (String) trueValue;
-                trueValue = str.charAt(0);
-            }else if(trueValue.getClass() == Boolean.class){
+        if (reflectHelper.isBooleanType(field)) {
+            if(sqlValue == null){
+                return null;
+            }
+            Object trueValue = setBooleanValue.setBooleanValue(field.getName(), true);
+            if (trueValue.getClass() == Character.class) {
+                char cr = (char) trueValue;
+                trueValue = String.valueOf(cr);
+            } else if (trueValue.getClass() == Boolean.class) {
                 Boolean aBoolean = (Boolean) trueValue;
-                if(aBoolean){
+                if (aBoolean) {
                     trueValue = 1;
-                }else {
+                } else {
                     trueValue = 0;
                 }
             }
-            if(sqlValue != null) {
-                if (trueValue.equals(sqlValue)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }else {
-                return null;
+            if (trueValue.equals(sqlValue)) {
+                return true;
+            } else {
+                return false;
             }
-        }else {
+        } else {
             return sqlValue;
         }
     }
 
     @Override
     public Object toValue(Field field, Object dataValue) {
-        if(reflectHelper.isBooleanType(field)){
-            if(dataValue != null) {
+        if (reflectHelper.isBooleanType(field)) {
+            if (dataValue != null) {
                 boolean bool = (boolean) dataValue;
                 Object value = setBooleanValue.setBooleanValue(field.getName(), bool);
                 if (value.getClass() == Character.class) {
@@ -107,7 +106,7 @@ public class BasicTypeSupport implements TypeSupport {
                 } else {
                     return value;
                 }
-            }else {
+            } else {
                 return null;
             }
         } else {
@@ -115,7 +114,7 @@ public class BasicTypeSupport implements TypeSupport {
         }
     }
 
-    public interface  SetBooleanValue{
+    public interface SetBooleanValue {
         Object setBooleanValue(String classFieldName, boolean value);
     }
 }
