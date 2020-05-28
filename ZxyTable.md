@@ -315,6 +315,16 @@ Father类：
     //最终判断的时候以0映射，最终您的Boolean会被映射成false(请一定注意这点)
     Object value = cursor.getInt(index);
 
+还有一点需要笔者提出的如果您的属性有装箱类型Integer,Short,Dobule,Float,Long等等，请警惕这个将NULL读取成0的机制,没有必要的话,笔者建议不要使用装箱类型，如果装箱类型的NULL对您的业务有逻辑需求，笔者建议多加个变量进行拆分，比如以下代码:
+
+    Integer integer;
+     
+    //它可以拆分成
+    int integer;
+    //为false时候读取integer的值，为true时为NULL状态 
+    boolean isNull = false;
+
+
 - JsonLibraryType getJsonLibraryType()
 
 &emsp;&emsp;此方法的作用就是指定此框架使用的JSON库是哪种，因为此框架内部用到了json映射，因此需要指定使用何种方式的JSON库，目前仅支持2中JSON库：Gson(谷歌)和FastJson(阿里)，注意如果您的项目中没有导入Gson(谷歌)或者FastJson(阿里),那么当框架进行Json映射时就会抛出JsonNoCanFormatException的运行时异常，您无需担心，只要导入对应要使用的库即可，示例代码如下:  
