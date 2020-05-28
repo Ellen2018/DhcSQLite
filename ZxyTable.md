@@ -48,7 +48,7 @@ bean类代码：
 
 - @DataStructure 
  
-&emsp;&emsp;这个注解专门用于映射数组,List,Set,Map数据结构类型数据的，目前仅仅支持所有数组,ArrayList,LinkedList,Vector,HashSet,TreeSet,HashMap,TreeMap,其它均不支持,如果您想要支持其它类型的转换，笔者提供了一种方式:[如何扩展新的转换类型?](),如果您想要扩展其它数据结构，您需要了解原理进行修改，数据结构属性的数据框架自动帮您以JSON的方式进行存储。注意的是你可以不需要添加此注解，框架内部自动判断当前属性是否为数据结构类型，如果是数据结构类型，则自行按照数据结构类型进行处理。还需要注意的是存的操作基本又框架自动帮您完成，但是取的操作您需要在ZxyTable中实现resumeDataStructure方法进行去恢复这个数据结构的数据。
+&emsp;&emsp;这个注解专门用于映射数组,List,Set,Map数据结构类型数据的，目前仅仅支持所有数组,ArrayList,LinkedList,Vector,HashSet,TreeSet,HashMap,TreeMap,其它均不支持,如果您想要支持其它类型的转换，笔者提供了一种方式:通过studentTable.addIntercept()添加映射拦截来完成您要添加的任何类型属性支持，关于这部分知识点，请查看【3.8 扩展支持新的属性类型】。注意的是您可以不需要添加此注解，框架内部自动判断当前属性是否为数据结构类型，如果是数据结构类型，则自行按照数据结构类型进行处理。还需要注意的是存的操作基本由框架自动帮您完成，但是取的操作您需要在ZxyTable中实现resumeDataStructure方法进行去恢复这个数据结构的数据。
 
 - @Operate 
  
