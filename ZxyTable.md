@@ -274,7 +274,7 @@ Father类：
          * 您可以根据classFieldName 或者 fieldClass
          * 再根据json来恢复您bean类中数据结构类型属性数据
          *         
-         * @param classFieldName 属性的名字；例如Fathers
+         * @param classFieldName 属性的名字；例如fathers
          * @param fieldClass 属性的类型：；例如ArrayList.class 
          * @param json
          * @return
