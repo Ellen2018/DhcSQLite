@@ -75,7 +75,7 @@
 
 - 清空表  
 
-    appLibrary.deleteTable("表名");  
+    appLibrary.clearLibrary();  
 
 - 执行任意sql语句(建议不使用这种，因为笔者封装了另外一套，方便简洁)
 
