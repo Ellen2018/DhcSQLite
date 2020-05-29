@@ -94,7 +94,7 @@ Father类：
     private Father father2;
 
     //什么注解也不加，框架内部就会以JSON映射方式进行处理
-    private Father father2;
+    private Father father3;
 
 - @SqlType(不再建议使用) 
  
