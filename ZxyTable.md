@@ -106,6 +106,8 @@ Father类：
 
     INTEGER("integer"),
     BIG_INT("bigint"),
+    LONG_TEXT("longtext"),
+    MEDIUM_TEXT("mediumtext"),
     TEXT("text"),
     REAL("real"),
     BLOB("blob"),
@@ -731,3 +733,4 @@ Father类：
                 return json;
             }
         });
+
