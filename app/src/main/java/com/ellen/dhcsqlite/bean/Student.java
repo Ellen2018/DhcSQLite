@@ -19,6 +19,7 @@ public class Student {
 
     //主键
     @MajorKey(isAutoIncrement = true)
+    @DhcSqlFieldName(sqlFieldName = "sssssid")
     private int id;
     @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
     @EndAutoString("CHECK(my_name like 'Ellen%')")

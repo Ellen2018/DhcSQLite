@@ -211,7 +211,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
             if (isAutoIncrement) {
                 List<SQLField> currentSqlFieldList = new ArrayList<>();
                 for (SQLField sqlField : sqlFieldList) {
-                    if (!sqlField.getName().equals(majorKeyField.getName())) {
+                    if (!sqlField.getName().equals(majorKeySqlField.getName())) {
                         currentSqlFieldList.add(sqlField);
                     }
                 }
