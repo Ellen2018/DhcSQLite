@@ -123,6 +123,8 @@ public class NewActivtiy extends Activity {
         }
         studentTable.saveData(studentList);
 
+        studentTable.getAutoDesignOperate().update1("新的名字","Ellen2018_0");
+
         String whereSql = Where.getInstance(false).addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 3).createSQL();
 
         for (Student student1 : studentTable.getAllData()) {

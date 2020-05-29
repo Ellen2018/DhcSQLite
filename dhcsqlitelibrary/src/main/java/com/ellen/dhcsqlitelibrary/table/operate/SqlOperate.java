@@ -87,6 +87,21 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     }
 
     /**
+     * 判断是否是主键且自增
+     *
+     * @return
+     */
+    protected boolean isHaveMajorKeyAndAuto() {
+        boolean isHaveMajorAndAuto = false;
+        if (majorKeySqlField != null) {
+            if (isAutoIncrement) {
+                isHaveMajorAndAuto = true;
+            }
+        }
+        return isHaveMajorAndAuto;
+    }
+
+    /**
      * 进行解析
      */
     private void parsing() {
@@ -96,9 +111,9 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
             SQLFieldType sqlFieldType = typeSupport.setSQLiteType(field);
             SQLField sqlField = handlerSqlField(field, typeSupport.setSqlFieldName(field), sqlFieldType.getSQLFieldTypeString());
             sqlNameMap.put(sqlField, field);
-            for(SQLField s:sqlFieldList){
-                if(s.getName().equals(sqlField.getName())){
-                    throw new SqlFieldDuplicateException("存在重复字段名:"+sqlField.getName()+"");
+            for (SQLField s : sqlFieldList) {
+                if (s.getName().equals(sqlField.getName())) {
+                    throw new SqlFieldDuplicateException("存在重复字段名:" + sqlField.getName() + "");
                 }
             }
             sqlFieldList.add(sqlField);
@@ -177,21 +192,17 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         AddSingleRowToTable addSingleRowToTable = getAddSingleRowToTable();
         addSingleRowToTable.setTableName(getTableName());
         for (int i = 0; i < sqlFieldList.size(); i++) {
+            SQLField sqlField = sqlFieldList.get(i);
             Field field = sqlNameMap.get(sqlFieldList.get(i));
             Object value = null;
             TypeSupport typeSupport = getTypeSupport(field);
             value = typeSupport.toValue(field, reflectHelper.getValue(data, field));
-            //先判断是否有主键
-            if (majorKeyField != null) {
-                if (majorKeySqlField.getName().equals(sqlFieldList.get(i).getName())) {
-                    //当前是主键
-                    if (!isAutoIncrement) {
-                        addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
-                    }
-                } else {
+            //先判断是否有主键且自增
+            if (isHaveMajorKeyAndAuto()) {
+                if(!sqlField.getName().equals(majorKeySqlField.getName())) {
                     addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
                 }
-            } else {
+            }else {
                 addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
             }
         }
@@ -206,20 +217,14 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         }
         AddManyRowToTable addManyRowToTable = getAddManyRowToTable();
         addManyRowToTable.setTableName(getTableName());
-        boolean isAddMajorKeyValue = true;
-        if (majorKeySqlField != null) {
-            if (isAutoIncrement) {
-                List<SQLField> currentSqlFieldList = new ArrayList<>();
-                for (SQLField sqlField : sqlFieldList) {
-                    if (!sqlField.getName().equals(majorKeySqlField.getName())) {
-                        currentSqlFieldList.add(sqlField);
-                    }
+        if (isHaveMajorKeyAndAuto()) {
+            List<SQLField> currentSqlFieldList = new ArrayList<>();
+            for (SQLField sqlField : sqlFieldList) {
+                if (!sqlField.getName().equals(majorKeySqlField.getName())) {
+                    currentSqlFieldList.add(sqlField);
                 }
-                addManyRowToTable.addFieldList(currentSqlFieldList);
-                isAddMajorKeyValue = false;
-            } else {
-                addManyRowToTable.addFieldList(sqlFieldList);
             }
+            addManyRowToTable.addFieldList(currentSqlFieldList);
         } else {
             addManyRowToTable.addFieldList(sqlFieldList);
         }
@@ -229,14 +234,14 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
                 Field field = sqlNameMap.get(sqlFieldList.get(j));
                 Object value = null;
                 TypeSupport typeSupport = getTypeSupport(field);
-                value = typeSupport.toValue(field,reflectHelper.getValue(dataList.get(i),field));
+                value = typeSupport.toValue(field, reflectHelper.getValue(dataList.get(i), field));
                 //此处可以添加记录数据库数据之前的操作:加密数据等
-                if (isAddMajorKeyValue) {
-                    list.add(value);
-                } else {
+                if (isHaveMajorKeyAndAuto()) {
                     if (!sqlFieldList.get(j).getName().equals(majorKeySqlField.getName())) {
                         list.add(value);
                     }
+                } else {
+                    list.add(value);
                 }
             }
             addManyRowToTable.addValueList(list);
@@ -511,35 +516,14 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         String whereSql = Where.getInstance(false)
                 .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, reflectHelper.getValue(t, majorKeyField))
                 .createSQL();
-        update(t,whereSql);
+        update(t, whereSql);
     }
 
     @Override
     public int updateReturnCount(T t, String whereSQL) {
         int count = getSearchDataCount(whereSQL);
         if (count > 0) {
-            UpdateTableDataRow updateTableDataRow = getUpdateTableDataRow();
-            updateTableDataRow.setTableName(getTableName());
-            for (int i = 0; i < sqlFieldList.size(); i++) {
-                String fieldName = sqlFieldList.get(i).getName();
-                Field field = sqlNameMap.get(sqlFieldList.get(i));
-                Object value = null;
-                TypeSupport typeSupport = getTypeSupport(field);
-                value = typeSupport.toValue(field, reflectHelper.getValue(t, field));
-                if(majorKeySqlField != null){
-                    if(field.getName().equals(majorKeyField.getName())){
-                        if(!isAutoIncrement){
-                            updateTableDataRow.addSetValue(fieldName, value);
-                        }
-                    }else {
-                        updateTableDataRow.addSetValue(fieldName, value);
-                    }
-                }else {
-                    updateTableDataRow.addSetValue(fieldName, value);
-                }
-            }
-            String updateSql = updateTableDataRow.createSQLAutoWhere(whereSQL);
-            exeSql(updateSql);
+            update(t, whereSQL);
             return count;
         } else {
             return 0;
@@ -552,19 +536,18 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         updateTableDataRow.setTableName(getTableName());
         for (int i = 0; i < sqlFieldList.size(); i++) {
             String fieldName = sqlFieldList.get(i).getName();
+            SQLField sqlField = sqlFieldList.get(i);
             Field field = sqlNameMap.get(sqlFieldList.get(i));
             Object value = null;
             TypeSupport typeSupport = getTypeSupport(field);
             value = typeSupport.toValue(field, reflectHelper.getValue(t, field));
-            if(majorKeySqlField != null){
-                if(field.getName().equals(majorKeyField.getName())){
-                    if(!isAutoIncrement){
-                        updateTableDataRow.addSetValue(fieldName, value);
-                    }
-                }else {
+            if (isHaveMajorKeyAndAuto()) {
+                //不更新主键
+                if (!sqlField.getName().equals(majorKeySqlField.getName())) {
+                    //不是主键
                     updateTableDataRow.addSetValue(fieldName, value);
                 }
-            }else {
+            } else {
                 updateTableDataRow.addSetValue(fieldName, value);
             }
         }

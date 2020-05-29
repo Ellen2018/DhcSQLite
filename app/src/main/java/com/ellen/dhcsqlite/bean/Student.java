@@ -22,7 +22,6 @@ public class Student {
     @DhcSqlFieldName(sqlFieldName = "sssssid")
     private int id;
     @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
-    @EndAutoString("CHECK(my_name like 'Ellen%')")
     private String name;
     @DhcSqlFieldName(sqlFieldName = "your_age")
     @Default(defaultValueEnum = DefaultValueEnum.BYTE,byteValue = 3)

@@ -23,7 +23,6 @@ public class BaseOperate<T> extends ZxySqlCreate {
 
     protected SQLiteDatabase db;
 
-
     protected Class dataClass;
     protected List<SQLField> sqlFieldList;
     protected HashMap<SQLField, Field> sqlNameMap;
