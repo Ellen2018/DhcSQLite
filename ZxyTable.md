@@ -560,7 +560,7 @@ Father类：
 - 修改数据(只修改表中的部分值)
 
         //自定义updateSql进行修改数据
-        //将your_age > 20岁年龄的数据的 age 的值全部修改为 your_age = 18,my_name = "永远18岁"
+        //将your_age > 20岁年龄的数据的部分值全部修改为 your_age = 18,my_name = "永远18岁"
         String whereSqlByAge =
                 Where.getInstance(false)
                         .addAndWhereValue("your_age", WhereSymbolEnum.MORE_THAN, 20)
@@ -576,7 +576,7 @@ Father类：
 
 ## 3.6 查询语句
 
-- 查询单数据(根据主建进行查询)
+- 查询单数据(根据主键进行查询)
         
         //查询主键为3的数据，没有返回为null
         Student student = studentTable.searchByMajorKey(3);
@@ -604,7 +604,7 @@ Father类：
                 .createSQL();
 
         //查询表中所有数据，没有排列顺序
-        List<Student> studentList1 = studentTable.getAllData(null);
+        List<Student> studentList1 = studentTable.getAllData();
         //查询表中所有数据，根据your_age进行排序(Desc方式)
         List<Student> studentList2 = studentTable.getAllData(orderSql);
 
