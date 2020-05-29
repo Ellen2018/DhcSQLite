@@ -87,6 +87,7 @@ public class NewActivtiy extends Activity {
             studentTable.deleteTable();
         }
 
+        
         Log.e("Ellen2018", "表是否存在:" + studentTable.isExist());
 
         studentTable.onCreateTableIfNotExits(new OnCreateTableCallback() {
