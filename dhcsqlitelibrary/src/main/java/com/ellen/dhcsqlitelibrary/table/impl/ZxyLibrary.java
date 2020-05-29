@@ -96,7 +96,11 @@ public abstract class ZxyLibrary implements BaseZxyLibrary {
                 .setTableName(tableName)
                 .createSQL();
         Cursor cursor = zxySQLiteHelper.getWritableDatabase().rawQuery(searchTableExistSql, null);
-        return cursor.getCount() != 0;
+        int count = cursor.getCount();
+        if(cursor != null){
+            cursor.close();
+        }
+        return count != 0;
     }
 
     @Override
@@ -128,6 +132,9 @@ public abstract class ZxyLibrary implements BaseZxyLibrary {
                 stringList.add(name);
             }
 
+        }
+        if(cursor != null){
+            cursor.close();
         }
         if (stringList.size() > 0) {
             String[] stringArray = new String[stringList.size()];

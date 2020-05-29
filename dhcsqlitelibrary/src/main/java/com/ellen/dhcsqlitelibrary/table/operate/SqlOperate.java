@@ -407,7 +407,11 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
                 .setTableName(getTableName())
                 .createSQL();
         Cursor cursor = db.rawQuery(searchTableExistSql, null);
-        return cursor.getCount() != 0;
+        int count = cursor.getCount();
+        if(cursor != null){
+            cursor.close();
+        }
+        return count != 0;
     }
 
     @Override
@@ -570,6 +574,9 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
                 .setNewTableName(newName)
                 .createSQL();
         exeSql(reNameTableSql);
+        if(cursor != null){
+            cursor.close();
+        }
         return true;
     }
 
