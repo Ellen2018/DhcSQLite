@@ -420,7 +420,7 @@ Father类：
         studentTable.setDebugListener(new DebugListener() {
             @Override
             public void exeSql(String sql) {
-                //sql是框架没执行一个sql语句都会回调这里
+                //sql是框架每执行一个sql语句都会回调这里
                 //您可以以debug的方式输出这些sql语句方便您进行调试
             }
         });
