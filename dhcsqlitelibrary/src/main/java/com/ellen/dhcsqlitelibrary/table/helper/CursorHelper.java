@@ -27,6 +27,28 @@ public class CursorHelper<T> {
             } else {
                 value = cursor.getDouble(index);
             }
+        } else if(sqlDataType.equals(SQLFieldTypeEnum.MEDIUM_TEXT.getTypeName())){
+            if (type == Character.class || type.getName().equals("char")) {
+                String str = cursor.getString(index);
+                if (str != null) {
+                    value = cursor.getString(index).charAt(0);
+                } else {
+                    value = null;
+                }
+            } else {
+                value = cursor.getString(index);
+            }
+        } else if(sqlDataType.equals(SQLFieldTypeEnum.LONG_TEXT.getTypeName())){
+            if (type == Character.class || type.getName().equals("char")) {
+                String str = cursor.getString(index);
+                if (str != null) {
+                    value = cursor.getString(index).charAt(0);
+                } else {
+                    value = null;
+                }
+            } else {
+                value = cursor.getString(index);
+            }
         } else if (sqlDataType.equals(SQLFieldTypeEnum.TEXT.getTypeName())) {
             if (type == Character.class || type.getName().equals("char")) {
                 String str = cursor.getString(index);
