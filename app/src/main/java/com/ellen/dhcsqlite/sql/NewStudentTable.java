@@ -34,6 +34,6 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
 
     @Override
     protected JsonLibraryType getJsonLibraryType() {
-        return JsonLibraryType.FastJson;
+        return JsonLibraryType.Gson;
     }
 }

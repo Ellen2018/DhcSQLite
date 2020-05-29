@@ -37,7 +37,7 @@ public class JsonHelper implements JsonFormat {
                 if (gsonClass != null) {
                     jsonFormat = new GsonFormat(getT(gsonClass));
                 } else if (fastJsonClass != null) {
-                    jsonFormat = new FastJsonFormat();
+                    jsonFormat = new FastJsonFormat(fastJsonClass);
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
