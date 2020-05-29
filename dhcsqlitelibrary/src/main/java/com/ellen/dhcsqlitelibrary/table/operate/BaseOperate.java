@@ -26,8 +26,8 @@ public class BaseOperate<T> extends ZxySqlCreate {
     protected Class dataClass;
     protected List<SQLField> sqlFieldList;
     protected HashMap<SQLField, Field> sqlNameMap;
-    protected CursorHelper cursorHelper;
-    protected ReflectHelper<T> reflectHelper;
+    protected CursorHelper<T> cursorHelper;
+    protected ReflectHelper<T> reflectHelper = null;
     protected DebugListener debugListener;
 
     //数据类型支持
@@ -48,17 +48,16 @@ public class BaseOperate<T> extends ZxySqlCreate {
         interceptList.add(0, intercept);
     }
 
-    public void removeIntercept(TypeSupport typeSupport){
+    public void removeIntercept(Intercept intercept){
         if(interceptList == null){
             return;
         }else {
-            interceptList.remove(typeSupport);
+            interceptList.remove(intercept);
         }
     }
 
     public BaseOperate(SQLiteDatabase db) {
         this.db = db;
-        cursorHelper = new CursorHelper();
     }
 
     protected void exeSql(String sql) {

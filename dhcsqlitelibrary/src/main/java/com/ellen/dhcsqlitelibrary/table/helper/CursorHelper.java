@@ -1,17 +1,19 @@
 package com.ellen.dhcsqlitelibrary.table.helper;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.lang.reflect.Field;
 
-public class CursorHelper {
+public class CursorHelper<T> {
 
     public Object readValueFromCursor(Cursor cursor, Field field, SQLField sqlField, String sqlDataType){
         Object value = null;
         int index = cursor.getColumnIndex(sqlField.getName());
+        if(index < 0)return null;
         Class type = field.getType();
         if (sqlDataType.equals(SQLFieldTypeEnum.INTEGER.getTypeName())) {
             value = cursor.getInt(index);

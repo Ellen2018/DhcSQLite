@@ -122,10 +122,10 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     /**
      * 移除拦截
-     * @param typeSupport
+     * @param intercept
      */
-    public void removeIntercept(TypeSupport typeSupport) {
-        sqlOperate.removeIntercept(typeSupport);
+    public void removeIntercept(Intercept intercept) {
+        sqlOperate.removeIntercept(intercept);
     }
 
     public O getAutoDesignOperate() {

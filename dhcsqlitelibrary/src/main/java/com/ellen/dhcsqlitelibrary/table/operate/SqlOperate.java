@@ -579,7 +579,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     }
 
     @Override
-    public void removeIntercept(TypeSupport typeSupport) {
-        super.removeIntercept(typeSupport);
+    public void removeIntercept(Intercept intercept) {
+        super.removeIntercept(intercept);
     }
 }

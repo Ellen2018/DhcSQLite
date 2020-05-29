@@ -46,7 +46,7 @@ public class BasicTypeSupport implements TypeSupport {
                 sqlField = new SQLFieldType(sqlFieldTypeEnum, null);
             } else {
                 //不是 抛出异常
-                throw new BoolNoCanSaveException("布尔值类型只能映射为基本类型，您映射的类型:" + booleanSaveValue.getClass().getName() + " 不被支持!");
+                throw new BoolNoCanSaveException("布尔值类型只能映射为基本类型或者String类型，您映射的类型:" + booleanSaveValue.getClass().getName() + " 不被支持!");
             }
         } else {
             sqlField = new SQLFieldType(reflectHelper.getSqlStringType(field.getType()), null);
@@ -62,8 +62,11 @@ public class BasicTypeSupport implements TypeSupport {
     @Override
     public Object toObj(Field field, Object sqlValue) {
         if (reflectHelper.isBooleanType(field)) {
-            if(sqlValue == null){
+            if(sqlValue == null && field.getType() == Boolean.class){
                 return null;
+            }
+            if(sqlValue == null && field.getType().getName().equals("boolean")){
+                return false;
             }
             Object trueValue = setBooleanValue.setBooleanValue(field.getName(), true);
             if (trueValue.getClass() == Character.class) {
@@ -83,7 +86,11 @@ public class BasicTypeSupport implements TypeSupport {
                 return false;
             }
         } else {
-            return sqlValue;
+            if(sqlValue == null){
+                return reflectHelper.getDefaultValue(field.getType());
+            }else {
+                return sqlValue;
+            }
         }
     }
 

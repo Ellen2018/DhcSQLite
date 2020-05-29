@@ -128,6 +128,9 @@ public class ObjectTypeSupport implements TypeSupport {
         Operate operate = field.getAnnotation(Operate.class);
         Class typeClass = field.getType();
         Object object = null;
+        if(sqlValue == null){
+            return null;
+        }
         if (operate != null) {
             String filedName = operate.valueName();
             OperateEnum operateEnum = operate.operate();
@@ -162,6 +165,9 @@ public class ObjectTypeSupport implements TypeSupport {
         Operate operate = field.getAnnotation(Operate.class);
         Object value = null;
         Class typeClass = field.getType();
+        if(dataValue == null){
+            return null;
+        }
         if (operate != null) {
             //先看转换类型的操作
             OperateEnum operateEnum = operate.operate();

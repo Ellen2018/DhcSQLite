@@ -44,7 +44,7 @@ public interface MyAutoDesignOperate extends AutoDesignOperate {
     @SearchByMajorKey(whereSql = "{} > @id_value")
     List<Student> searchByMajorKey(@Value("id_value") int id_value);
 
-    @TotalSql(sql = "SELECT * FROM Student WHERE my_name = '@name'",isReturnValue = true)
+    @TotalSql(sql = "SELECT id,my_name,father FROM Student WHERE my_name = '@name'",isReturnValue = true)
     List<Student> getStudentByName(@Value("name") String name);
 
     @TotalSql(sql = "DELETE FROM Student WHERE id = @id_value and my_name = '@name';")

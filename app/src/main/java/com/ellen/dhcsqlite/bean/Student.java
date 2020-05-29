@@ -19,7 +19,7 @@ public class Student {
 
     //主键
     @MajorKey(isAutoIncrement = true)
-    @DhcSqlFieldName(sqlFieldName = "sssssid")
+    @DhcSqlFieldName(sqlFieldName = "id")
     private int id;
     @DhcSqlFieldName(sqlFieldName = "my_name") //映射数据库中字段名字为my_name
     private String name;
@@ -32,7 +32,7 @@ public class Student {
     @Ignore //不映射这个属性到数据库中
     private String ingoreString;
     @DhcSqlFieldName(sqlFieldName = "真不真")
-    private boolean isMan;
+    private Boolean isMan;
     @Operate(operate = OperateEnum.VALUE,valueName = "student")
     private Father father;
     private Father father2;
