@@ -17,6 +17,7 @@ import com.ellen.sqlitecreate.createsql.where.WhereIn;
 
 /**
  * SQL语句制作封装类
+ * 能完成大部分SQL语句的拼接
  */
 public class ZxySqlCreate {
 
