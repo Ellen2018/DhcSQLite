@@ -35,49 +35,10 @@ public class NewActivtiy extends Activity {
         SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
         NewStudentTable studentTable = new NewStudentTable(sqLiteDatabase);
 
-        studentTable.addIntercept(new Intercept<Boolean,String>() {
-            @Override
-            public SQLFieldType setSQLiteType(Field field) {
-                return new SQLFieldType(SQLFieldTypeEnum.TEXT,1);
-            }
-
-            @Override
-            public boolean isType(Field field) {
-                return field.getType() == Boolean.class || field.getType().getName().equals("boolean");
-            }
-
-            @Override
-            public Boolean toObj(Field field, String sqlValue) {
-                if(sqlValue != null) {
-                    if (sqlValue.equals("真的")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }else {
-                    return null;
-                }
-            }
-
-            @Override
-            public String toValue(Field field, Boolean dataValue) {
-                if(dataValue != null){
-                    if(dataValue){
-                        return "真的";
-                    }else {
-                        return "假的";
-                    }
-                }else {
-                    return null;
-                }
-            }
-        });
-
         if (studentTable.isExist()) {
             studentTable.deleteTable();
         }
-
-
+        
         Log.e("Ellen2018", "表是否存在:" + studentTable.isExist());
 
         studentTable.onCreateTableIfNotExits(new OnCreateTableCallback() {

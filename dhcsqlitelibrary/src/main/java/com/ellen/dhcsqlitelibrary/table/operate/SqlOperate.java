@@ -407,7 +407,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         String searchTableExistSql = SerachTableExist.getInstance()
                 .setTableName(getTableName())
                 .createSQL();
-        Cursor cursor = db.rawQuery(searchTableExistSql, null);
+        Cursor cursor = searchReturnCursor(searchTableExistSql);
         int count = cursor.getCount();
         if(cursor != null){
             cursor.close();

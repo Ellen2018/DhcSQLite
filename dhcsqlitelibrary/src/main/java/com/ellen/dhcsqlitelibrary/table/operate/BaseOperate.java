@@ -90,6 +90,16 @@ public class BaseOperate<T> extends ZxySqlCreate {
         return getDataByCursor(db.rawQuery(sql, null));
     }
 
+    protected Cursor searchReturnCursor(String sql){
+        if (debugListener != null) {
+            debugListener.exeSql(sql);
+        }
+        if(totalListener != null){
+            totalListener.exeSql(zxyTable.getTableName(),sql);
+        }
+        return db.rawQuery(sql, null);
+    }
+
     private List<T> getDataByCursor(Cursor cursor) {
         List<T> dataList = new ArrayList<>();
         while (cursor.moveToNext()) {
