@@ -666,7 +666,112 @@ Father类：
             }
         });
 
-我们还可以利用这个拦截修改我们的基本类型的映射，我想把属性名为isMan且为boolean类型以"真的"(true)和"假的"(false)进行映射，代码如下:  
+下面我来讲解一下这些方法的作用: 
+
+- SQLFieldType setSQLiteType(Field field)
+
+&emsp;&emsp;此方法的作用就是为拦截的类型设置数据库中的字段类型，比如您想将它映射为长文本类型，且数据长度不限制，那么您应该这么写：  
+
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                return new SQLFieldType(SQLFieldTypeEnum.LONG_TEXT,null);
+            }
+
+关于这个SQLFieldType它是负责数据库字段类型的一个类，它有两个构造器SQLFieldType(SQLFieldTypeEnum,Integer)和SQLFieldType(String,Integer)，两个构成器的第二个参数指定的是数据长度，例如，我想将数据长度限制在100，且字段类型为TEXT，您可以这么写：
+
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                return new SQLFieldType(SQLFieldTypeEnum.TEXT,100);
+            }
+
+也可以这么写:
+
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                return new SQLFieldType("TEXT",100);
+            }
+
+Field为反射出的Field属性,它可以用来区分不同的属性类型，比如，我现在不单单只想拦截Father类型的映射，我还想拦截String类型的映射，但是我也不想写两个拦截器，那么如何写呢,代码如下:  
+
+            @Override
+            public SQLFieldType setSQLiteType(Field field) {
+                if(field.getType() == Father.class){
+                    ......
+                }else {
+                    ......
+                }
+            }
+
+
+传入SQLFieldTypeEnum的那个，笔者封装了以下类型:  
+
+    INTEGER("integer"),
+    BIG_INT("bigint"),
+    LONG_TEXT("longtext"),
+    MEDIUM_TEXT("mediumtext"),
+    TEXT("text"),
+    REAL("real"),
+    BLOB("blob"),
+    NUMERIC("numeric"),
+    DATE("date");
+
+
+
+如果这些封装的类型不满足您的要求，你可以通过SQLFieldType(String,Integer)构造器构建出您想要的任何类型。
+
+- boolean isType(Field field)
+
+&emsp;&emsp;这个方法非常重要，它指定您要拦截的类型，根据Field来判断此类型是否拦截，比如上方我们需要在拦截器中拦截Father类型和String类型，那么我们可以这么写：  
+
+            @Override
+            public boolean isType(Field field) {
+                return field.getType() == String.class || field.getType() == Father.class;
+            }
+
+- E toValue(Field field, T dataValue)
+
+&emsp;&emsp;此方法的作用就是将bean对象中的根据isType判断为true的属性值映射成数据库中存储的值，这里如何转换要看您上面方法setSQLiteType指定的数据库中的字段类型，由于上面我将Father和String都已TEXT类型保存，那么我这里就将Father进行Json映射保存，String直接保存即可:   
+
+            @Override
+            public Object toValue(Field field, Object dataValue) {
+                if(field.getType() == String.class){
+                    //String类型的保存
+                    return dataValue;
+                }else {
+                    //Father类型的保存
+                    //注意有些类型一定要进行null判断，如果不判断，可能引起异常
+                    if(dataValue != null) {
+                        Father father = (Father) dataValue;
+                        return new Gson().toJson(father);
+                    }else {
+                        return null;
+                    }
+                }
+            }
+
+
+- T toObj(Field field, E sqlValue)
+
+&emsp;&emsp;这个方法的作用就是将数据库读取出来的值sqlValue恢复成对应的bean类中的T类型的值，比如我现在要恢复上方的Father和String，那么我应该这么写:  
+
+            @Override
+            public Object toObj(Field field, Object sqlValue) {
+                if(field.getType() == String.class){
+                    //恢复sqlValue
+                    return sqlValue;
+                }else {
+                    //因为笔者上面用的Json进行的映射，所以这里使用json进行解析
+                    if(sqlValue != null) {
+                        String json = (String) sqlValue;
+                        Father father = new Gson().fromJson(json, Father.class);
+                        return father;
+                    }else {
+                        return null;
+                    }
+                }
+            }
+
+所有方法已经介绍完成,我们还可以利用这个拦截修改我们的基本类型的映射，我想把属性名为isMan且为boolean类型以"真的"(true)和"假的"(false)进行映射，代码如下:  
 
         studentTable.addIntercept(new Intercept<Boolean,String>() {
            
