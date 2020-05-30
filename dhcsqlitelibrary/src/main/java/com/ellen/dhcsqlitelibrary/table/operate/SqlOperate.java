@@ -15,6 +15,7 @@ import com.ellen.dhcsqlitelibrary.table.exception.SqlFieldDuplicateException;
 import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
+import com.ellen.dhcsqlitelibrary.table.impl.TotalListener;
 import com.ellen.dhcsqlitelibrary.table.operate.add.Add;
 import com.ellen.dhcsqlitelibrary.table.operate.create.Create;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
@@ -61,7 +62,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     public SqlOperate(SQLiteDatabase db, Class<T> dataClass, JsonHelper jsonHelper,
                       ReflectHelper<T> reflectHelper, DataStructureSupport dataStructureSupport,
                       BasicTypeSupport basicTypeSupport, ZxyTable zxyTable) {
-        super(db);
+        super(db,zxyTable);
         this.dataClass = dataClass;
         this.jsonHelper = jsonHelper;
         this.reflectHelper = reflectHelper;

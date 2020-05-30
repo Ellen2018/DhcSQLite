@@ -11,6 +11,8 @@ import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlite.bean.Student;
 import com.ellen.dhcsqlite.sql.AppLibrary;
 import com.ellen.dhcsqlite.sql.NewStudentTable;
+import com.ellen.dhcsqlitelibrary.table.impl.TotalListener;
+import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
@@ -32,14 +34,7 @@ public class NewActivtiy extends Activity {
         zxyLibrary.clearLibrary();
         SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
         NewStudentTable studentTable = new NewStudentTable(sqLiteDatabase);
-
-        studentTable.setDebugListener(new DebugListener() {
-            @Override
-            public void exeSql(String sql) {
-                Log.e("Ellen2018","执行sql语句:"+sql);
-            }
-        });
-
+        
         studentTable.addIntercept(new Intercept<Boolean,String>() {
             @Override
             public SQLFieldType setSQLiteType(Field field) {

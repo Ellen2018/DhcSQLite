@@ -51,9 +51,6 @@ bean类代码：
 &emsp;&emsp;TreeMap
 - 其它任意非数据结构类型的引用类型(例如上面代码中的Father)
 
-
-
-
 关于这些注解的说明
 
 - @Ignore 
@@ -282,14 +279,9 @@ Father类：
         @Override
         protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
           if(classFieldName.equals("fathers")){
-                Type founderSetType = new TypeToken<List<Father>>() {}.getType();
-                List<Father> fathers = new Gson().fromJson(json, founderSetType);
-                Father[] fathers1 = new Father[fathers.size()];
-                for(int i=0;i<fathers.size();i++){
-                    fathers1[i] = fathers.get(i);
-                }
-                return fathers1;
-
+                Type founderSetType = new TypeToken<Father[]>() {}.getType();
+                Father[] fathers = new Gson().fromJson(json, founderSetType);         
+                return fathers;
             }
             return null;
         }
@@ -363,19 +355,15 @@ Father类：
 
 &emsp;&emsp;此方法的作用从名字上就可以看出，它是将数据库中的json数据转化为数据结构的，由于笔者不知道你要恢复的数据结构，比如您的属性为List<Father>,虽然笔者知道您的数据结构类型为List,但我无法知道你要将它恢复成ArrayList还是LikedList等，所以此处的逻辑交给您来完成比较好，逻辑也很简单，只需要根据classFieldName和json进行解析，解析成你想要的数据结构类型，然后进行返回即可。比如bean类属性中有个Father[] fathers的数组数据类型结构的数据，那么恢复的示例代码如下:  
 
-    protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
-      if(classFieldName.equals("fathers")){
-            Type founderSetType = new TypeToken<List<Father>>() {}.getType();
-            List<Father> fathers = new Gson().fromJson(json, founderSetType);
-            Father[] fathers1 = new Father[fathers.size()];
-            for(int i=0;i<fathers.size();i++){
-                fathers1[i] = fathers.get(i);
+        @Override
+        protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
+          if(classFieldName.equals("fathers")){
+                Type founderSetType = new TypeToken<Father[]>() {}.getType();
+                Father[] fathers = new Gson().fromJson(json, founderSetType);         
+                return fathers;
             }
-            return fathers1;
-
+            return null;
         }
-        return null;
-    }
 
 
 # 3.详细操作

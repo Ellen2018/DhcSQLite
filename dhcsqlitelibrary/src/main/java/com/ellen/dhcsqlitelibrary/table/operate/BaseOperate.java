@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
+import com.ellen.dhcsqlitelibrary.table.impl.TotalListener;
+import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
+import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
 import com.ellen.dhcsqlitelibrary.table.type.Intercept;
@@ -36,6 +39,12 @@ public class BaseOperate<T> extends ZxySqlCreate {
     protected ObjectTypeSupport objectTypeSupport;
 
     protected List<Intercept> interceptList;
+    private static TotalListener totalListener;
+    private ZxyTable zxyTable;
+
+    public static void setTotalListener(TotalListener totalListener) {
+        BaseOperate.totalListener = totalListener;
+    }
 
     public void setDebugListener(DebugListener debugListener) {
         this.debugListener = debugListener;
@@ -56,13 +65,17 @@ public class BaseOperate<T> extends ZxySqlCreate {
         }
     }
 
-    public BaseOperate(SQLiteDatabase db) {
+    public BaseOperate(SQLiteDatabase db,ZxyTable zxyTable) {
         this.db = db;
+        this.zxyTable = zxyTable;
     }
 
     protected void exeSql(String sql) {
         if (debugListener != null) {
             debugListener.exeSql(sql);
+        }
+        if(totalListener != null){
+            totalListener.exeSql(zxyTable.getTableName(),sql);
         }
         db.execSQL(sql);
     }
@@ -70,6 +83,9 @@ public class BaseOperate<T> extends ZxySqlCreate {
     protected List<T> search(String sql) {
         if (debugListener != null) {
             debugListener.exeSql(sql);
+        }
+        if(totalListener != null){
+            totalListener.exeSql(zxyTable.getTableName(),sql);
         }
         return getDataByCursor(db.rawQuery(sql, null));
     }

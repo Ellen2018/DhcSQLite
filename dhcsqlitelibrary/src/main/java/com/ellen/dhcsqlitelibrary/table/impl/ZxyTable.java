@@ -2,10 +2,10 @@ package com.ellen.dhcsqlitelibrary.table.impl;
 
 
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
+import com.ellen.dhcsqlitelibrary.table.operate.BaseOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
 import com.ellen.dhcsqlitelibrary.table.proxy.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.SqlOperate;
@@ -21,7 +21,6 @@ import com.ellen.dhcsqlitelibrary.table.proxy.AutoOperateProxy;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;
 import com.ellen.dhcsqlitelibrary.table.type.Intercept;
-import com.ellen.dhcsqlitelibrary.table.type.TypeSupport;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -88,6 +87,10 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     protected JsonLibraryType getJsonLibraryType() {
         return JsonLibraryType.Gson;
+    }
+
+    public static void setTotalListener(TotalListener totalListener) {
+       BaseOperate.setTotalListener(totalListener);
     }
 
     protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
