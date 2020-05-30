@@ -18,5 +18,6 @@ public class App extends Application {
                 Log.e("Ellen2018","全局监听("+tableName+"):"+sql);
             }
         });
+
     }
 }
