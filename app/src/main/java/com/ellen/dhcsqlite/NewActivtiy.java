@@ -34,7 +34,7 @@ public class NewActivtiy extends Activity {
         zxyLibrary.clearLibrary();
         SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
         NewStudentTable studentTable = new NewStudentTable(sqLiteDatabase);
-        
+
         studentTable.addIntercept(new Intercept<Boolean,String>() {
             @Override
             public SQLFieldType setSQLiteType(Field field) {

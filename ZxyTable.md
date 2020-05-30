@@ -403,13 +403,25 @@ Father类：
 
 ## 3.2 表本身相关操作
 
-- 方便调试监听
+- 方便调试监听 by 表监听(注意这种方式仅能监听当前表对象的sql)
 
+        //这种方式仅用于单表的操作监听，多表情况下请使用下面全局监听 
         studentTable.setDebugListener(new DebugListener() {
             @Override
             public void exeSql(String sql) {
                 //sql是框架每执行一个sql语句都会回调这里
                 //您可以以debug的方式输出这些sql语句方便您进行调试
+            }
+        });
+
+- 方便调试监听 by 全局监听(建议使用这种)
+
+        //全局监听
+        ZxyTable.setTotalListener(new TotalListener() {
+            @Override
+            public void exeSql(String tableName, String sql) {
+                //tableName为操作的表名
+               //sql为操作这张表的sql语句               
             }
         });
 
