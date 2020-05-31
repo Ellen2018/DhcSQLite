@@ -67,9 +67,7 @@ public class NewActivtiy extends Activity {
             studentList.add(student);
         }
         studentTable.saveData(studentList);
-
         studentTable.getAutoDesignOperate().update1("新的名字","Ellen2018_0");
-
         for (Student student1 : studentTable.getAllData()) {
             Log.e("Ellen2018", "数据:" + student1.toString());
         }
