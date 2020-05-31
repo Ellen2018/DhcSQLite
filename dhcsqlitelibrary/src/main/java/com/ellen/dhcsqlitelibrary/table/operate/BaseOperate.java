@@ -2,12 +2,9 @@ package com.ellen.dhcsqlitelibrary.table.operate;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
-import com.ellen.dhcsqlitelibrary.table.impl.TotalListener;
-import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.type.BasicTypeSupport;
 import com.ellen.dhcsqlitelibrary.table.type.DataStructureSupport;

@@ -15,7 +15,6 @@ import com.ellen.dhcsqlitelibrary.table.exception.SqlFieldDuplicateException;
 import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
-import com.ellen.dhcsqlitelibrary.table.impl.TotalListener;
 import com.ellen.dhcsqlitelibrary.table.operate.add.Add;
 import com.ellen.dhcsqlitelibrary.table.operate.create.Create;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;

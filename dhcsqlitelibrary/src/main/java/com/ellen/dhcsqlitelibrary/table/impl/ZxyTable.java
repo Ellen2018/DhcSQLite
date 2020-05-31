@@ -7,6 +7,7 @@ import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.operate.BaseOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
+import com.ellen.dhcsqlitelibrary.table.operate.TotalListener;
 import com.ellen.dhcsqlitelibrary.table.proxy.AutoDesignOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.SqlOperate;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;

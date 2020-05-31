@@ -3,7 +3,7 @@ package com.ellen.dhcsqlite;
 import android.app.Application;
 import android.util.Log;
 
-import com.ellen.dhcsqlitelibrary.table.impl.TotalListener;
+import com.ellen.dhcsqlitelibrary.table.operate.TotalListener;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 
 public class App extends Application {

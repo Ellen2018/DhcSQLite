@@ -11,16 +11,9 @@ import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlite.bean.Student;
 import com.ellen.dhcsqlite.sql.AppLibrary;
 import com.ellen.dhcsqlite.sql.NewStudentTable;
-import com.ellen.dhcsqlitelibrary.table.impl.TotalListener;
-import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
-import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
-import com.ellen.dhcsqlitelibrary.table.type.Intercept;
-import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
-import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
