@@ -1,7 +1,9 @@
 package com.ellen.dhcsqlitelibrary.table.proxy;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -14,6 +16,7 @@ import com.ellen.dhcsqlitelibrary.table.annotation.auto.Update;
 import com.ellen.dhcsqlitelibrary.table.annotation.auto.Value;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -30,20 +33,18 @@ public class AutoOperateProxy implements InvocationHandler {
         this.zxyTable = zxyTable;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private Map<String, Object> getArgValue(Method method, Object[] args) {
         Map<String, Object> map = new HashMap<>();
-        Parameter[] parameters = method.getParameters();
-        if (parameters.length > 0) {
-            for (int i = 0; i < args.length; i++) {
-                Value value = parameters[i].getAnnotation(Value.class);
+        Annotation[][] annotations = method.getParameterAnnotations();
+        if(annotations.length > 0){
+            for(int i= 0;i<annotations.length;i++){
+                Value value = (Value) annotations[i][0];
                 map.put(value.value(), args[i]);
             }
         }
         return map;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private String newSql(String sql, Method method, Object[] args) {
         if (args != null && args.length > 0) {
             Map<String, Object> valueMap = getArgValue(method, args);
@@ -55,7 +56,6 @@ public class AutoOperateProxy implements InvocationHandler {
         return sql;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //查询

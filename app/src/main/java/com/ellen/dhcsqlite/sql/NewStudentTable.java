@@ -17,12 +17,11 @@ import java.lang.reflect.Type;
 
 public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
 
-    public NewStudentTable(SQLiteDatabase db, String tableName) {
-        super(db, tableName);
-    }
+    private SQLiteDatabase db;
 
     public NewStudentTable(SQLiteDatabase db) {
         super(db);
+        this.db = db;
         this.addIntercept(new Intercept() {
             @Override
             public SQLFieldType setSQLiteType(Field field) {
