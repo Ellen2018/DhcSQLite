@@ -181,6 +181,11 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     }
 
     @Override
+    public void saveData(List<T> dataList, int segment) {
+        sqlOperate.saveData(dataList,segment);
+    }
+
+    @Override
     public List<T> search(String whereSQL, String orderSQL) {
         return sqlOperate.search(whereSQL, orderSQL);
     }

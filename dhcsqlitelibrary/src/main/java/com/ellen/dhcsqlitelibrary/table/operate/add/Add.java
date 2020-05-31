@@ -26,4 +26,12 @@ public interface Add<T> {
      * @param data
      */
     void saveDataAndDeleteAgo(T data);
+
+    /**
+     * 分段存储您的数据
+     * 以防数据过多时，一条SQL语句太大了
+     * @param dataList
+     * @param segment
+     */
+    void saveData(List<T> dataList,int segment);
 }

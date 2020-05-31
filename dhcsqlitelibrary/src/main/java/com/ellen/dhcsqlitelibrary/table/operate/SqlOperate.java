@@ -189,6 +189,8 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         if (data == null) {
             return;
         }
+        //开启事务
+        db.beginTransaction();
         AddSingleRowToTable addSingleRowToTable = getAddSingleRowToTable();
         addSingleRowToTable.setTableName(getTableName());
         for (int i = 0; i < sqlFieldList.size(); i++) {
@@ -208,6 +210,9 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         }
         String addDataSql = addSingleRowToTable.createSQL();
         exeSql(addDataSql);
+        //事务已经执行成功
+        db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
     @Override
@@ -215,6 +220,51 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         if (dataList == null || dataList.size() == 0) {
             return;
         }
+        //开启事务
+        db.beginTransaction();
+        AddManyRowToTable addManyRowToTable = getAddManyRowToTable();
+        addManyRowToTable.setTableName(getTableName());
+        if (isHaveMajorKeyAndAuto()) {
+            List<SQLField> currentSqlFieldList = new ArrayList<>();
+            for (SQLField sqlField : sqlFieldList) {
+                if (!sqlField.getName().equals(majorKeySqlField.getName())) {
+                    currentSqlFieldList.add(sqlField);
+                }
+            }
+            addManyRowToTable.addFieldList(currentSqlFieldList);
+        } else {
+            addManyRowToTable.addFieldList(sqlFieldList);
+        }
+        for (int i = 0; i < dataList.size(); i++) {
+            List list = new ArrayList();
+            for (int j = 0; j < sqlFieldList.size(); j++) {
+                Field field = sqlNameMap.get(sqlFieldList.get(j));
+                Object value = null;
+                TypeSupport typeSupport = getTypeSupport(field);
+                value = typeSupport.toValue(field, reflectHelper.getValue(dataList.get(i), field));
+                //此处可以添加记录数据库数据之前的操作:加密数据等
+                if (isHaveMajorKeyAndAuto()) {
+                    if (!sqlFieldList.get(j).getName().equals(majorKeySqlField.getName())) {
+                        list.add(value);
+                    }
+                } else {
+                    list.add(value);
+                }
+            }
+            addManyRowToTable.addValueList(list);
+        }
+        String addDataSql = addManyRowToTable.createSQL();
+        exeSql(addDataSql);
+        //事务已经执行成功
+        db.setTransactionSuccessful();
+        db.endTransaction();
+    }
+
+    private void saveDataToSegment(List<T> dataList) {
+        if (dataList == null || dataList.size() == 0) {
+            return;
+        }
+
         AddManyRowToTable addManyRowToTable = getAddManyRowToTable();
         addManyRowToTable.setTableName(getTableName());
         if (isHaveMajorKeyAndAuto()) {
@@ -260,6 +310,25 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     public void saveDataAndDeleteAgo(T data) {
         clear();
         saveData(data);
+    }
+
+    @Override
+    public void saveData(List<T> dataList, int segmentCount) {
+        if(dataList == null && dataList.size() == 0){
+            return;
+        }
+        //开启事务
+        db.beginTransaction();
+        int current = 0;
+        int sCount = dataList.size() / segmentCount + 1;
+        for(int i =0;i<sCount;i++){
+            List<T> zList = dataList.subList(current,current + segmentCount);
+            saveDataToSegment(zList);
+            current = segmentCount * i;
+        }
+        //事务已经执行成功
+        db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
     @Override
