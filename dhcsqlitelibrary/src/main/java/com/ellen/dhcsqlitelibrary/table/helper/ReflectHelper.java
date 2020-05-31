@@ -141,7 +141,7 @@ public class ReflectHelper<T> {
     }
 
     /**
-     * 更具Value值判断它的类型
+     * 根据Value值判断它的类型
      * @param value
      * @return
      */

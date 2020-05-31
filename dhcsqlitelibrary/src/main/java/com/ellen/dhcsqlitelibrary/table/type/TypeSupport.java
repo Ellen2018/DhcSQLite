@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  * @param <T> T为您要拦截的类型，E为数据库中保存的类型
  * @param <E>
  */
-public abstract interface TypeSupport<T,E> {
+public interface TypeSupport<T,E> {
 
     /**
      * 设置该属性映射到数据库中的字段名字
