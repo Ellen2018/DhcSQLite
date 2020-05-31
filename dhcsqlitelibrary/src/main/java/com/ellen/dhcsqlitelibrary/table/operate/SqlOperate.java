@@ -61,7 +61,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     public SqlOperate(SQLiteDatabase db, Class<T> dataClass, JsonHelper jsonHelper,
                       ReflectHelper<T> reflectHelper, DataStructureSupport dataStructureSupport,
                       BasicTypeSupport basicTypeSupport, ZxyTable zxyTable) {
-        super(db,zxyTable);
+        super(db, zxyTable);
         this.dataClass = dataClass;
         this.jsonHelper = jsonHelper;
         this.reflectHelper = reflectHelper;
@@ -201,10 +201,10 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
             value = typeSupport.toValue(field, reflectHelper.getValue(data, field));
             //先判断是否有主键且自增
             if (isHaveMajorKeyAndAuto()) {
-                if(!sqlField.getName().equals(majorKeySqlField.getName())) {
+                if (!sqlField.getName().equals(majorKeySqlField.getName())) {
                     addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
                 }
-            }else {
+            } else {
                 addSingleRowToTable.addData(new Value(sqlFieldList.get(i).getName(), value));
             }
         }
@@ -312,19 +312,34 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         saveData(data);
     }
 
+    /**
+     * 分组存储
+     * 避免数据太多而导致SQL语句太长问题
+     * @param dataList 存储的集合
+     * @param segmentCount 每组的数目个数
+     */
     @Override
     public void saveData(List<T> dataList, int segmentCount) {
-        if(dataList == null && dataList.size() == 0){
+        if (dataList == null && dataList.size() == 0) {
             return;
         }
         //开启事务
         db.beginTransaction();
         int current = 0;
         int sCount = dataList.size() / segmentCount + 1;
-        for(int i =0;i<sCount;i++){
-            List<T> zList = dataList.subList(current,current + segmentCount);
-            saveDataToSegment(zList);
-            current = segmentCount * i;
+        if (sCount == 0 && segmentCount > dataList.size()) {
+            //当分组的数目大于集合本身
+            saveData(dataList);
+        } else {
+            for (int i = 0; i < sCount; i++) {
+                current = segmentCount * i;
+                int end = current + segmentCount;
+                if (end > dataList.size()) {
+                    end = dataList.size();
+                }
+                List<T> zList = dataList.subList(current, end);
+                saveDataToSegment(zList);
+            }
         }
         //事务已经执行成功
         db.setTransactionSuccessful();
@@ -477,7 +492,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
                 .createSQL();
         Cursor cursor = searchReturnCursor(searchTableExistSql);
         int count = cursor.getCount();
-        if(cursor != null){
+        if (cursor != null) {
             cursor.close();
         }
         return count != 0;
@@ -643,7 +658,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
                 .setNewTableName(newName)
                 .createSQL();
         exeSql(reNameTableSql);
-        if(cursor != null){
+        if (cursor != null) {
             cursor.close();
         }
         return true;
