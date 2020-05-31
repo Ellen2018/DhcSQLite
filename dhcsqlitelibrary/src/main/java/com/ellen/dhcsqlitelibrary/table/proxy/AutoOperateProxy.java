@@ -88,7 +88,7 @@ public class AutoOperateProxy implements InvocationHandler {
             }else {
                 //不具有返回值
                 String sql = newSql(totalSqlString, method, args);
-                zxyTable.exeSql(newSql(totalSqlString, method, args));
+                zxyTable.exeSql(sql);
                 return null;
             }
         }
