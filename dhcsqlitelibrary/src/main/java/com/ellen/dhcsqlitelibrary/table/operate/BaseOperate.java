@@ -74,7 +74,17 @@ public class BaseOperate<T> extends ZxySqlCreate {
         if(totalListener != null){
             totalListener.exeSql(zxyTable.getTableName(),sql);
         }
-        db.execSQL(sql);
+        db.beginTransaction();
+        try {
+            db.execSQL(sql);
+            //设置事务处理成功，不设置会自动回滚不提交。
+            //如果没有执行这里，事务会自动回滚
+            db.setTransactionSuccessful();
+        }catch (Exception e){
+            //这里进行事务回滚
+        }finally {
+            db.endTransaction();
+        }
     }
 
     protected List<T> search(String sql) {
@@ -94,7 +104,8 @@ public class BaseOperate<T> extends ZxySqlCreate {
         if(totalListener != null){
             totalListener.exeSql(zxyTable.getTableName(),sql);
         }
-        return db.rawQuery(sql, null);
+        Cursor cursor = db.rawQuery(sql,null);
+        return cursor;
     }
 
     private List<T> getDataByCursor(Cursor cursor) {

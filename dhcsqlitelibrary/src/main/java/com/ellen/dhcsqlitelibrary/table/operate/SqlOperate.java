@@ -185,6 +185,11 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     }
 
     @Override
+    public void close() {
+        db.close();
+    }
+
+    @Override
     public void saveData(T data) {
         if (data == null) {
             return;
