@@ -179,7 +179,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     @Override
     public void saveDataAndDeleteAgo(T data) {
-        sqlOperate.saveData(data);
+        sqlOperate.saveDataAndDeleteAgo(data);
     }
 
     @Override
