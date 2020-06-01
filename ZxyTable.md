@@ -368,6 +368,8 @@ Father类：
 
 # 3.详细操作
 
+**注意:该类中提供的增删改操作都已添加事务机制，您无需担心在执行过程中发生异常还需要回滚。**
+
 如何新建ZxyTable对象？ 
 
     ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
@@ -483,7 +485,7 @@ Father类：
         //单条数据添加
         studentTable.saveData(student);
 
-- 添加多条数据
+- 添加多条数据(数据量不大采用这种方式)
 
         //多条数据添加
         List<Student> studentList = new ArrayList<>();
@@ -496,6 +498,23 @@ Father类：
         }
 
         studentTable.saveData(studentList);
+
+- 添加多条数据(数据量大采用这种方式，进行分组存储)
+
+        List<Student> studentList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            student = new Student("Ellen2018_" + i, i, "18272167574", "火星");
+            father = new Father("Ellen2019", "1", "尼玛" + i);
+            student.setFather(father);
+            if(i == 3){
+                student.setMan(true);
+            }
+            studentList.add(student);
+        }
+        //将studentList按照每组4个进行存储
+        studentTable.saveData(studentList,4);
+
+&emsp;&emsp;注意这中方式应对数据类庞大的多条数据存储，如果您的数据量非常之大，建议使用这种方式进行存储，而且请不要将每组存储的个数设置太小哦，以免影响性能。
 
 - 添加或者更新(根据主键进行判断)
 
