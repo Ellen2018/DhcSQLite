@@ -15,7 +15,7 @@ public class App extends Application {
         ZxyTable.setTotalListener(new TotalListener() {
             @Override
             public void exeSql(String tableName, String sql) {
-                Log.e("Ellen2018","全局监听("+tableName+"):"+sql);
+                Log.e("Ellen2018","全局监听SQL语句("+tableName+"):"+sql);
             }
         });
 
