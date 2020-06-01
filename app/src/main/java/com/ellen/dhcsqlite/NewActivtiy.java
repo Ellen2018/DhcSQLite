@@ -66,7 +66,7 @@ public class NewActivtiy extends Activity {
             }
             studentList.add(student);
         }
-        studentTable.saveData(studentList,10);
+        studentTable.saveData(studentList,4);
 
         //通过代理接口调用
         studentTable.getAutoDesignOperate().update1("新的名字","Ellen2018_0");

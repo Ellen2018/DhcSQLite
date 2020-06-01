@@ -41,6 +41,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     private DataStructureSupport dataStructureSupport = null;
     private BasicTypeSupport basicTypeSupport = null;
+    protected SQLiteDatabase db;
 
     public ZxyTable(SQLiteDatabase db, String tableName) {
         init(db, tableName);
@@ -59,6 +60,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     }
 
     private void init(SQLiteDatabase db, String tableName) {
+        this.db = db;
         Class<T> dataClass = getClassByIndex(0);
         this.autoClass = getClassByIndex(1);
         if(tableName == null){
@@ -162,12 +164,33 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     @Override
     public void saveData(T data) {
-        sqlOperate.saveData(data);
+        //开启事务
+        db.beginTransaction();
+        try {
+            sqlOperate.saveData(data);
+        }catch (Exception e){
+            //发现异常结束事务
+            db.endTransaction();
+        }finally {
+            //显示的设置数据事务是否成功
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
     }
 
     @Override
     public void saveData(List<T> dataList) {
-        sqlOperate.saveData(dataList);
+        db.beginTransaction();
+        try {
+            sqlOperate.saveData(dataList);
+        }catch (Exception e){
+            //发现异常结束事务
+            db.endTransaction();
+        }finally {
+            //显示的设置数据事务是否成功
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
     }
 
     @Override
@@ -182,7 +205,18 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     @Override
     public void saveData(List<T> dataList, int segment) {
-        sqlOperate.saveData(dataList,segment);
+        //开启事务
+        db.beginTransaction();
+        try {
+            sqlOperate.saveData(dataList,segment);
+        }catch (Exception e){
+            //发现异常结束事务
+            db.endTransaction();
+        }finally {
+            //显示的设置数据事务是否成功
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
     }
 
     @Override
@@ -268,12 +302,35 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     @Override
     public int updateReturnCount(T t, String whereSQL) {
-        return sqlOperate.updateReturnCount(t, whereSQL);
+         int count = 0;
+        //开启事务
+        db.beginTransaction();
+        try {
+            count = sqlOperate.updateReturnCount(t, whereSQL);
+        }catch (Exception e){
+            //发现异常结束事务
+            db.endTransaction();
+        }finally {
+            //显示的设置数据事务是否成功
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
+        return count;
     }
 
     @Override
     public void update(T t, String whereSQL) {
-        sqlOperate.update(t, whereSQL);
+        db.beginTransaction();
+        try {
+            sqlOperate.update(t, whereSQL);
+        }catch (Exception e){
+            //发现异常结束事务
+            db.endTransaction();
+        }finally {
+            //显示的设置数据事务是否成功
+            db.setTransactionSuccessful();
+            db.endTransaction();
+        }
     }
 
     @Override

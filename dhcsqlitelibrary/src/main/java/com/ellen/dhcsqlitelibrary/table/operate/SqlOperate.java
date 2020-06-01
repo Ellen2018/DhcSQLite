@@ -189,8 +189,6 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         if (data == null) {
             return;
         }
-        //开启事务
-        db.beginTransaction();
         AddSingleRowToTable addSingleRowToTable = getAddSingleRowToTable();
         addSingleRowToTable.setTableName(getTableName());
         for (int i = 0; i < sqlFieldList.size(); i++) {
@@ -210,9 +208,6 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         }
         String addDataSql = addSingleRowToTable.createSQL();
         exeSql(addDataSql);
-        //事务已经执行成功
-        db.setTransactionSuccessful();
-        db.endTransaction();
     }
 
     @Override
@@ -220,8 +215,6 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         if (dataList == null || dataList.size() == 0) {
             return;
         }
-        //开启事务
-        db.beginTransaction();
         AddManyRowToTable addManyRowToTable = getAddManyRowToTable();
         addManyRowToTable.setTableName(getTableName());
         if (isHaveMajorKeyAndAuto()) {
@@ -255,9 +248,6 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         }
         String addDataSql = addManyRowToTable.createSQL();
         exeSql(addDataSql);
-        //事务已经执行成功
-        db.setTransactionSuccessful();
-        db.endTransaction();
     }
 
     private void saveDataToSegment(List<T> dataList) {
@@ -323,8 +313,6 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
         if (dataList == null && dataList.size() == 0) {
             return;
         }
-        //开启事务
-        db.beginTransaction();
         int current = 0;
         int sCount = dataList.size() / segmentCount + 1;
         if (sCount == 0 && segmentCount > dataList.size()) {
@@ -341,9 +329,6 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
                 saveDataToSegment(zList);
             }
         }
-        //事务已经执行成功
-        db.setTransactionSuccessful();
-        db.endTransaction();
     }
 
     @Override
