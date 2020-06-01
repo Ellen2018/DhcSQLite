@@ -82,6 +82,7 @@ public class BaseOperate<T> extends ZxySqlCreate {
             db.setTransactionSuccessful();
         }catch (Exception e){
             //这里进行事务回滚
+            throw e;
         }finally {
             db.endTransaction();
         }
