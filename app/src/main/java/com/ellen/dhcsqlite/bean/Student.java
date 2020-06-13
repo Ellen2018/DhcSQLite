@@ -6,7 +6,6 @@ import com.ellen.dhcsqlitelibrary.table.annotation.field.DataStructure;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.DhcSqlFieldName;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Default;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.DefaultValueEnum;
-import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.EndAutoString;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.Ignore;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.MajorKey;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.Operate;
