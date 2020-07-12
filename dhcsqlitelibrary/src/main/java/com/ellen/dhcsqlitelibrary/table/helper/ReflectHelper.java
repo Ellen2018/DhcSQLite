@@ -1,10 +1,7 @@
 package com.ellen.dhcsqlitelibrary.table.helper;
 
-import android.database.Cursor;
-
 import com.ellen.dhcsqlitelibrary.table.annotation.field.Ignore;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.bound.Default;
-import com.ellen.sqlitecreate.createsql.create.createtable.SQLField;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 
 import java.lang.reflect.Constructor;

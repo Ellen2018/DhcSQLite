@@ -1,11 +1,6 @@
 package com.ellen.dhcsqlitelibrary.table.proxy;
 
-import android.annotation.SuppressLint;
-import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
-
-import androidx.annotation.RequiresApi;
 
 import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
 import com.ellen.dhcsqlitelibrary.table.annotation.auto.Delete;
@@ -19,7 +14,6 @@ import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
