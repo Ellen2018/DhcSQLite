@@ -3,6 +3,7 @@ package com.ellen.dhcsqlitelibrary.table.impl;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.operate.BaseOperate;
@@ -34,7 +35,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     private String tableName;
     private ReflectHelper<T> reflectHelper;
-    private JsonHelper jsonHelper;
+    private JsonFormat jsonFormat;
 
     //数据操作
     private SqlOperate<T> sqlOperate;
@@ -51,26 +52,29 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         init(db, null);
     }
 
-    private Class getClassByIndex(int index){
+    private Class getClassByIndex(int index) {
         Class<? extends ZxyTable> zxyTableClass = this.getClass();
         Type typeZxy = zxyTableClass.getGenericSuperclass();
         ParameterizedType parameterizedType = (ParameterizedType) typeZxy;
         Type type = parameterizedType.getActualTypeArguments()[index];
-        return (Class)type;
+        return (Class) type;
     }
 
     private void init(SQLiteDatabase db, String tableName) {
         this.db = db;
         Class<T> dataClass = getClassByIndex(0);
         this.autoClass = getClassByIndex(1);
-        if(tableName == null){
+        if (tableName == null) {
             this.tableName = dataClass.getSimpleName();
-        }else {
+        } else {
             this.tableName = tableName;
         }
         reflectHelper = new ReflectHelper<>();
-        jsonHelper = new JsonHelper(getJsonLibraryType());
-        dataStructureSupport = new DataStructureSupport(jsonHelper, new DataStructureSupport.ToObject() {
+        jsonFormat = getJsonFormat();
+        if (jsonFormat == null) {
+            jsonFormat = new JsonHelper(getJsonLibraryType());
+        }
+        dataStructureSupport = new DataStructureSupport(jsonFormat, new DataStructureSupport.ToObject() {
             @Override
             public Object toObj(String fieldName, Class fieldClass, String json) {
                 return resumeDataStructure(fieldName, fieldClass, json);
@@ -82,7 +86,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
                 return ZxyTable.this.setBooleanValue(classFieldName, value);
             }
         });
-        sqlOperate = new SqlOperate<>(db, dataClass, jsonHelper, reflectHelper, dataStructureSupport, basicTypeSupport, this);
+        sqlOperate = new SqlOperate<>(db, dataClass, jsonFormat, reflectHelper, dataStructureSupport, basicTypeSupport, this);
 
         //完成代理
         autoDesignOperate = AutoOperateProxy.newMapperProxy(autoClass, this);
@@ -93,7 +97,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     }
 
     public static void setTotalListener(TotalListener totalListener) {
-       BaseOperate.setTotalListener(totalListener);
+        BaseOperate.setTotalListener(totalListener);
     }
 
     protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
@@ -120,6 +124,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     /**
      * 添加拦截
+     *
      * @param intercept
      */
     public void addIntercept(Intercept intercept) {
@@ -128,6 +133,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     /**
      * 移除拦截
+     *
      * @param intercept
      */
     public void removeIntercept(Intercept intercept) {
@@ -184,7 +190,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     @Override
     public void saveData(List<T> dataList, int segment) {
-        sqlOperate.saveData(dataList,segment);
+        sqlOperate.saveData(dataList, segment);
     }
 
     @Override
@@ -270,8 +276,8 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     @Override
     public int updateReturnCount(T t, String whereSQL) {
-         int count = 0;
-         count = sqlOperate.updateReturnCount(t, whereSQL);
+        int count = 0;
+        count = sqlOperate.updateReturnCount(t, whereSQL);
         return count;
     }
 
@@ -303,5 +309,9 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     @Override
     public void close() {
         sqlOperate.close();
+    }
+
+    public JsonFormat getJsonFormat() {
+        return null;
     }
 }

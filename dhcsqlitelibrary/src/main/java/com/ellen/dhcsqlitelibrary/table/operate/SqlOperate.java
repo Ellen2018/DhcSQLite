@@ -14,6 +14,7 @@ import com.ellen.dhcsqlitelibrary.table.exception.NoMajorKeyException;
 import com.ellen.dhcsqlitelibrary.table.exception.SqlFieldDuplicateException;
 import com.ellen.dhcsqlitelibrary.table.helper.CursorHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.operate.add.Add;
 import com.ellen.dhcsqlitelibrary.table.operate.create.Create;
@@ -55,15 +56,15 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
     private SQLField majorKeySqlField = null;
     private boolean isAutoIncrement = false;
     //Helper
-    private JsonHelper jsonHelper;
+    private JsonFormat jsonFormat;
     private ZxyTable zxyTable;
 
-    public SqlOperate(SQLiteDatabase db, Class<T> dataClass, JsonHelper jsonHelper,
+    public SqlOperate(SQLiteDatabase db, Class<T> dataClass, JsonFormat jsonFormat,
                       ReflectHelper<T> reflectHelper, DataStructureSupport dataStructureSupport,
                       BasicTypeSupport basicTypeSupport, ZxyTable zxyTable) {
         super(db, zxyTable);
         this.dataClass = dataClass;
-        this.jsonHelper = jsonHelper;
+        this.jsonFormat = jsonFormat;
         this.reflectHelper = reflectHelper;
         this.basicTypeSupport = basicTypeSupport;
         this.dataStructureSupport = dataStructureSupport;
@@ -76,7 +77,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
 
     private void init() {
         cursorHelper = new CursorHelper();
-        objectTypeSupport = new ObjectTypeSupport(reflectHelper, jsonHelper);
+        objectTypeSupport = new ObjectTypeSupport(reflectHelper, jsonFormat);
         sqlFieldList = new ArrayList<>();
         sqlNameMap = new HashMap<>();
     }

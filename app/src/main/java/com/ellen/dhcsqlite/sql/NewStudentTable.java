@@ -2,8 +2,10 @@ package com.ellen.dhcsqlite.sql;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.ellen.dhcsqlite.MyJsonFormat;
 import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlite.bean.Student;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.type.Intercept;
@@ -88,5 +90,14 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
     @Override
     protected JsonLibraryType getJsonLibraryType() {
         return JsonLibraryType.Gson;
+    }
+
+    /**
+     * 自定义Json解析器
+     * @return
+     */
+    @Override
+    public JsonFormat getJsonFormat() {
+        return new MyJsonFormat();
     }
 }

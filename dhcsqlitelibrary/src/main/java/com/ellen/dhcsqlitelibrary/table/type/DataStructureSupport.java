@@ -1,6 +1,7 @@
 package com.ellen.dhcsqlitelibrary.table.type;
 
 import com.ellen.dhcsqlitelibrary.table.annotation.field.DhcSqlFieldName;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
@@ -19,11 +20,11 @@ import java.util.Vector;
  */
 public class DataStructureSupport implements TypeSupport {
 
-    private JsonHelper jsonHelper;
+    private JsonFormat jsonFormat;
     private ToObject toObject;
 
-    public DataStructureSupport(JsonHelper jsonHelper, ToObject toObject) {
-        this.jsonHelper = jsonHelper;
+    public DataStructureSupport(JsonFormat jsonFormat, ToObject toObject) {
+        this.jsonFormat = jsonFormat;
         this.toObject = toObject;
     }
 
@@ -80,7 +81,7 @@ public class DataStructureSupport implements TypeSupport {
 
     @Override
     public Object toValue(Field field,Object dataValue) {
-        return dataValue == null ? null : jsonHelper.toJson(dataValue);
+        return dataValue == null ? null : jsonFormat.toJson(dataValue);
     }
 
     public interface ToObject{

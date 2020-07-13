@@ -5,6 +5,7 @@ import com.ellen.dhcsqlitelibrary.table.annotation.field.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.OperateEnum;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.SqlType;
 import com.ellen.dhcsqlitelibrary.table.exception.NoCanSaveToSqlException;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
@@ -19,11 +20,11 @@ import java.lang.reflect.InvocationTargetException;
 public class ObjectTypeSupport implements TypeSupport {
 
     private ReflectHelper reflectHelper;
-    private JsonHelper jsonHelper;
+    private JsonFormat jsonFormat;
 
-    public ObjectTypeSupport(ReflectHelper reflectHelper, JsonHelper jsonHelper) {
+    public ObjectTypeSupport(ReflectHelper reflectHelper, JsonFormat jsonFormat) {
         this.reflectHelper = reflectHelper;
-        this.jsonHelper = jsonHelper;
+        this.jsonFormat = jsonFormat;
     }
 
     @Override
@@ -152,10 +153,10 @@ public class ObjectTypeSupport implements TypeSupport {
                     e.printStackTrace();
                 }
             } else {
-                object = jsonHelper.toObject((String) sqlValue, typeClass);
+                object = jsonFormat.toObject((String) sqlValue, typeClass);
             }
         } else {
-            object = jsonHelper.toObject((String) sqlValue, typeClass);
+            object = jsonFormat.toObject((String) sqlValue, typeClass);
         }
         return object;
     }
@@ -184,11 +185,11 @@ public class ObjectTypeSupport implements TypeSupport {
                 value = reflectHelper.getValue(dataValue, valueField);
             } else {
                 //Json存储
-                value = jsonHelper.toJson(dataValue);
+                value = jsonFormat.toJson(dataValue);
             }
         } else {
             //Json存储
-            value = jsonHelper.toJson(dataValue);
+            value = jsonFormat.toJson(dataValue);
         }
         return value;
     }
