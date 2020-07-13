@@ -69,6 +69,11 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         } else {
             this.tableName = tableName;
         }
+        //是否设置多线程安全
+        if(isMultiThreadSafety()){
+            //设置多线程安全
+            db.enableWriteAheadLogging();
+        }
         reflectHelper = new ReflectHelper<>();
         jsonFormat = getJsonFormat();
         if (jsonFormat == null) {
@@ -313,5 +318,9 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     public JsonFormat getJsonFormat() {
         return null;
+    }
+
+    public boolean isMultiThreadSafety(){
+        return false;
     }
 }

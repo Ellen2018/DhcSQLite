@@ -26,6 +26,9 @@ public class NewActivtiy extends Activity {
         ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
         zxyLibrary.clearLibrary();
         SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
+
+        sqLiteDatabase.enableWriteAheadLogging();//开启数据库的多线程读写
+
         NewStudentTable studentTable = new NewStudentTable(sqLiteDatabase);
 
         if (studentTable.isExist()) {
