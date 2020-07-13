@@ -2,7 +2,6 @@ package com.ellen.dhcsqlitelibrary.table.impl;
 
 
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
