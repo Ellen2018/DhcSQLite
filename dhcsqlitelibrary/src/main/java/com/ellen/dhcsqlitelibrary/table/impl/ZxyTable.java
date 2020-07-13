@@ -2,10 +2,10 @@ package com.ellen.dhcsqlitelibrary.table.impl;
 
 
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.operate.BaseOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalListener;
@@ -36,6 +36,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     private String tableName;
     private ReflectHelper<T> reflectHelper;
     private JsonFormat jsonFormat;
+    private CommonSetting commonSetting;
 
     //数据操作
     private SqlOperate<T> sqlOperate;
@@ -70,14 +71,20 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
             this.tableName = tableName;
         }
         //是否设置多线程安全
-        if(isMultiThreadSafety()){
+        commonSetting = new CommonSetting();
+        setting(commonSetting);
+        if(commonSetting.isMultiThreadSafety()){
             //设置多线程安全
             this.db.enableWriteAheadLogging();
+            Log.e("Ellen2018","开启了多线程安全");
         }
         reflectHelper = new ReflectHelper<>();
-        jsonFormat = getJsonFormat();
+        jsonFormat = commonSetting.getJsonFormat();
         if (jsonFormat == null) {
-            jsonFormat = new JsonHelper(getJsonLibraryType());
+            Log.e("Ellen2018","设置了内部解析器:"+commonSetting.getJsonLibraryType());
+            jsonFormat = new JsonHelper(commonSetting.getJsonLibraryType());
+        }else {
+            Log.e("Ellen2018","设置了自定义解析器:"+commonSetting.getJsonFormat().getClass());
         }
         dataStructureSupport = new DataStructureSupport(jsonFormat, new DataStructureSupport.ToObject() {
             @Override
@@ -95,10 +102,6 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
         //完成代理
         autoDesignOperate = AutoOperateProxy.newMapperProxy(autoClass, this);
-    }
-
-    protected JsonLibraryType getJsonLibraryType() {
-        return JsonLibraryType.Gson;
     }
 
     public static void setTotalListener(TotalListener totalListener) {
@@ -316,11 +319,5 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         sqlOperate.close();
     }
 
-    protected JsonFormat getJsonFormat() {
-        return null;
-    }
-
-    protected boolean isMultiThreadSafety(){
-        return false;
-    }
+    protected void setting(CommonSetting commonSetting){}
 }

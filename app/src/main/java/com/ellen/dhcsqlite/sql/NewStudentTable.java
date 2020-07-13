@@ -7,6 +7,7 @@ import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlite.bean.Student;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
+import com.ellen.dhcsqlitelibrary.table.impl.CommonSetting;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
 import com.ellen.dhcsqlitelibrary.table.type.Intercept;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
@@ -87,18 +88,19 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
         return null;
     }
 
-    @Override
-    protected JsonLibraryType getJsonLibraryType() {
-        return JsonLibraryType.Gson;
-    }
-
     /**
-     * 自定义Json解析器
-     * 指定的优先级高于getJsonLibraryType()方法
-     * @return
+     * 库内部公共设置
+     * @param commonSetting
      */
     @Override
-    public JsonFormat getJsonFormat() {
-        return new MyJsonFormat();
+    protected void setting(CommonSetting commonSetting) {
+        super.setting(commonSetting);
+        //是否设置为多线程模式
+        //true:设置为多线程模式，false：设置为非多线程模式
+        commonSetting.setMultiThreadSafety(true);
+        //设置库内部的Json解析器为Gson
+        commonSetting.setJsonLibraryType(JsonLibraryType.Gson);
+        //设置库内部的Json解析为自定义的MyJsonFormat
+        commonSetting.setJsonFormat(new MyJsonFormat());
     }
 }
