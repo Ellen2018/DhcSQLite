@@ -72,7 +72,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         //是否设置多线程安全
         if(isMultiThreadSafety()){
             //设置多线程安全
-            db.enableWriteAheadLogging();
+            this.db.enableWriteAheadLogging();
         }
         reflectHelper = new ReflectHelper<>();
         jsonFormat = getJsonFormat();
