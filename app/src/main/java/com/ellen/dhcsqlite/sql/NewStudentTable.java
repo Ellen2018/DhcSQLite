@@ -94,6 +94,7 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
 
     /**
      * 自定义Json解析器
+     * 指定的优先级高于getJsonLibraryType()方法
      * @return
      */
     @Override
