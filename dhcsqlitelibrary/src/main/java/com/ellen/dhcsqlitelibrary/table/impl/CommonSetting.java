@@ -5,8 +5,17 @@ import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 
 public class CommonSetting {
 
+    /**
+     * 自定义Json解析器
+     */
     private JsonFormat jsonFormat = null;
+    /**
+     * 指定内部Json解析器
+     */
     private JsonLibraryType jsonLibraryType = JsonLibraryType.Gson;
+    /**
+     * 是否开启多线程模式
+     */
     private boolean isMultiThreadSafety = false;
 
     public JsonFormat getJsonFormat() {

@@ -70,21 +70,17 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         } else {
             this.tableName = tableName;
         }
-        //是否设置多线程安全
         commonSetting = new CommonSetting();
         setting(commonSetting);
+        //是否设置多线程安全
         if(commonSetting.isMultiThreadSafety()){
             //设置多线程安全
             this.db.enableWriteAheadLogging();
-            Log.e("Ellen2018","开启了多线程安全");
         }
         reflectHelper = new ReflectHelper<>();
         jsonFormat = commonSetting.getJsonFormat();
         if (jsonFormat == null) {
-            Log.e("Ellen2018","设置了内部解析器:"+commonSetting.getJsonLibraryType());
             jsonFormat = new JsonHelper(commonSetting.getJsonLibraryType());
-        }else {
-            Log.e("Ellen2018","设置了自定义解析器:"+commonSetting.getJsonFormat().getClass());
         }
         dataStructureSupport = new DataStructureSupport(jsonFormat, new DataStructureSupport.ToObject() {
             @Override
