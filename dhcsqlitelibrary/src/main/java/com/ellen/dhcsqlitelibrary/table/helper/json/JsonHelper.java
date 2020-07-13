@@ -28,9 +28,9 @@ public class JsonHelper implements JsonFormat {
         if (gsonClass == null && fastJsonClass == null) {
             //报异常
             if(jsonLibraryType == JsonLibraryType.Gson) {
-                throw new JsonNoCanFormatException("无法进行json映射,因为您选择了使用com.google.gson.Gson进行Json映射,但您未导入此库。");
+                throw new JsonNoCanFormatException("无法进行json映射,无可用的Json解析器");
             }else {
-                throw new JsonNoCanFormatException("无法进行json映射,因为您选择了使用com.alibaba.fastjson.JSONObject进行Json映射,但您未导入此库。");
+                throw new JsonNoCanFormatException("无法进行json映射,无可用的Json解析器");
             }
         } else {
             try {
