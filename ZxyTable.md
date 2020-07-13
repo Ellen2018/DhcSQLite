@@ -266,6 +266,17 @@ Father类：
         }
 
         /**
+         * 自定义Json解析器
+         * 指定的优先级高于getJsonLibraryType()方法
+         * 默认情况下返回null
+         * @return
+         */
+         @Override
+        public JsonFormat getJsonFormat() {
+            return new MyJsonFormat();
+        }
+
+        /**
          * 将json恢复成成数据结构的形式
          *
          * 您可以根据classFieldName 或者 fieldClass
@@ -349,6 +360,46 @@ Father类：
     protected JsonLibraryType getJsonLibraryType() {
         //JsonLibraryType.FastJson; ->FastJson方式
         return JsonLibraryType.Gson; //Gson方式
+    }
+
+- JsonFormat getJsonFormat()
+
+&emsp;&emsp;如果你不想使用Gson或者FastJso作为库内部的json解析器，那么你可以重写此方法，指定自己的Json解析器,默认情况下该方法返回null,那么如何指定呢？第一步就是自定义一个类去继承接口JsonFormat，比如下面所示:
+
+    /**
+     * 自定义Json解析器
+     */
+    public class MyJsonFormat implements JsonFormat {
+    
+        private Gson gson;
+    
+        public MyJsonFormat(){
+            gson = new Gson();
+        }
+    
+        //此方法将要写入数据库的对象映射为json
+        @Override
+        public String toJson(Object obj) {
+            return gson.toJson(obj);
+        }
+
+        //此方法将数据库中json数据映射为对象
+        @Override
+        public <E> E toObject(String json, Class jsonClass) {
+            return (E) gson.fromJson(json,jsonClass);
+        }
+    }
+
+&emsp;&emsp;自定义完成之后，在继承的那个ZxyTable中进行指定即可:
+
+    /**
+     * 自定义Json解析器
+     * 指定的优先级高于getJsonLibraryType()方法
+     * @return
+     */
+    @Override
+    public JsonFormat getJsonFormat() {
+        return new MyJsonFormat();
     }
 
 - Object resumeDataStructure(String classFieldName, Class fieldClass, String json)

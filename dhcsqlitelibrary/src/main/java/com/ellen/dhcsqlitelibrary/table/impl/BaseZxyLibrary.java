@@ -1,7 +1,5 @@
 package com.ellen.dhcsqlitelibrary.table.impl;
 
-import java.util.List;
-
 public interface BaseZxyLibrary {
 
     /**
