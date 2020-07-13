@@ -316,11 +316,11 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         sqlOperate.close();
     }
 
-    public JsonFormat getJsonFormat() {
+    protected JsonFormat getJsonFormat() {
         return null;
     }
 
-    public boolean isMultiThreadSafety(){
+    protected boolean isMultiThreadSafety(){
         return false;
     }
 }
