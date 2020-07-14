@@ -43,6 +43,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     private DataStructureSupport dataStructureSupport = null;
     private BasicTypeSupport basicTypeSupport = null;
     protected SQLiteDatabase db;
+    private ZxyLibrary zxyLibrary = null;
 
     public ZxyTable(SQLiteDatabase db, String tableName) {
         init(db, tableName);
@@ -50,6 +51,16 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     public ZxyTable(SQLiteDatabase db) {
         init(db, null);
+    }
+
+    public ZxyTable(ZxyLibrary zxyLibrary, String tableName) {
+        this.zxyLibrary = zxyLibrary;
+        init(zxyLibrary.getWriteDataBase(), tableName);
+    }
+
+    public ZxyTable(ZxyLibrary zxyLibrary) {
+        this.zxyLibrary = zxyLibrary;
+        init(zxyLibrary.getWriteDataBase(), null);
     }
 
     private Class getClassByIndex(int index) {
@@ -69,11 +80,15 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         } else {
             this.tableName = tableName;
         }
-        commonSetting = new CommonSetting();
+        if(zxyLibrary.getCommonSetting() == null) {
+            commonSetting = new CommonSetting();
+        }else {
+            commonSetting = zxyLibrary.getCommonSetting();
+        }
         setting(commonSetting);
         //是否设置多线程安全
-        if(commonSetting.isMultiThreadSafety()){
-            //设置多线程安全
+        if (commonSetting.isMultiThreadSafety()) {
+            //设置多线程安全(读写之间不阻塞,写与写之间阻塞)
             this.db.enableWriteAheadLogging();
         }
         reflectHelper = new ReflectHelper<>();
@@ -97,6 +112,9 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
         //完成代理
         autoDesignOperate = AutoOperateProxy.newMapperProxy(autoClass, this);
+    }
+
+    protected void setting(CommonSetting commonSetting) {
     }
 
     public static void setTotalListener(TotalListener totalListener) {
@@ -314,5 +332,4 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         sqlOperate.close();
     }
 
-    protected void setting(CommonSetting commonSetting){}
 }

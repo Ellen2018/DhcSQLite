@@ -20,6 +20,7 @@ public abstract class ZxyLibrary implements BaseZxyLibrary {
     private ZxySQLiteHelper zxySQLiteHelper;
     private String name = null;
     private String filePath = null;
+    private CommonSetting commonSetting;
 
     public ZxyLibrary(Context context, String name, int version) {
         zxySQLiteHelper = new ZxySQLiteHelper(context, name, null, version);
@@ -97,7 +98,7 @@ public abstract class ZxyLibrary implements BaseZxyLibrary {
                 .createSQL();
         Cursor cursor = zxySQLiteHelper.getWritableDatabase().rawQuery(searchTableExistSql, null);
         int count = cursor.getCount();
-        if(cursor != null){
+        if (cursor != null) {
             cursor.close();
         }
         return count != 0;
@@ -106,7 +107,7 @@ public abstract class ZxyLibrary implements BaseZxyLibrary {
     @Override
     public void clearLibrary() {
         String[] tableNames = getAllTableName();
-        if(tableNames != null && tableNames.length > 0) {
+        if (tableNames != null && tableNames.length > 0) {
             for (String tableName : tableNames) {
                 getWriteDataBase().execSQL(DeleteTable.getInstance().setTableName(tableName).createSQL());
             }
@@ -133,7 +134,7 @@ public abstract class ZxyLibrary implements BaseZxyLibrary {
             }
 
         }
-        if(cursor != null){
+        if (cursor != null) {
             cursor.close();
         }
         if (stringList.size() > 0) {
@@ -153,4 +154,11 @@ public abstract class ZxyLibrary implements BaseZxyLibrary {
         return s == null ? 0 : s.length;
     }
 
+    public CommonSetting getCommonSetting() {
+        return commonSetting;
+    }
+
+    public void setCommonSetting(CommonSetting commonSetting) {
+        this.commonSetting = commonSetting;
+    }
 }

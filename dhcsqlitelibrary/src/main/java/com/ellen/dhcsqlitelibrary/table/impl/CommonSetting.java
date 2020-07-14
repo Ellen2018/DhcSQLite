@@ -3,6 +3,9 @@ package com.ellen.dhcsqlitelibrary.table.impl;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 
+/**
+ * 设置库内部表操作的公共配置
+ */
 public class CommonSetting {
 
     /**
