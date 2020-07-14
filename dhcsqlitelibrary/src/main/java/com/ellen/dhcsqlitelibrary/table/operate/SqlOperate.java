@@ -635,19 +635,22 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
 
     @Override
     public boolean reNameTable(String newName) {
+        boolean isCanRename = true;
         //判断新表是否存在
         String searchTableExistSql = SerachTableExist.getInstance()
                 .setTableName(newName)
                 .createSQL();
         Cursor cursor = db.rawQuery(searchTableExistSql, null);
         if (cursor.getCount() != 0) {
-            return false;
+           isCanRename = false;
         }
-        String reNameTableSql = getUpdateTableName()
-                .setOldTableName(getTableName())
-                .setNewTableName(newName)
-                .createSQL();
-        exeSql(reNameTableSql);
+        if(isCanRename) {
+            String reNameTableSql = getUpdateTableName()
+                    .setOldTableName(getTableName())
+                    .setNewTableName(newName)
+                    .createSQL();
+            exeSql(reNameTableSql);
+        }
         if (cursor != null) {
             cursor.close();
         }
