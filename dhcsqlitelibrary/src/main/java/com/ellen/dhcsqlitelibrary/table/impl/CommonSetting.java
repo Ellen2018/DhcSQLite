@@ -1,6 +1,6 @@
 package com.ellen.dhcsqlitelibrary.table.impl;
 
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JxFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 
 /**
@@ -11,7 +11,7 @@ public class CommonSetting {
     /**
      * 自定义Json解析器
      */
-    private JsonFormat jsonFormat = null;
+    private JxFormat jxFormat = null;
     /**
      * 指定内部Json解析器
      */
@@ -21,12 +21,12 @@ public class CommonSetting {
      */
     private boolean isMultiThreadSafety = false;
 
-    public JsonFormat getJsonFormat() {
-        return jsonFormat;
+    public JxFormat getJxFormat() {
+        return jxFormat;
     }
 
-    public void setJsonFormat(JsonFormat jsonFormat) {
-        this.jsonFormat = jsonFormat;
+    public void setJxFormat(JxFormat jxFormat) {
+        this.jxFormat = jxFormat;
     }
 
     public JsonLibraryType getJsonLibraryType() {

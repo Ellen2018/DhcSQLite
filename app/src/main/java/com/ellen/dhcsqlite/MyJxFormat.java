@@ -1,21 +1,22 @@
 package com.ellen.dhcsqlite;
 
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
+
+import com.ellen.dhcsqlitelibrary.table.helper.json.JxFormat;
 import com.google.gson.Gson;
 
 /**
  * 自定义Json解析器
  */
-public class MyJsonFormat implements JsonFormat {
+public class MyJxFormat implements JxFormat {
 
     private Gson gson;
 
-    public MyJsonFormat(){
+    public MyJxFormat(){
         gson = new Gson();
     }
 
     @Override
-    public String toJson(Object obj) {
+    public String toJxString(Object obj) {
         return gson.toJson(obj);
     }
 

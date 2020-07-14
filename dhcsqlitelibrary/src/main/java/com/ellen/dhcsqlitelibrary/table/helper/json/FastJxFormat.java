@@ -3,16 +3,16 @@ package com.ellen.dhcsqlitelibrary.table.helper.json;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class FastJsonFormat implements JsonFormat {
+class FastJxFormat implements JxFormat {
 
     private Class fastJsonClass;
 
-    public FastJsonFormat(Class fastJsonClass) {
+    public FastJxFormat(Class fastJsonClass) {
         this.fastJsonClass = fastJsonClass;
     }
 
     @Override
-    public String toJson(Object obj) {
+    public String toJxString(Object obj) {
         String json = null;
         try {
             Method toJson = fastJsonClass.getMethod("toJSONString", Object.class);

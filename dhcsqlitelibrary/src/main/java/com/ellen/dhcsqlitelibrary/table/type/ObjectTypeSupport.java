@@ -5,8 +5,7 @@ import com.ellen.dhcsqlitelibrary.table.annotation.field.Operate;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.OperateEnum;
 import com.ellen.dhcsqlitelibrary.table.annotation.field.SqlType;
 import com.ellen.dhcsqlitelibrary.table.exception.NoCanSaveToSqlException;
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JxFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.ReflectHelper;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
 import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
@@ -20,11 +19,11 @@ import java.lang.reflect.InvocationTargetException;
 public class ObjectTypeSupport implements TypeSupport {
 
     private ReflectHelper reflectHelper;
-    private JsonFormat jsonFormat;
+    private JxFormat jxFormat;
 
-    public ObjectTypeSupport(ReflectHelper reflectHelper, JsonFormat jsonFormat) {
+    public ObjectTypeSupport(ReflectHelper reflectHelper, JxFormat jxFormat) {
         this.reflectHelper = reflectHelper;
-        this.jsonFormat = jsonFormat;
+        this.jxFormat = jxFormat;
     }
 
     @Override
@@ -153,10 +152,10 @@ public class ObjectTypeSupport implements TypeSupport {
                     e.printStackTrace();
                 }
             } else {
-                object = jsonFormat.toObject((String) sqlValue, typeClass);
+                object = jxFormat.toObject((String) sqlValue, typeClass);
             }
         } else {
-            object = jsonFormat.toObject((String) sqlValue, typeClass);
+            object = jxFormat.toObject((String) sqlValue, typeClass);
         }
         return object;
     }
@@ -185,11 +184,11 @@ public class ObjectTypeSupport implements TypeSupport {
                 value = reflectHelper.getValue(dataValue, valueField);
             } else {
                 //Json存储
-                value = jsonFormat.toJson(dataValue);
+                value = jxFormat.toJson(dataValue);
             }
         } else {
             //Json存储
-            value = jsonFormat.toJson(dataValue);
+            value = jxFormat.toJson(dataValue);
         }
         return value;
     }

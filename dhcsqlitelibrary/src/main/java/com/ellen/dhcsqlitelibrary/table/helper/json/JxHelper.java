@@ -4,11 +4,11 @@ import com.ellen.dhcsqlitelibrary.table.exception.JsonNoCanFormatException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class JsonHelper implements JsonFormat {
+public class JxHelper implements JxFormat {
 
-    private JsonFormat jsonFormat;
+    private JxFormat jxFormat;
 
-    public JsonHelper(JsonLibraryType jsonLibraryType) {
+    public JxHelper(JsonLibraryType jsonLibraryType) {
         Class gsonClass = null;
         Class fastJsonClass = null;
         try {
@@ -35,9 +35,9 @@ public class JsonHelper implements JsonFormat {
         } else {
             try {
                 if (gsonClass != null) {
-                    jsonFormat = new GsonFormat(getT(gsonClass));
+                    jxFormat = new GsonFormat(getT(gsonClass));
                 } else if (fastJsonClass != null) {
-                    jsonFormat = new FastJsonFormat(fastJsonClass);
+                    jxFormat = new FastJxFormat(fastJsonClass);
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -64,12 +64,12 @@ public class JsonHelper implements JsonFormat {
     }
 
     @Override
-    public String toJson(Object obj) {
-        return jsonFormat.toJson(obj);
+    public String toJxString(Object obj) {
+        return jxFormat.toJxString(obj);
     }
 
     @Override
     public <E> E toObject(String json, Class jsonClass) {
-        return jsonFormat.toObject(json, jsonClass);
+        return jxFormat.toObject(json, jsonClass);
     }
 }

@@ -3,8 +3,8 @@ package com.ellen.dhcsqlitelibrary.table.impl;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonHelper;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JxFormat;
+import com.ellen.dhcsqlitelibrary.table.helper.json.JxHelper;
 import com.ellen.dhcsqlitelibrary.table.operate.BaseOperate;
 import com.ellen.dhcsqlitelibrary.table.operate.DebugListener;
 import com.ellen.dhcsqlitelibrary.table.operate.TotalListener;
@@ -34,7 +34,7 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     private String tableName;
     private ReflectHelper<T> reflectHelper;
-    private JsonFormat jsonFormat;
+    private JxFormat jxFormat;
     private CommonSetting commonSetting;
 
     //数据操作
@@ -92,23 +92,25 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
             this.db.enableWriteAheadLogging();
         }
         reflectHelper = new ReflectHelper<>();
-        jsonFormat = commonSetting.getJsonFormat();
-        if (jsonFormat == null) {
-            jsonFormat = new JsonHelper(commonSetting.getJsonLibraryType());
+        jxFormat = commonSetting.getJxFormat();
+        if (jxFormat == null) {
+            jxFormat = new JxHelper(commonSetting.getJsonLibraryType());
         }
-        dataStructureSupport = new DataStructureSupport(jsonFormat, new DataStructureSupport.ToObject() {
+        //数据结构支持
+        dataStructureSupport = new DataStructureSupport(jxFormat, new DataStructureSupport.ToObject() {
             @Override
             public Object toObj(String fieldName, Class fieldClass, String json) {
                 return resumeDataStructure(fieldName, fieldClass, json);
             }
         });
+        //基本类型支持
         basicTypeSupport = new BasicTypeSupport(reflectHelper, new BasicTypeSupport.SetBooleanValue() {
             @Override
             public Object setBooleanValue(String classFieldName, boolean value) {
                 return ZxyTable.this.setBooleanValue(classFieldName, value);
             }
         });
-        sqlOperate = new SqlOperate<>(db, dataClass, jsonFormat, reflectHelper, dataStructureSupport, basicTypeSupport, this);
+        sqlOperate = new SqlOperate<>(db, dataClass, jxFormat, reflectHelper, dataStructureSupport, basicTypeSupport, this);
 
         //完成代理
         autoDesignOperate = AutoOperateProxy.newMapperProxy(autoClass, this);

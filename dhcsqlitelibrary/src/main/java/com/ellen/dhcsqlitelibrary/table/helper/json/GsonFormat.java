@@ -3,7 +3,7 @@ package com.ellen.dhcsqlitelibrary.table.helper.json;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class GsonFormat implements JsonFormat {
+class GsonFormat implements JxFormat {
 
     private Object gsonObject;
 
@@ -12,7 +12,7 @@ class GsonFormat implements JsonFormat {
     }
 
     @Override
-    public String toJson(Object obj) {
+    public String toJxString(Object obj) {
         Class gsonClass = gsonObject.getClass();
         Method toJson = null;
         String json = null;

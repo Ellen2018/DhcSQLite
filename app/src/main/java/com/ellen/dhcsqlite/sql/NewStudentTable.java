@@ -2,21 +2,16 @@ package com.ellen.dhcsqlite.sql;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.ellen.dhcsqlite.MyJsonFormat;
+import com.ellen.dhcsqlite.MyJxFormat;
 import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlite.bean.Student;
-import com.ellen.dhcsqlitelibrary.table.helper.json.JsonFormat;
 import com.ellen.dhcsqlitelibrary.table.helper.json.JsonLibraryType;
 import com.ellen.dhcsqlitelibrary.table.impl.CommonSetting;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyTable;
-import com.ellen.dhcsqlitelibrary.table.type.Intercept;
-import com.ellen.sqlitecreate.createsql.helper.SQLFieldType;
-import com.ellen.sqlitecreate.createsql.helper.SQLFieldTypeEnum;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
@@ -66,6 +61,6 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
         //设置库内部的Json解析器为FastJson
         commonSetting.setJsonLibraryType(JsonLibraryType.FastJson);
         //设置库内部的Json解析为自定义的MyJsonFormat
-        commonSetting.setJsonFormat(new MyJsonFormat());
+        commonSetting.setJxFormat(new MyJxFormat());
     }
 }
