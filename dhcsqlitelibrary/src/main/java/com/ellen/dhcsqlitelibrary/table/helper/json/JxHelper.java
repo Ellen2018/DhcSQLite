@@ -27,11 +27,7 @@ public class JxHelper implements JxFormat {
 
         if (gsonClass == null && fastJsonClass == null) {
             //报异常
-            if(jsonLibraryType == JsonLibraryType.Gson) {
-                throw new JsonNoCanFormatException("无法进行json映射,无可用的Json解析器");
-            }else {
-                throw new JsonNoCanFormatException("无法进行json映射,无可用的Json解析器");
-            }
+            throw new JsonNoCanFormatException("无法进行json映射,无可用的Json解析器");
         } else {
             try {
                 if (gsonClass != null) {
