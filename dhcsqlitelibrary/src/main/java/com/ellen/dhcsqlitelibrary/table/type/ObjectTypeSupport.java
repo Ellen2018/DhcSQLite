@@ -184,11 +184,11 @@ public class ObjectTypeSupport implements TypeSupport {
                 value = reflectHelper.getValue(dataValue, valueField);
             } else {
                 //Json存储
-                value = jxFormat.toJson(dataValue);
+                value = jxFormat.toJxString(dataValue);
             }
         } else {
             //Json存储
-            value = jxFormat.toJson(dataValue);
+            value = jxFormat.toJxString(dataValue);
         }
         return value;
     }

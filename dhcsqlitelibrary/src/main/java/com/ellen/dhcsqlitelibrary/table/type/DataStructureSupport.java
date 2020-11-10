@@ -80,7 +80,7 @@ public class DataStructureSupport implements TypeSupport {
 
     @Override
     public Object toValue(Field field,Object dataValue) {
-        return dataValue == null ? null : jxFormat.toJson(dataValue);
+        return dataValue == null ? null : jxFormat.toJxString(dataValue);
     }
 
     public interface ToObject{
