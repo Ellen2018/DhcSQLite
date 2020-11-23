@@ -463,7 +463,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
                     .addAndWhereValue(majorKeySqlField.getName(), WhereSymbolEnum.EQUAL, value)
                     .createSQL();
             List<T> tList = search(whereSql, null);
-            if (tList != null & tList.size() > 0) {
+            if (tList != null && tList.size() > 0) {
                 t = tList.get(0);
             }
         }
