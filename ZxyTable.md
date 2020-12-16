@@ -418,7 +418,7 @@ Father类：
         
 # 2.2的补充
 
-**以上关于ZxyTable的Api文档适用于1.1.24版本**
+**以上关于ZxyTable的Api文档适用于1.1.24及其以下版本**
 
     public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
 
