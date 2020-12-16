@@ -113,13 +113,13 @@
 
 &emsp;&emsp;从名字上来看它就是用来更新数据的，它规定的返回值为null(笔者后期可以改成int类型来记录您修改的数据个数,后面版本再修改吧),代码示例:
 
-        @TotalUpdateSql("UPDATE Student SET my_name = '@newName' WHERE my_name = '@oldName';")
-        void update(@Value("newName") String newName,@Value("oldName") String oldName);
+        @Update(valueSql = "name = '@newName'", whereSql = "sid = @sid")
+        void updateStudentNameById(@Value("sid") int sid, @Value("newName") String newName);
 
 调用时:  
 
-        //相当于执行了：UPDATE Student SET  my_name = 'Ellen2020' WHERE my_name = 'Ellen2018';
-        myAutoDesignOperate.update("Ellen2020","Ellen2018");
+        //相当于执行了：UPDATE Student SET  name = 'Ellen2020' WHERE sid = 3;
+        myAutoDesignOperate.updateStudentNameById(3,"Ellen2020");
 
 - @Delete 
 
