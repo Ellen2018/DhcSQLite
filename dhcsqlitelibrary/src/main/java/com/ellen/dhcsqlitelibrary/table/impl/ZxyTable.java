@@ -92,10 +92,14 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
         } else {
             this.tableName = tableName;
         }
-        if(zxyLibrary.getCommonSetting() == null) {
+        if(zxyLibrary == null){
             commonSetting = new CommonSetting();
         }else {
-            commonSetting = zxyLibrary.getCommonSetting();
+            if (zxyLibrary.getCommonSetting() == null) {
+                commonSetting = new CommonSetting();
+            } else {
+                commonSetting = zxyLibrary.getCommonSetting();
+            }
         }
         setting(commonSetting);
         //是否设置多线程安全
