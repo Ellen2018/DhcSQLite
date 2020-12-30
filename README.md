@@ -3,7 +3,7 @@
 
 [![](https://jitpack.io/v/Ellen2018/DhcSQLite.svg)](https://jitpack.io/#Ellen2018/DhcSQLite)
 
-**当前最新版本：1.1.26**
+**当前最新版本：1.1.28**
 
 &emsp;&emsp;首先你需要在项目的build.gradle中配置以下代码：  
 
