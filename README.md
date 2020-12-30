@@ -131,44 +131,54 @@ Student类代码:
 
 ### 2.4 步骤四：声明ZxyTable类(声明一个类去继承ZxyTable)
 
-    public class StudentTable extends ZxyTable<Student,StudentOperate> {
-    
-        public StudentTable(SQLiteDatabase db, String tableName) {
-            super(db, tableName);
+    public class StudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
+
+        private SQLiteDatabase db;
+
+        public StudentTable(SQLiteDatabase db, String tableName, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(db, tableName, dataClass, autoClass);
         }
 
-        public StudentTable(SQLiteDatabase db) {
-            super(db);
+        public StudentTable(SQLiteDatabase db, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(db, dataClass, autoClass);
         }
 
-        @Override
-        protected Object setBooleanValue(String classFieldName, boolean value) {
-        vif(classFieldName.equals("isMan")){
-                if(value){
-                    return "男";
-                }else {
-                    return "女";
-                }
-            }else {
-                return super.setBooleanValue(classFieldName, value);
-            }
+        public StudentTable(ZxyLibrary zxyLibrary, String tableName, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(zxyLibrary, tableName, dataClass, autoClass);
         }
-    
-        /**
-         * 恢复数据结构数据
-         * @param classFieldName
-         * @param fieldClass
-         * @param json
-         * @return
-         */
+
+        public StudentTable(ZxyLibrary zxyLibrary, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(zxyLibrary, dataClass, autoClass);
+        }
+
+
         @Override
         protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
-            if(classFieldName.equals("subjectMap")){
-                Type type = new TypeToken<HashMap<String,Integer>>() {}.getType();
-                HashMap<String,Integer> subjectMap = new Gson().fromJson(json, type);
-                return subjectMap;
+            if(classFieldName.equals("fathers")){
+                Type founderSetType = new TypeToken<Father[]>() {}.getType();
+                Father[] fathers = new Gson().fromJson(json, founderSetType);
+                return fathers;
+
             }
-            return super.resumeDataStructure(classFieldName, fieldClass, json);
+            return null;
+        }
+
+        /**
+         * 库内部公共设置
+         * @param commonSetting
+         */
+        @Override
+        protected void setting(CommonSetting commonSetting) {
+            super.setting(commonSetting);
+            //是否设置为多线程模式
+            //true:设置为多线程模式，false：设置为非多线程模式
+            commonSetting.setMultiThreadSafety(true);
+            //设置库内部的Json解析器为Gson
+            commonSetting.setJsonLibraryType(JsonLibraryType.Gson);
+            //设置库内部的Json解析器为FastJson
+            commonSetting.setJsonLibraryType(JsonLibraryType.FastJson);
+            //设置库内部的Json解析为自定义的MyJsonFormat
+            commonSetting.setJxFormat(new MyJxFormat());
         }
     }
 
