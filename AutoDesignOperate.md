@@ -1,7 +1,7 @@
 
 # 1.简介
 
-&emsp;&emsp;因为笔者考虑掉导入此框架后代码简洁优雅性问题，所以加入了一个动态代理的机制，这个接口一方面为了让代码更加简洁，另一方面让您的数据库操纵业务化，那么怎样业务化呢？就是笔者提供了一系列注解，帮您完成很多数据库表增删改查乃至更多的操作问题，而且代码写起来非常简洁。
+&emsp;&emsp;因为笔者考虑到导入此框架后代码简洁优雅性问题，所以加入了一个动态代理的机制，这个接口一方面为了让代码更加简洁，另一方面让您的数据库操纵业务化，那么怎样业务化呢？就是笔者提供了一系列注解，帮您完成很多数据库表增删改查乃至更多的操作问题，而且代码写起来非常简洁。
 
 # api介绍  
 
@@ -113,13 +113,13 @@
 
 &emsp;&emsp;从名字上来看它就是用来更新数据的，它规定的返回值为null(笔者后期可以改成int类型来记录您修改的数据个数,后面版本再修改吧),代码示例:
 
-        @TotalUpdateSql("UPDATE Student SET my_name = '@newName' WHERE my_name = '@oldName';")
-        void update(@Value("newName") String newName,@Value("oldName") String oldName);
+        @Update(valueSql = "name = '@newName'", whereSql = "sid = @sid")
+        void updateStudentNameById(@Value("sid") int sid, @Value("newName") String newName);
 
 调用时:  
 
-        //相当于执行了：UPDATE Student SET  my_name = 'Ellen2020' WHERE my_name = 'Ellen2018';
-        myAutoDesignOperate.update("Ellen2020","Ellen2018");
+        //相当于执行了：UPDATE Student SET  name = 'Ellen2020' WHERE sid = 3;
+        myAutoDesignOperate.updateStudentNameById(3,"Ellen2020");
 
 - @Delete 
 

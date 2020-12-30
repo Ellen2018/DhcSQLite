@@ -415,6 +415,64 @@ Father类：
             }
             return null;
         }
+        
+# 2.2的补充
+
+**以上关于ZxyTable的Api文档适用于1.1.24及其以下版本**
+
+    public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
+
+        private SQLiteDatabase db;
+
+        public NewStudentTable(SQLiteDatabase db, String tableName) {
+            super(db, tableName);
+        }
+
+        public NewStudentTable(SQLiteDatabase db) {
+            super(db);
+        }
+
+        public NewStudentTable(ZxyLibrary zxyLibrary, String tableName) {
+            super(zxyLibrary, tableName);
+        }
+    
+        public NewStudentTable(ZxyLibrary zxyLibrary) {
+            super(zxyLibrary);
+        }
+
+
+        @Override
+        protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
+            if(classFieldName.equals("fathers")){
+               Type founderSetType = new TypeToken<Father[]>() {}.getType();
+                Father[] fathers = new Gson().fromJson(json, founderSetType);
+                return fathers;
+
+            }
+            return null;
+        }
+
+        /**
+         * 库内部公共设置
+         * 
+         * @param commonSetting
+         */
+        @Override
+        protected void setting(CommonSetting commonSetting) {
+            super.setting(commonSetting);
+            //是否设置为多线程模式
+            //true:设置为多线程模式，false：设置为非多线程模式
+            commonSetting.setMultiThreadSafety(true);
+            //设置库内部的Json解析器为Gson
+            commonSetting.setJsonLibraryType(JsonLibraryType.Gson);
+            //设置库内部的Json解析器为FastJson
+            commonSetting.setJsonLibraryType(JsonLibraryType.FastJson);
+            //设置库内部的Json解析为自定义的MyJsonFormat
+            commonSetting.setJxFormat(new MyJxFormat());
+        }
+    }
+
+Api改动的区别是:把getJsonLibraryType() & getJsonFormat()等这两个方法合并到setting(CommonSetting commonSetting)方法中了，通过CommonSetting 可以设置数据库能否应对多线程环境，已经它的内部解析器，可以指定自定义的，也可以指定Json或者是FastJson。
 
 
 # 3.详细操作
