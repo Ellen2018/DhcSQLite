@@ -46,9 +46,8 @@
 使用方法:  
 
         ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
-        SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
-        StudentTable studentTable = new StudentTable(sqLiteDatabase);
-
+        NewStudentTable studentTable = new NewStudentTable(zxyLibrary,Student.class, MyAutoDesignOperate.class);
+        
         //获取代理对象
         MyAutoDesignOperate myAutoDesignOperate = studentTable.getAutoDesignOperate();
         
