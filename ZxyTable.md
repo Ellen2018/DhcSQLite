@@ -424,27 +424,27 @@ Father类：
 
         private SQLiteDatabase db;
 
-        public NewStudentTable(SQLiteDatabase db, String tableName) {
-            super(db, tableName);
+        public NewStudentTable(SQLiteDatabase db, String tableName, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(db, tableName, dataClass, autoClass);
         }
 
-        public NewStudentTable(SQLiteDatabase db) {
-            super(db);
+        public NewStudentTable(SQLiteDatabase db, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(db, dataClass, autoClass);
         }
 
-        public NewStudentTable(ZxyLibrary zxyLibrary, String tableName) {
-            super(zxyLibrary, tableName);
+        public NewStudentTable(ZxyLibrary zxyLibrary, String tableName, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(zxyLibrary, tableName, dataClass, autoClass);
         }
-    
-        public NewStudentTable(ZxyLibrary zxyLibrary) {
-            super(zxyLibrary);
+
+        public NewStudentTable(ZxyLibrary zxyLibrary, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+            super(zxyLibrary, dataClass, autoClass);
         }
 
 
         @Override
         protected Object resumeDataStructure(String classFieldName, Class fieldClass, String json) {
             if(classFieldName.equals("fathers")){
-               Type founderSetType = new TypeToken<Father[]>() {}.getType();
+                Type founderSetType = new TypeToken<Father[]>() {}.getType();
                 Father[] fathers = new Gson().fromJson(json, founderSetType);
                 return fathers;
 
@@ -454,7 +454,6 @@ Father类：
 
         /**
          * 库内部公共设置
-         * 
          * @param commonSetting
          */
         @Override
@@ -481,9 +480,8 @@ Api改动的区别是:把getJsonLibraryType() & getJsonFormat()等这两个方�
 
 如何新建ZxyTable对象？ 
 
-    ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1);
-    SQLiteDatabase sqLiteDatabase = zxyLibrary.getWriteDataBase();
-    StudentTable studentTable = new StudentTable(sqLiteDatabase);
+        ZxyLibrary zxyLibrary = new AppLibrary(this, "sqlite_library", 1); 
+        NewStudentTable studentTable = new NewStudentTable(zxyLibrary,Student.class, MyAutoDesignOperate.class);
 
 ## 3.1 创建表
 
