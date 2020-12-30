@@ -155,7 +155,7 @@ public class SqlOperate<T> extends BaseOperate<T> implements Create, Add<T>, Sea
             }
             Default defaultA = field.getAnnotation(Default.class);
             if (defaultA != null) {
-                sqlField.setDefaultValue(reflectHelper.getDefaultAValue(defaultA));
+                sqlField.setDefaultValue(reflectHelper.getDefaultValue(defaultA));
             }
             Check check = field.getAnnotation(Check.class);
             if (check != null) {

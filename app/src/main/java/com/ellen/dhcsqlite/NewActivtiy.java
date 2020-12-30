@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.ellen.dhcsqlite.bean.Father;
 import com.ellen.dhcsqlite.bean.Student;
 import com.ellen.dhcsqlite.sql.AppLibrary;
+import com.ellen.dhcsqlite.sql.MyAutoDesignOperate;
 import com.ellen.dhcsqlite.sql.NewStudentTable;
 import com.ellen.dhcsqlitelibrary.table.operate.create.OnCreateTableCallback;
 import com.ellen.dhcsqlitelibrary.table.impl.ZxyLibrary;
@@ -29,7 +30,8 @@ public class NewActivtiy extends Activity {
 
         sqLiteDatabase.enableWriteAheadLogging();//开启数据库的多线程读写
 
-        NewStudentTable studentTable = new NewStudentTable(zxyLibrary);
+        NewStudentTable studentTable = new NewStudentTable(zxyLibrary,Student.class, MyAutoDesignOperate.class);
+
 
         if (studentTable.isExist()) {
             studentTable.deleteTable();

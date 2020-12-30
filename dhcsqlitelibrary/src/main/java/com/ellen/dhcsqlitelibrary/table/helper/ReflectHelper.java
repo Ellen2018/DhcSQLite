@@ -219,7 +219,7 @@ public class ReflectHelper<T> {
         return sqlType;
     }
 
-    public Object getDefaultAValue(Default d){
+    public Object getDefaultValue(Default d){
         Object obj = null;
         switch (d.defaultValueEnum()){
             case BYTE:

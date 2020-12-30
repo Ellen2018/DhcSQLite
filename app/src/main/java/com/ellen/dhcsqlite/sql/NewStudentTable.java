@@ -18,20 +18,20 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
 
     private SQLiteDatabase db;
 
-    public NewStudentTable(SQLiteDatabase db, String tableName) {
-        super(db, tableName);
+    public NewStudentTable(SQLiteDatabase db, String tableName, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+        super(db, tableName, dataClass, autoClass);
     }
 
-    public NewStudentTable(SQLiteDatabase db) {
-        super(db);
+    public NewStudentTable(SQLiteDatabase db, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+        super(db, dataClass, autoClass);
     }
 
-    public NewStudentTable(ZxyLibrary zxyLibrary, String tableName) {
-        super(zxyLibrary, tableName);
+    public NewStudentTable(ZxyLibrary zxyLibrary, String tableName, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+        super(zxyLibrary, tableName, dataClass, autoClass);
     }
 
-    public NewStudentTable(ZxyLibrary zxyLibrary) {
-        super(zxyLibrary);
+    public NewStudentTable(ZxyLibrary zxyLibrary, Class<Student> dataClass, Class<MyAutoDesignOperate> autoClass) {
+        super(zxyLibrary, dataClass, autoClass);
     }
 
 

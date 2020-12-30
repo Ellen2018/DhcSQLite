@@ -4,6 +4,11 @@ import com.ellen.dhcsqlitelibrary.table.annotation.field.DhcSqlFieldName;
 
 import java.lang.reflect.Field;
 
+/**
+ * 拦截器
+ * @param <T>
+ * @param <E>
+ */
 public abstract class Intercept<T,E> implements TypeSupport<T,E>{
 
     @Override

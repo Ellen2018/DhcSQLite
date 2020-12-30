@@ -30,6 +30,7 @@ import java.util.List;
 public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>, Search<T>, Delete, Update<T>, Table {
 
     private Class<O> autoClass;
+    private Class<T> dataClass;
     private O autoDesignOperate;
 
     private String tableName;
@@ -45,24 +46,37 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
     protected SQLiteDatabase db;
     private ZxyLibrary zxyLibrary = null;
 
-    public ZxyTable(SQLiteDatabase db, String tableName) {
+    public ZxyTable(SQLiteDatabase db, String tableName,Class<T> dataClass,Class<O> autoClass) {
+        this.dataClass = dataClass;
+        this.autoClass = autoClass;
         init(db, tableName);
     }
 
-    public ZxyTable(SQLiteDatabase db) {
+    public ZxyTable(SQLiteDatabase db,Class<T> dataClass,Class<O> autoClass) {
+        this.dataClass = dataClass;
+        this.autoClass = autoClass;
         init(db, null);
     }
 
-    public ZxyTable(ZxyLibrary zxyLibrary, String tableName) {
+    public ZxyTable(ZxyLibrary zxyLibrary, String tableName,Class<T> dataClass,Class<O> autoClass) {
         this.zxyLibrary = zxyLibrary;
+        this.dataClass = dataClass;
+        this.autoClass = autoClass;
         init(zxyLibrary.getWriteDataBase(), tableName);
     }
 
-    public ZxyTable(ZxyLibrary zxyLibrary) {
+    public ZxyTable(ZxyLibrary zxyLibrary,Class<T> dataClass,Class<O> autoClass) {
         this.zxyLibrary = zxyLibrary;
+        this.dataClass = dataClass;
+        this.autoClass = autoClass;
         init(zxyLibrary.getWriteDataBase(), null);
     }
 
+    /**
+     * 不安全的Class获取方式，弃用
+     * @param index
+     * @return
+     */
     private Class getClassByIndex(int index) {
         Class<? extends ZxyTable> zxyTableClass = this.getClass();
         Type typeZxy = zxyTableClass.getGenericSuperclass();
@@ -73,8 +87,6 @@ public class ZxyTable<T, O extends AutoDesignOperate> implements Create, Add<T>,
 
     private void init(SQLiteDatabase db, String tableName) {
         this.db = db;
-        Class<T> dataClass = getClassByIndex(0);
-        this.autoClass = getClassByIndex(1);
         if (tableName == null) {
             this.tableName = dataClass.getSimpleName();
         } else {
