@@ -12,10 +12,10 @@ public class JxHelper implements JxFormat {
         Class gsonClass = null;
         Class fastJsonClass = null;
         try {
-            if (jsonLibraryType == JsonLibraryType.Gson) {
+            if (jsonLibraryType == JsonLibraryType.GSON) {
                 //使用Gson
                 gsonClass = Class.forName("com.google.gson.Gson");
-            } else if (jsonLibraryType == JsonLibraryType.FastJson) {
+            } else if (jsonLibraryType == JsonLibraryType.FAST_JSON) {
                 //使用FastJson
                 fastJsonClass = Class.forName("com.alibaba.fastjson.JSONObject");
             }

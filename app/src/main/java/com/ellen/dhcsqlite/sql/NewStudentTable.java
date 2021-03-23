@@ -57,9 +57,9 @@ public class NewStudentTable extends ZxyTable<Student,MyAutoDesignOperate> {
         //true:设置为多线程模式，false：设置为非多线程模式
         commonSetting.setMultiThreadSafety(true);
         //设置库内部的Json解析器为Gson
-        commonSetting.setJsonLibraryType(JsonLibraryType.Gson);
+        commonSetting.setJsonLibraryType(JsonLibraryType.GSON);
         //设置库内部的Json解析器为FastJson
-        commonSetting.setJsonLibraryType(JsonLibraryType.FastJson);
+        commonSetting.setJsonLibraryType(JsonLibraryType.FAST_JSON);
         //设置库内部的Json解析为自定义的MyJsonFormat
         commonSetting.setJxFormat(new MyJxFormat());
     }

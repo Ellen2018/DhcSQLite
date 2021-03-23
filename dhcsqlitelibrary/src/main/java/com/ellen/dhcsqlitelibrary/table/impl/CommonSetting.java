@@ -15,7 +15,7 @@ public class CommonSetting {
     /**
      * 指定内部Json解析器
      */
-    private JsonLibraryType jsonLibraryType = JsonLibraryType.Gson;
+    private JsonLibraryType jsonLibraryType = JsonLibraryType.GSON;
     /**
      * 是否开启多线程模式
      */
